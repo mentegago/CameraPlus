@@ -511,11 +511,19 @@ namespace CameraPlus
             {
                 if (Config.thirdPerson || Config.use360Camera)
                 {
+                    if (Config.avatarOnly)
+                    {
+                        _cam.cullingMask = 0; //Everything is culled.
+                    }
                     _cam.cullingMask |= 1 << OnlyInThirdPerson;
-                    _cam.cullingMask &= ~(1 << OnlyInFirstPerson);
+                    _cam.cullingMask &= ~(1 << OnlyInFirstPerson); 
                 }
                 else
                 {
+                    if (Config.avatarOnly)
+                    {
+                        _cam.cullingMask = 0; //Everything is culled.
+                    }
                     _cam.cullingMask |= 1 << OnlyInFirstPerson;
                     _cam.cullingMask &= ~(1 << OnlyInThirdPerson);
                 }
