@@ -69,6 +69,7 @@ Edit that file to configure CameraPlus:
 | **transparentWalls**        | Make Walls appear transparent on the camera                                                  |
 | **forceFirstPersonUpRight** | Lock rotation of first person camera on Z axis to keep the camera upright                    |
 | **Avatar**                  | Switch avatar display layer                                                                  |
+| **AvatarOnly**              | Enable transparent avatar overlay (option available in .cfg file only)                       |
 | **debri**                   | Switches between In-Game setting linkage, forced display, and forced off for Notes Debris.   |
 | **movementScriptPath**      | Full path (including file name) to the movement script file to associate with the camera     |
 
@@ -142,3 +143,5 @@ If you plan on adding any new dependencies which are located in the Beat Saber d
 </Reference>
 ...
 ```
+
+Currently, due to limitations with Unity's Graphics library, a shader is applied in the form of a `Material` using green as the Chroma Key to achieve the effect for `AvatarOnly`. It may therefore be necessary to rebundle the shader using the contents [here](CameraPlus/Unity).

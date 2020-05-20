@@ -97,6 +97,10 @@
       <HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\VRUI.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="UnityEngine.AssetBundleModule, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\UnityEngine.AssetBundleModule.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CameraMoverPointer.cs" />
@@ -121,6 +125,9 @@
     <EmbeddedResource Include="manifest.json" />
     <EmbeddedResource Include="Resources\ExampleMovementScript.json" />
   </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\chromakey" />
+  </ItemGroup>  
   <ItemGroup>
     <EmbeddedResource Include="Resources\Resize_DiagLeft.png" />
     <EmbeddedResource Include="Resources\Resize_DiagRight.png" />

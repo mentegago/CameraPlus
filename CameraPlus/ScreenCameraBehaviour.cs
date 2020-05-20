@@ -1,4 +1,7 @@
 ﻿using UnityEngine;
+using System.Collections;
+using System.IO;
+using System.Reflection;
 
 namespace CameraPlus
 {
@@ -10,16 +13,54 @@ namespace CameraPlus
     {
         private Camera _cam;
         private RenderTexture _renderTexture;
+        public static readonly string customShadersPath = Path.GetFullPath("CustomShaders");
+        private Material _transparencyShader = null;
+        private bool _isBackgroundTransparent = false;
+        public bool isBackgroundTransparent
+        {
+            get{
+                return _isBackgroundTransparent;
+            }
+            set{
+                _isBackgroundTransparent = value;
+                if(_isBackgroundTransparent)
+                {
+                    if(_transparencyShader == null)
+                    {
+                        byte[] shaderRaw = Utils.GetResource(Assembly.GetCallingAssembly(), "CameraPlus.Resources.chromakey");
+                        AssetBundle bundle = AssetBundle.LoadFromMemory(shaderRaw);
+                        _transparencyShader = bundle.LoadAsset<Material>("Assets/Materials/Chroma.mat");
+                    }
+                }
+            }
+        }
+        private bool isSnapping = true;
+        IEnumerator takeSnapshot(float waitTime) //useful for debugging
+        {
+            isSnapping = true;
+            yield return new WaitForSeconds(waitTime);
+            Texture2D snap = new Texture2D(_renderTexture.width,_renderTexture.height,TextureFormat.ARGB32, false);
+            snap.ReadPixels(new Rect(0,0,_renderTexture.width,_renderTexture.height),0,0);
+            byte[] bytes;
+            bytes = snap.EncodeToPNG();
+            System.IO.File.WriteAllBytes(string.Format("snap{0}.png",(int)Random.Range(1,100)), bytes );
+            isSnapping = false;
+        } 
 
         public void SetRenderTexture(RenderTexture renderTexture)
         {
             _renderTexture = renderTexture;
+            //StartCoroutine(takeSnapshot(5));
         }
 
         public void SetCameraInfo(Vector2 position, Vector2 size, int layer)
         {
             _cam.pixelRect = new Rect(position, size);
             _cam.depth = layer;
+        }
+        
+        public void changeClearFlag(CameraClearFlags flag){
+            _cam.clearFlags = flag;
         }
 
         public void Awake()
@@ -36,7 +77,8 @@ namespace CameraPlus
         private void OnRenderImage(RenderTexture src, RenderTexture dest)
         {
             if (_renderTexture == null) return;
-            Graphics.Blit(_renderTexture, dest);
+            if (_isBackgroundTransparent) Graphics.Blit(_renderTexture, dest, _transparencyShader);
+            else Graphics.Blit(_renderTexture, dest);
         }
     }
 }

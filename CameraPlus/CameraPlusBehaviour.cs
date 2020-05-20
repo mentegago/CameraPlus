@@ -2,9 +2,7 @@
 using System.IO;
 using System.Linq;
 using System.Collections;
-using System.Collections.Generic;
 using System.Runtime.InteropServices;
-using IPA.Utilities;
 using LogLevel = IPA.Logging.Logger.Level;
 using UnityEngine;
 using UnityEngine.XR;
@@ -266,7 +264,7 @@ namespace CameraPlus
                 var replace = false;
                 if (_camRenderTexture == null)
                 {
-                    _camRenderTexture = new RenderTexture(1, 1, 24);
+                    _camRenderTexture = new RenderTexture(1, 1, 24, RenderTextureFormat.ARGB32);
                     replace = true;
                 }
                 else
@@ -502,6 +500,7 @@ namespace CameraPlus
 
         internal virtual void SetCullingMask()
         {
+            _screenCamera.isBackgroundTransparent = false;
             _cam.cullingMask = Camera.main.cullingMask;
             if (Config.transparentWalls)
                 _cam.cullingMask &= ~(1 << TransparentWallsPatch.WallLayerMask);
@@ -509,21 +508,20 @@ namespace CameraPlus
                 _cam.cullingMask |= (1 << TransparentWallsPatch.WallLayerMask);
             if (Config.avatar)
             {
+                if (Config.avatarOnly)
+                {
+                    _cam.clearFlags = CameraClearFlags.SolidColor;
+                    _screenCamera.isBackgroundTransparent = true; //Enables transparency chroma shader
+                    _cam.backgroundColor = new Color32(0,255,0,0); //Pure green
+                    _cam.cullingMask = 0; //Everything is culled.
+                }
                 if (Config.thirdPerson || Config.use360Camera)
                 {
-                    if (Config.avatarOnly)
-                    {
-                        _cam.cullingMask = 0; //Everything is culled.
-                    }
                     _cam.cullingMask |= 1 << OnlyInThirdPerson;
                     _cam.cullingMask &= ~(1 << OnlyInFirstPerson); 
                 }
                 else
                 {
-                    if (Config.avatarOnly)
-                    {
-                        _cam.cullingMask = 0; //Everything is culled.
-                    }
                     _cam.cullingMask |= 1 << OnlyInFirstPerson;
                     _cam.cullingMask &= ~(1 << OnlyInThirdPerson);
                 }
