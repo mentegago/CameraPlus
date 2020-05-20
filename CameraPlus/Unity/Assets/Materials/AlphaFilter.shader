@@ -1,11 +1,8 @@
-﻿// Upgrade NOTE: replaced 'mul(UNITY_MATRIX_MVP,*)' with 'UnityObjectToClipPos(*)'
-
-Shader "Unlit/Chroma"
+﻿Shader "Unlit/AlphaFilter"
 {
 	Properties
 	{
 		_MainTex ("Texture", 2D) = "defaulttexture" {}
-		_ColorKey ("Chroma Key", Color) = (0,1,0,1)
 	}
 	SubShader
 	{
@@ -38,9 +35,7 @@ Shader "Unlit/Chroma"
 			
 			float4 frag(v2f IN) : COLOR {
 				half4 c = tex2D (_MainTex, IN.uv_MainTex);
-				half3 transparent_diff = c.xyz - _ColorKey.xyz;
-				half transparent_diff_squared = dot(transparent_diff,transparent_diff);
-				if(transparent_diff_squared == 0) discard;
+				if(c.a == 1) discard;
 				return c;
 			}
 			ENDCG

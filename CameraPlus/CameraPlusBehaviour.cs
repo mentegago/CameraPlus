@@ -512,7 +512,7 @@ namespace CameraPlus
                 {
                     _cam.clearFlags = CameraClearFlags.SolidColor;
                     _screenCamera.isBackgroundTransparent = true; //Enables transparency chroma shader
-                    _cam.backgroundColor = new Color32(0,255,0,0); //Pure green
+                    _cam.backgroundColor = new Color32(0,0,0,255);
                     _cam.cullingMask = 0; //Everything is culled.
                 }
                 if (Config.thirdPerson || Config.use360Camera)

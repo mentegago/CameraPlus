@@ -126,7 +126,7 @@
     <EmbeddedResource Include="Resources\ExampleMovementScript.json" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Resources\chromakey" />
+    <EmbeddedResource Include="Resources\alphafilter" />
   </ItemGroup>  
   <ItemGroup>
     <EmbeddedResource Include="Resources\Resize_DiagLeft.png" />

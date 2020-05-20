@@ -6,8 +6,8 @@ Material:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
-  m_Name: Chroma
-  m_Shader: {fileID: 4800000, guid: 573f29982a62ea549bf0ef7281ea53b4, type: 3}
+  m_Name: AlphaFilter
+  m_Shader: {fileID: 4800000, guid: e9f0c06f71777144d907d4e4008dee75, type: 3}
   m_ShaderKeywords: 
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
@@ -73,6 +73,4 @@ Material:
     - _ZWrite: 1
     m_Colors:
     - _Color: {r: 1, g: 1, b: 1, a: 1}
-    - _ColorKey: {r: 0, g: 1, b: 0, a: 1}
-    - _ColorSub: {r: 0, g: 0, b: 0, a: 0}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
