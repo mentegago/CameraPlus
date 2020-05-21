@@ -6,8 +6,10 @@
 	}
 	SubShader
 	{
-		Tags { "RenderType" = "Transparent" "Queue" = "Transparent" }
-		LOD 200
+		Blend SrcAlpha OneMinusSrcAlpha
+		
+		Tags { "RenderType" = "Transparent" "IgnoreProjector"="True" "Queue" = "Transparent" }
+		LOD 100
 		
 		Pass {
 			CGPROGRAM
@@ -35,7 +37,8 @@
 			
 			float4 frag(v2f IN) : COLOR {
 				half4 c = tex2D (_MainTex, IN.uv_MainTex);
-				if(c.a == 1) discard;
+				c.a = (1 - c.a);
+				//if(c.a == 1) discard;
 				return c;
 			}
 			ENDCG

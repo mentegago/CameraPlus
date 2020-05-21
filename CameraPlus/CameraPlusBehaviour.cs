@@ -301,6 +301,7 @@ namespace CameraPlus
                 _camRenderTexture.height = Mathf.Clamp(Mathf.RoundToInt(Config.screenHeight * Config.renderScale), 1, int.MaxValue);
 
                 _camRenderTexture.useDynamicScale = false;
+                _camRenderTexture.autoGenerateMips = false;
                 _camRenderTexture.antiAliasing = Config.antiAliasing;
                 _camRenderTexture.Create();
 
@@ -512,7 +513,7 @@ namespace CameraPlus
                 {
                     _cam.clearFlags = CameraClearFlags.SolidColor;
                     _screenCamera.isBackgroundTransparent = true; //Enables transparency chroma shader
-                    _cam.backgroundColor = new Color32(0,0,0,255);
+                    _cam.backgroundColor = new Color32(0,0,64,255);
                     _cam.cullingMask = 0; //Everything is culled.
                 }
                 if (Config.thirdPerson || Config.use360Camera)

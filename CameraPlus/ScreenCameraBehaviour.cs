@@ -14,6 +14,7 @@ namespace CameraPlus
         private Camera _cam;
         private RenderTexture _renderTexture;
         private static Material _transparencyShader = null; //load once
+        private int _antiAliasing = 1;
         private bool _isBackgroundTransparent = false;
         public bool isBackgroundTransparent
         {
@@ -53,6 +54,8 @@ namespace CameraPlus
         public void SetRenderTexture(RenderTexture renderTexture)
         {
             _renderTexture = renderTexture;
+            _antiAliasing = _renderTexture.antiAliasing;
+            if(_isBackgroundTransparent) _renderTexture.antiAliasing = 1;
             //StartCoroutine(takeSnapshot(5));
         }
 
@@ -66,7 +69,7 @@ namespace CameraPlus
         {
             Logger.Log("Created new screen camera behaviour component!");
             DontDestroyOnLoad(gameObject);
-
+        
             _cam = gameObject.AddComponent<Camera>();
             _cam.clearFlags = CameraClearFlags.Nothing;
             _cam.cullingMask = 0;
