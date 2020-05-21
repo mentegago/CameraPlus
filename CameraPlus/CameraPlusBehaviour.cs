@@ -295,6 +295,16 @@ namespace CameraPlus
                     Config.screenHeight = Screen.height;
                 }
 
+                if(Config.avatarOnly)
+                {
+                    _cam.clearFlags = CameraClearFlags.SolidColor;
+                    _cam.backgroundColor = new Color32(0,0,0,255); //still unable to determine why cam renders with alpha channel at 0
+                    _screenCamera.isBackgroundTransparent = true;
+                }else
+                {
+                    _screenCamera.isBackgroundTransparent = false;
+                }
+
                 _lastRenderUpdate = DateTime.Now;
                 //GetScaledScreenResolution(Config.renderScale, out var scaledWidth, out var scaledHeight);
                 _camRenderTexture.width = Mathf.Clamp(Mathf.RoundToInt(Config.screenWidth * Config.renderScale), 1, int.MaxValue);
@@ -303,6 +313,7 @@ namespace CameraPlus
                 _camRenderTexture.useDynamicScale = false;
                 _camRenderTexture.autoGenerateMips = false;
                 _camRenderTexture.antiAliasing = Config.antiAliasing;
+                if(Config.avatarOnly) _camRenderTexture.antiAliasing = 1; //TODO: find workaround, do AA in shader?
                 _camRenderTexture.Create();
 
                 _cam.targetTexture = _camRenderTexture;
@@ -501,7 +512,6 @@ namespace CameraPlus
 
         internal virtual void SetCullingMask()
         {
-            _screenCamera.isBackgroundTransparent = false;
             _cam.cullingMask = Camera.main.cullingMask;
             if (Config.transparentWalls)
                 _cam.cullingMask &= ~(1 << TransparentWallsPatch.WallLayerMask);
@@ -509,13 +519,7 @@ namespace CameraPlus
                 _cam.cullingMask |= (1 << TransparentWallsPatch.WallLayerMask);
             if (Config.avatar)
             {
-                if (Config.avatarOnly)
-                {
-                    _cam.clearFlags = CameraClearFlags.SolidColor;
-                    _screenCamera.isBackgroundTransparent = true; //Enables transparency chroma shader
-                    _cam.backgroundColor = new Color32(0,0,64,255);
-                    _cam.cullingMask = 0; //Everything is culled.
-                }
+                if (Config.avatarOnly) _cam.cullingMask = 0; //Everything is culled.
                 if (Config.thirdPerson || Config.use360Camera)
                 {
                     _cam.cullingMask |= 1 << OnlyInThirdPerson;
