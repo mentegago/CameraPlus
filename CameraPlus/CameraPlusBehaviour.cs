@@ -293,17 +293,7 @@ namespace CameraPlus
                     Config.screenPosY = 0;
                     Config.screenWidth = Screen.width;
                     Config.screenHeight = Screen.height;
-                }
-
-                if(Config.avatarOnly)
-                {
-                    _cam.clearFlags = CameraClearFlags.SolidColor;
-                    _cam.backgroundColor = new Color32(0,0,0,255); //still unable to determine why cam renders with alpha channel at 0
-                    _screenCamera.isBackgroundTransparent = true;
-                }else
-                {
-                    _screenCamera.isBackgroundTransparent = false;
-                }
+                }                
 
                 _lastRenderUpdate = DateTime.Now;
                 //GetScaledScreenResolution(Config.renderScale, out var scaledWidth, out var scaledHeight);
@@ -519,7 +509,13 @@ namespace CameraPlus
                 _cam.cullingMask |= (1 << TransparentWallsPatch.WallLayerMask);
             if (Config.avatar)
             {
-                if (Config.avatarOnly) _cam.cullingMask = 0; //Everything is culled.
+                if (Config.avatarOnly)
+                {
+                    _cam.clearFlags = CameraClearFlags.SolidColor;
+                    _cam.backgroundColor = new Color32(0,0,0,255);
+                    _screenCamera.isBackgroundTransparent = true;
+                    _cam.cullingMask = 0; //Everything is culled.
+                }
                 if (Config.thirdPerson || Config.use360Camera)
                 {
                     _cam.cullingMask |= 1 << OnlyInThirdPerson;
@@ -537,6 +533,11 @@ namespace CameraPlus
                 _cam.cullingMask &= ~(1 << OnlyInThirdPerson);
                 _cam.cullingMask &= ~(1 << OnlyInFirstPerson);
                 _cam.cullingMask &= ~(1 << AlwaysVisible);
+            }
+            if((!Config.avatar) || (!Config.avatarOnly))
+            {
+                _cam.clearFlags = CameraClearFlags.Skybox;
+                _screenCamera.isBackgroundTransparent = false;
             }
             if (Config.debri!="link")
             {

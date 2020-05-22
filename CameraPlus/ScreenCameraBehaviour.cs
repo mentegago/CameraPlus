@@ -1,6 +1,5 @@
 ﻿using UnityEngine;
 using System.Collections;
-using System.IO;
 using System.Reflection;
 
 namespace CameraPlus
@@ -26,8 +25,10 @@ namespace CameraPlus
                         byte[] shaderRaw = Utils.GetResource(Assembly.GetCallingAssembly(), "CameraPlus.Resources.alphafilter");
                         AssetBundle bundle = AssetBundle.LoadFromMemory(shaderRaw);
                         _transparencyShader = bundle.LoadAsset<Material>("Assets/Materials/alphafilter.mat");
+                        DontDestroyOnLoad(_transparencyShader);
                     }
                 }
+                
             }
         }
         private bool isSnapping = true;
