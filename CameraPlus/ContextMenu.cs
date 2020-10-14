@@ -193,11 +193,12 @@ namespace CameraPlus
                     {
                         profileMode = true;
                     }
+                    /*
                     if (GUI.Button(new Rect(menuPos.x, menuPos.y + 385, 300, 30), new GUIContent("Spawn 38 Cameras")))
                     {
                         parentBehaviour.StartCoroutine(CameraUtilities.Spawn38Cameras());
                         parentBehaviour.CloseContextMenu();
-                    }
+                    }*/
                     if (GUI.Button(new Rect(menuPos.x, menuPos.y + 430, 300, 30), new GUIContent("Close Menu")))
                     {
                         parentBehaviour.CloseContextMenu();

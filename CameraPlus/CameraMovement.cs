@@ -98,31 +98,6 @@ namespace CameraPlus
             public float Delay;
             public bool EaseTransition = true;
         }
-
-        public static T[] FindObjectOfInterfaces<T>() where T : class
-        {
-            List<T> findList = new List<T>();
-
-            foreach (var component in GameObject.FindObjectsOfType<Component>())
-            {
-                var obj = component as T;
-
-                if (obj == null) continue;
-
-                findList.Add(obj);
-            }
-
-            T[] findObjArray = new T[findList.Count];
-            int count = 0;
-
-            foreach (T obj in findList)
-            {
-                findObjArray[count] = obj;
-                count++;
-            }
-            return findObjArray;
-        }
-
         public class CameraData
         {
             public bool ActiveInPauseMenu = true;
@@ -171,15 +146,12 @@ namespace CameraPlus
         {
             if (to.name == "GameCore")
             {
-                /*
-                var gp = FindObjectOfInterfaces<IGamePause>().First();
-                if (gp!=null && dataLoaded && !data.ActiveInPauseMenu)
+                var gp = Resources.FindObjectsOfTypeAll<PauseController>().First();
+                if (gp && dataLoaded && !data.ActiveInPauseMenu)
                 {
-                    Logger.Log($"Pause Register", LogLevel.Notice);
                     gp.didResumeEvent += Resume;
                     gp.didPauseEvent += Pause;
                 }
-                */
             }
         }
 
