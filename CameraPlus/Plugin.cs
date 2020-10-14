@@ -43,10 +43,13 @@ namespace CameraPlus
                 {
                     string gameCfgPath = Path.Combine(Application.persistentDataPath, "settings.cfg");
                     var settings = JsonConvert.DeserializeObject<ConfigEntity>(File.ReadAllText(gameCfgPath));
-                    if (settings.smoothCameraEnabled == 1)
+                    if (settings.version == "1.6.0")
                     {
-                        settings.smoothCameraEnabled = 0;
-                        File.WriteAllText(gameCfgPath, JsonConvert.SerializeObject(settings));
+                        if (settings.smoothCameraEnabled == 1)
+                        {
+                            settings.smoothCameraEnabled = 0;
+                            File.WriteAllText(gameCfgPath, JsonConvert.SerializeObject(settings));
+                        }
                     }
                 }
                 catch (Exception e)

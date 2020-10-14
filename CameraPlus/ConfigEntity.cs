@@ -2,12 +2,12 @@
 {
     class ConfigEntity
     {
-		public string version = "1.5.0";
+		public string version = "1.6.0";
 		public int windowResolutionWidth = 1280;
 		public int windowResolutionHeight = 720;
 		public MainSettingsModelSO.WindowMode windowMode = MainSettingsModelSO.WindowMode.Fullscreen;
-		public float vrResolutionScale = 1f;
-		public float menuVRResolutionScaleMultiplier = 1f;
+		public float vrResolutionScale = 1.0f;
+		public float menuVRResolutionScaleMultiplier = 1.0f;
 		public bool useFixedFoveatedRenderingDuringGameplay = false;
 		public int antiAliasingLevel = 2;
 		public int mirrorGraphicsSettings = 2;
@@ -47,5 +47,7 @@
 		public int maxNumberOfCutSoundEffects = 24;
 		public bool onlineServicesEnabled = false;
 		public bool oculusMRCEnabled = false;
+		public bool openVrThreadedHaptics = false;
+		public int languageSettings = 0;
 	}
 }
