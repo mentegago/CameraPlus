@@ -486,12 +486,19 @@ namespace CameraPlus
                     if (GUI.Button(new Rect(menuPos.x, menuPos.y + 195, 290, 30), new GUIContent("Load Selected")))
                     {
                         var cs = Resources.FindObjectsOfTypeAll<CameraPlusBehaviour>();
-                        foreach (var c in cs)
-                            CameraUtilities.RemoveCamera(c);
+                        if (Plugin.Instance._rootConfig.ProfileLoadCopyMethod)
+                        {
+                            foreach (var c in cs)
+                                CameraUtilities.RemoveCamera(c);
+                        }
                         foreach (var csi in Plugin.Instance.Cameras.Values)
                             Destroy(csi.Instance.gameObject);
                         Plugin.Instance.Cameras.Clear();
-                        CameraProfiles.SetProfile(CameraProfiles.currentlySelected);
+
+                        Plugin.Instance._currentProfile = CameraProfiles.currentlySelected;
+
+                        if(Plugin.Instance._rootConfig.ProfileLoadCopyMethod)
+                            CameraProfiles.SetProfile(CameraProfiles.currentlySelected);
                         CameraUtilities.ReloadCameras();
                     }
                     if (GUI.Button(new Rect(menuPos.x, menuPos.y + 245, 290, 30), new GUIContent(Plugin.Instance._rootConfig.ProfileSceneChange ? "To SceneChange Off" : "To SceneChange On")))

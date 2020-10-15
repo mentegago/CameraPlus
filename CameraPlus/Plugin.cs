@@ -29,13 +29,14 @@ namespace CameraPlus
 
         public RootConfig _rootConfig;
         private ProfileChanger _profileChanger;
+        public string _currentProfile;
 
         [Init]
         public void Init(IPALogger logger)
         {
             Logger.log = logger;
             Logger.Log("Logger prepared", LogLevel.Debug);
-            string path = Path.Combine(UnityGame.UserDataPath, Plugin.Name + ".ini");
+            string path = Path.Combine(UnityGame.UserDataPath, $"{Plugin.Name}.ini");
             _rootConfig = new RootConfig(path);
             if (_rootConfig.ForceDisableSmoothCamera)
             {
@@ -107,8 +108,10 @@ namespace CameraPlus
                     {
                         _profileChanger.ProfileChange(_rootConfig.GameProfile);
                     }
-                    else if (to.name == "MenuCore" && _rootConfig.MenuProfile != "")
+                    else if ((to.name == "MenuCore" ||  to.name == "HealthWarning") && _rootConfig.MenuProfile != "")
+                    {
                         _profileChanger.ProfileChange(_rootConfig.MenuProfile);
+                    }
                 }
 
                 yield return new WaitForSeconds(1.0f);

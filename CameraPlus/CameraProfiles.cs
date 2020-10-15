@@ -149,15 +149,23 @@ namespace CameraPlus
     }
     class ProfileChanger : MonoBehaviour
     {
-        public void ProfileChange(String ProifileName)
+        public void ProfileChange(String ProfileName)
         {
             var cs = Resources.FindObjectsOfTypeAll<CameraPlusBehaviour>();
-            foreach (var c in cs)
-                CameraUtilities.RemoveCamera(c);
+
+            if (Plugin.Instance._rootConfig.ProfileLoadCopyMethod)
+            {
+                foreach (var c in cs)
+                    CameraUtilities.RemoveCamera(c);
+            }
             foreach (var csi in Plugin.Instance.Cameras.Values)
                 Destroy(csi.Instance.gameObject);
             Plugin.Instance.Cameras.Clear();
-            CameraProfiles.SetProfile(ProifileName);
+
+            Plugin.Instance._currentProfile = ProfileName;
+
+            if(Plugin.Instance._rootConfig.ProfileLoadCopyMethod)
+                CameraProfiles.SetProfile(ProfileName);
             CameraUtilities.ReloadCameras();
         }
     }

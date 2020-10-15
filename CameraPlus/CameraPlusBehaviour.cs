@@ -31,7 +31,7 @@ namespace CameraPlus
         protected const int UILayer = 5;
         protected const int OnlyInFirstPerson = 6; //Moved to an empty layer because layer 4 overlapped the floor
         protected const int NotesDebriLayer = 9;
-        protected const int AlwaysVisible = 10; // For BeatSaberCunstomAvatars above v5.0.0
+        protected const int AlwaysVisible = 10;
 
         public bool ThirdPerson {
             get { return _thirdPerson; }

@@ -13,12 +13,15 @@ namespace CameraPlus
     {
         public static bool CameraExists(string cameraName)
         {
-            return Plugin.Instance.Cameras.Keys.Where(c => c == cameraName + ".cfg").Count() > 0;
+            return Plugin.Instance.Cameras.Keys.Where(c => c == $"{cameraName}.cfg").Count() > 0;
         }
         
         public static void AddNewCamera(string cameraName, Config CopyConfig = null, bool meme = false)
         {
             string path = Path.Combine(UnityGame.UserDataPath, Plugin.Name, $"{cameraName}.cfg");
+            if (!Plugin.Instance._rootConfig.ProfileLoadCopyMethod && Plugin.Instance._currentProfile != null)
+                path = Path.Combine(UnityGame.UserDataPath, "." + Plugin.Name.ToLower(), "Profiles",Plugin.Instance._currentProfile, $"{cameraName}.cfg");
+
             if (!File.Exists(path))
             {
                 // Try to copy their old config file into the new camera location
@@ -159,7 +162,11 @@ namespace CameraPlus
             {
                 if (!Directory.Exists(Path.Combine(UnityGame.UserDataPath, Plugin.Name)))
                     Directory.CreateDirectory(Path.Combine(UnityGame.UserDataPath, Plugin.Name));
+
                 string[] files = Directory.GetFiles(Path.Combine(UnityGame.UserDataPath, Plugin.Name));
+                if (!Plugin.Instance._rootConfig.ProfileLoadCopyMethod && Plugin.Instance._currentProfile != null)
+                    files = Directory.GetFiles(Path.Combine(UnityGame.UserDataPath, $".{Plugin.Name.ToLower()}", "Profiles", Plugin.Instance._currentProfile));
+
                 foreach (string filePath in files)
                 {
                     string fileName = Path.GetFileName(filePath);
