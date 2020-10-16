@@ -516,6 +516,11 @@ namespace CameraPlus
                             Plugin.Instance._rootConfig.GameProfile = CameraProfiles.currentlySelected;
                     }
 
+                    if (GUI.Button(new Rect(menuPos.x, menuPos.y + 380, 290, 30), new GUIContent(Plugin.Instance._rootConfig.ProfileLoadCopyMethod ? "To Folder Reference Method" : "To File Copy Method")))
+                    {
+                        Plugin.Instance._rootConfig.ProfileLoadCopyMethod = !Plugin.Instance._rootConfig.ProfileLoadCopyMethod;
+                        Plugin.Instance._rootConfig.Save();
+                    }
 
                     if (GUI.Button(new Rect(menuPos.x, menuPos.y + 430, 290, 30), new GUIContent("Close Profile Menu")))
                         profileMode = false;
