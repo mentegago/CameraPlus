@@ -2,7 +2,10 @@
 using System;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using UnityEngine;
+using IPALogger = IPA.Logging.Logger;
+using LogLevel = IPA.Logging.Logger.Level;
 
 namespace CameraPlus
 {
@@ -24,7 +27,13 @@ namespace CameraPlus
 
         public static void SaveCurrent()
         {
-            DirectoryCopy(mPath, Path.Combine(pPath, "Profiles", GetNextProfileName()), true);
+            string cPath = mPath;
+
+            if (!Plugin.Instance._rootConfig.ProfileLoadCopyMethod)
+            {
+                cPath = Path.Combine(pPath, "Profiles", Plugin.Instance._currentProfile);
+            }
+            DirectoryCopy(cPath, Path.Combine(pPath, "Profiles", GetNextProfileName()), false);
         }
 
         public static void SetNext(string now = null)
@@ -113,10 +122,10 @@ namespace CameraPlus
             DirectoryInfo di = new DirectoryInfo(mPath);
             foreach (FileInfo file in di.GetFiles())
                 file.Delete();
-            foreach (DirectoryInfo dim in di.GetDirectories())
-                dim.Delete(true);
+            //foreach (DirectoryInfo dim in di.GetDirectories())
+            //    dim.Delete(true);
 
-            DirectoryCopy(dir.FullName, mPath, true);
+            DirectoryCopy(dir.FullName, mPath, false);
         }
 
         private static void DirectoryCopy(string sourceDirName, string destDirName, bool copySubDirs)
@@ -147,7 +156,7 @@ namespace CameraPlus
             }
         }
     }
-    class ProfileChanger : MonoBehaviour
+    public class ProfileChanger : MonoBehaviour
     {
         public void ProfileChange(String ProfileName)
         {
@@ -164,7 +173,7 @@ namespace CameraPlus
 
             Plugin.Instance._currentProfile = ProfileName;
 
-            if(Plugin.Instance._rootConfig.ProfileLoadCopyMethod)
+            if (Plugin.Instance._rootConfig.ProfileLoadCopyMethod && ProfileName !=null)
                 CameraProfiles.SetProfile(ProfileName);
             CameraUtilities.ReloadCameras();
         }

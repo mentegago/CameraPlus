@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using UnityEngine;
+﻿using UnityEngine;
 using LogLevel = IPA.Logging.Logger.Level;
+
 namespace CameraPlus
 {
     public class ContextMenu : MonoBehaviour
@@ -482,25 +478,14 @@ namespace CameraPlus
                     if (GUI.Button(new Rect(menuPos.x, menuPos.y + 155, 140, 30), new GUIContent("Save")))
                         CameraProfiles.SaveCurrent();
                     if (GUI.Button(new Rect(menuPos.x + 150, menuPos.y + 155, 140, 30), new GUIContent("Delete")))
-                        CameraProfiles.DeleteProfile(CameraProfiles.currentlySelected);
-                    if (GUI.Button(new Rect(menuPos.x, menuPos.y + 195, 290, 30), new GUIContent("Load Selected")))
                     {
-                        var cs = Resources.FindObjectsOfTypeAll<CameraPlusBehaviour>();
-                        if (Plugin.Instance._rootConfig.ProfileLoadCopyMethod)
-                        {
-                            foreach (var c in cs)
-                                CameraUtilities.RemoveCamera(c);
-                        }
-                        foreach (var csi in Plugin.Instance.Cameras.Values)
-                            Destroy(csi.Instance.gameObject);
-                        Plugin.Instance.Cameras.Clear();
-
-                        Plugin.Instance._currentProfile = CameraProfiles.currentlySelected;
-
-                        if(Plugin.Instance._rootConfig.ProfileLoadCopyMethod)
-                            CameraProfiles.SetProfile(CameraProfiles.currentlySelected);
-                        CameraUtilities.ReloadCameras();
+                        if (!Plugin.Instance._rootConfig.ProfileLoadCopyMethod)
+                            Plugin.Instance._profileChanger.ProfileChange(null);
+                        CameraProfiles.DeleteProfile(CameraProfiles.currentlySelected);
+                        CameraProfiles.TrySetLast();
                     }
+                    if (GUI.Button(new Rect(menuPos.x, menuPos.y + 195, 290, 30), new GUIContent("Load Selected")))
+                        Plugin.Instance._profileChanger.ProfileChange(CameraProfiles.currentlySelected);
                     if (GUI.Button(new Rect(menuPos.x, menuPos.y + 245, 290, 30), new GUIContent(Plugin.Instance._rootConfig.ProfileSceneChange ? "To SceneChange Off" : "To SceneChange On")))
                     {
                         Plugin.Instance._rootConfig.ProfileSceneChange = !Plugin.Instance._rootConfig.ProfileSceneChange;
@@ -515,13 +500,14 @@ namespace CameraPlus
                         if (GUI.Button(new Rect(menuPos.x + 150, menuPos.y + 345, 140, 30), new GUIContent("Set Game Selected")))
                             Plugin.Instance._rootConfig.GameProfile = CameraProfiles.currentlySelected;
                     }
-
-                    if (GUI.Button(new Rect(menuPos.x, menuPos.y + 380, 290, 30), new GUIContent(Plugin.Instance._rootConfig.ProfileLoadCopyMethod ? "To Folder Reference Method" : "To File Copy Method")))
+                    /*
+                    if (GUI.Button(new Rect(menuPos.x, menuPos.y + 390, 290, 30), new GUIContent(Plugin.Instance._rootConfig.ProfileLoadCopyMethod ? "To Folder Reference Method" : "To File Copy Method")))
                     {
                         Plugin.Instance._rootConfig.ProfileLoadCopyMethod = !Plugin.Instance._rootConfig.ProfileLoadCopyMethod;
                         Plugin.Instance._rootConfig.Save();
+                        Plugin.Instance._profileChanger.ProfileChange(null);
                     }
-
+                    */
                     if (GUI.Button(new Rect(menuPos.x, menuPos.y + 430, 290, 30), new GUIContent("Close Profile Menu")))
                         profileMode = false;
                 }

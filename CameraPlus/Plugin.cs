@@ -28,7 +28,7 @@ namespace CameraPlus
         public static string MainCamera => "cameraplus";
 
         public RootConfig _rootConfig;
-        private ProfileChanger _profileChanger;
+        public ProfileChanger _profileChanger;
         public string _currentProfile;
 
         [Init]
