@@ -29,7 +29,7 @@ namespace CameraPlus
         {
             string cPath = mPath;
 
-            if (!Plugin.Instance._rootConfig.ProfileLoadCopyMethod)
+            if (!Plugin.Instance._rootConfig.ProfileLoadCopyMethod && Plugin.Instance._currentProfile != null)
             {
                 cPath = Path.Combine(pPath, "Profiles", Plugin.Instance._currentProfile);
             }
@@ -158,8 +158,12 @@ namespace CameraPlus
     }
     public class ProfileChanger : MonoBehaviour
     {
+        public static string pPath = Path.Combine(UnityGame.UserDataPath, "." + Plugin.Name.ToLower());
         public void ProfileChange(String ProfileName)
         {
+            DirectoryInfo dir = new DirectoryInfo(Path.Combine(pPath, "Profiles", ProfileName));
+            if (!dir.Exists)
+                return;
             var cs = Resources.FindObjectsOfTypeAll<CameraPlusBehaviour>();
 
             if (Plugin.Instance._rootConfig.ProfileLoadCopyMethod)
