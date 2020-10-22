@@ -146,7 +146,7 @@ namespace CameraPlus
         {
             if (to.name == "GameCore")
             {
-                var gp = Resources.FindObjectsOfTypeAll<PauseController>().First();
+                var gp = Resources.FindObjectsOfTypeAll<PauseController>().FirstOrDefault();
                 if (gp && dataLoaded && !data.ActiveInPauseMenu)
                 {
                     gp.didResumeEvent += Resume;

@@ -343,7 +343,7 @@ namespace CameraPlus
             _moverPointer = pointer.gameObject.AddComponent<CameraMoverPointer>();
             _moverPointer.Init(this, _cameraCube);
 
-            if (to.name=="GameCore" && Config.movementScriptPath != String.Empty && Config.movementAudioSync)
+            if (to.name == "GameCore" && Config.movementScriptPath != String.Empty && Config.movementAudioSync)
             {
                 AddMovementScript();
                 Logger.Log($"Add MoveScript \"{Path.GetFileName(Config.movementScriptPath)}\" successfully initialized! {Convert.ToString(_cam.cullingMask, 16)}");
@@ -467,14 +467,20 @@ namespace CameraPlus
                     _cameraMovement = _cam.gameObject.AddComponent<CameraMovement>();
                 else
                     return;
-
-                if (_cameraMovement.Init(this))
+                try
                 {
-                    ThirdPersonPos = Config.Position;
-                    ThirdPersonRot = Config.Rotation;
-                    Config.thirdPerson = true;
-                    ThirdPerson = true;
-                    CreateScreenRenderTexture();
+                    if (_cameraMovement.Init(this))
+                    {
+                        ThirdPersonPos = Config.Position;
+                        ThirdPersonRot = Config.Rotation;
+                        Config.thirdPerson = true;
+                        ThirdPerson = true;
+                        CreateScreenRenderTexture();
+                    }
+                }
+                catch (Exception ex)
+                {
+
                 }
             }
         }

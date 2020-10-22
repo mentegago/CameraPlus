@@ -104,17 +104,18 @@ namespace CameraPlus
             {
                 if (_rootConfig.ProfileSceneChange)
                 {
-                    if (to.name == "GameCore" && _rootConfig.GameProfile != "") 
+                    if (to.name == "GameCore" && _rootConfig.GameProfile != "")
                     {
                         _profileChanger.ProfileChange(_rootConfig.GameProfile);
                     }
-                    else if ((to.name == "MenuCore" ||  to.name == "HealthWarning") && _rootConfig.MenuProfile != "")
+                    else if ((to.name == "MenuCore" || to.name == "HealthWarning") && _rootConfig.MenuProfile != "")
                     {
                         _profileChanger.ProfileChange(_rootConfig.MenuProfile);
                     }
                 }
 
                 yield return new WaitForSeconds(1.0f);
+                while (Camera.main == null) yield return null;
 
                 // Invoke each activeSceneChanged event
                 foreach (var func in ActiveSceneChanged?.GetInvocationList())
