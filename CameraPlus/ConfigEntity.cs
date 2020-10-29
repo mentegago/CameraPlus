@@ -5,7 +5,7 @@
 		public string version = "1.6.0";
 		public int windowResolutionWidth = 1280;
 		public int windowResolutionHeight = 720;
-		public MainSettingsModelSO.WindowMode windowMode = MainSettingsModelSO.WindowMode.Fullscreen;
+		public int windowMode = (int)MainSettingsModelSO.WindowMode.Fullscreen;
 		public float vrResolutionScale = 1.0f;
 		public float menuVRResolutionScaleMultiplier = 1.0f;
 		public bool useFixedFoveatedRenderingDuringGameplay = false;
