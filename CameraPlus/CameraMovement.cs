@@ -7,8 +7,9 @@ using IPA.Utilities;
 using LogLevel = IPA.Logging.Logger.Level;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using CameraPlus.SimpleJSON;
+using Newtonsoft.Json;
 using System.Runtime.InteropServices;
+
 
 namespace CameraPlus
 {
@@ -77,6 +78,8 @@ namespace CameraPlus
         protected Vector3 EndPos = Vector3.zero;
         protected Vector3 StartRot = Vector3.zero;
         protected Vector3 EndRot = Vector3.zero;
+        protected float StartFOV = 0;
+        protected float EndFOV = 0;
         protected bool easeTransition = true;
         protected float movePerc;
         protected int eventID;
@@ -106,33 +109,38 @@ namespace CameraPlus
             public bool LoadFromJson(string jsonString)
             {
                 Movements.Clear();
-                JSONNode node = JSON.Parse(jsonString);
-
-                if (node != null && !node["Movements"].IsNull)
+                MovementScriptJson movementScriptJson;
+                movementScriptJson = JsonConvert.DeserializeObject<MovementScriptJson>(jsonString);
+                if (movementScriptJson != null && movementScriptJson.Jsonmovement !=null)
                 {
-                    if (node["ActiveInPauseMenu"].IsBoolean)
-                        ActiveInPauseMenu = node["ActiveInPauseMenu"].AsBool;
+                    if (movementScriptJson.ActiveInPauseMenu)
+                        ActiveInPauseMenu = movementScriptJson.ActiveInPauseMenu;
 
-                    foreach (JSONObject movement in node["Movements"].AsArray)
+                    foreach (JSONMovement jsonmovement in movementScriptJson.Jsonmovement)
                     {
                         Movements newMovement = new Movements();
-                        var startPos = movement["StartPos"];
-                        var startRot = movement["StartRot"];
-                        newMovement.StartPos = new Vector3(startPos["x"].AsFloat, startPos["y"].AsFloat, startPos["z"].AsFloat);
-                        newMovement.StartRot = new Vector3(startRot["x"].AsFloat, startRot["y"].AsFloat, startRot["z"].AsFloat);
-                        newMovement.StartFOV = movement["StartFOV"].AsFloat;
+                        StartPos startPos = jsonmovement.startPos;
+                        StartRot startRot = jsonmovement.startRot;
+                        if (startPos.x != null) newMovement.StartPos = new Vector3(float.Parse(startPos.x), float.Parse(startPos.y), float.Parse(startPos.z));
+                        if (startRot.x != null) newMovement.StartRot = new Vector3(float.Parse(startRot.x), float.Parse(startRot.y), float.Parse(startRot.z));
+                        if (startPos.FOV != null)
+                            newMovement.StartFOV = float.Parse(startPos.FOV);
+                        else
+                            newMovement.StartFOV = 0;
+                        EndPos endPos = jsonmovement.endPos;
+                        EndRot endRot = jsonmovement.endRot;
+                        if (endPos.x != null) newMovement.EndPos = new Vector3(float.Parse(endPos.x), float.Parse(endPos.y), float.Parse(endPos.z));
+                        if (endRot.x != null) newMovement.EndRot = new Vector3(float.Parse(endRot.x), float.Parse(endRot.y), float.Parse(endRot.z));
+                        if (endPos.FOV != null)
+                            newMovement.EndFOV = float.Parse(endPos.FOV);
+                        else
+                            newMovement.EndFOV = 0;
 
-                        var endPos = movement["EndPos"];
-                        var endRot = movement["EndRot"];
-                        newMovement.EndPos = new Vector3(endPos["x"].AsFloat, endPos["y"].AsFloat, endPos["z"].AsFloat);
-                        newMovement.EndRot = new Vector3(endRot["x"].AsFloat, endRot["y"].AsFloat, endRot["z"].AsFloat);
-                        newMovement.EndFOV = movement["EndFOV"].AsFloat;
-
-                        newMovement.Delay = movement["Delay"].AsFloat;
-                        newMovement.Duration = Mathf.Clamp(movement["Duration"].AsFloat, 0.01f, float.MaxValue); // Make sure duration is at least 0.01 seconds, to avoid a divide by zero error
+                        if (jsonmovement.Delay != null) newMovement.Delay = float.Parse(jsonmovement.Delay);
+                        if (jsonmovement.Duration != null) newMovement.Duration = Mathf.Clamp(float.Parse(jsonmovement.Duration), 0.01f, float.MaxValue); // Make sure duration is at least 0.01 seconds, to avoid a divide by zero error
                         
-                        if (movement["EaseTransition"].IsBoolean)
-                            newMovement.EaseTransition = movement["EaseTransition"].AsBool;
+                        if (jsonmovement.EaseTransition)
+                            newMovement.EaseTransition = jsonmovement.EaseTransition;
 
                         Movements.Add(newMovement);
                     }
@@ -182,6 +190,8 @@ namespace CameraPlus
             }
             _cameraPlus.ThirdPersonPos = LerpVector3(StartPos, EndPos, Ease(movePerc));
             _cameraPlus.ThirdPersonRot = LerpVector3(StartRot, EndRot, Ease(movePerc));
+            _cameraPlus.FOV(Mathf.Lerp(StartFOV,EndFOV,Ease(movePerc)));
+            Logger.Log($"{Ease(movePerc)},{StartFOV},{EndFOV}", LogLevel.Notice);
         }
 
         protected Vector3 LerpVector3(Vector3 from, Vector3 to, float percent)
@@ -279,6 +289,15 @@ namespace CameraPlus
 
             EndRot = new Vector3(data.Movements[eventID].EndRot.x, data.Movements[eventID].EndRot.y, data.Movements[eventID].EndRot.z);
             EndPos = new Vector3(data.Movements[eventID].EndPos.x, data.Movements[eventID].EndPos.y, data.Movements[eventID].EndPos.z);
+
+            if (data.Movements[eventID].StartFOV != 0)
+                StartFOV = data.Movements[eventID].StartFOV;
+            else
+                StartFOV = _cameraPlus.Config.fov;
+            if (data.Movements[eventID].EndFOV != 0)
+                EndFOV = data.Movements[eventID].EndFOV;
+            else
+                EndFOV = _cameraPlus.Config.fov;
 
             FindShortestDelta(ref StartRot, ref EndRot);
 

@@ -467,20 +467,13 @@ namespace CameraPlus
                     _cameraMovement = _cam.gameObject.AddComponent<CameraMovement>();
                 else
                     return;
-                try
+                if (_cameraMovement.Init(this))
                 {
-                    if (_cameraMovement.Init(this))
-                    {
-                        ThirdPersonPos = Config.Position;
-                        ThirdPersonRot = Config.Rotation;
-                        Config.thirdPerson = true;
-                        ThirdPerson = true;
-                        CreateScreenRenderTexture();
-                    }
-                }
-                catch (Exception ex)
-                {
-
+                    ThirdPersonPos = Config.Position;
+                    ThirdPersonRot = Config.Rotation;
+                    Config.thirdPerson = true;
+                    ThirdPerson = true;
+                    CreateScreenRenderTexture();
                 }
             }
         }
@@ -517,6 +510,11 @@ namespace CameraPlus
         {
             if (_cam == null) return;
             _cam.fieldOfView = Config.fov;
+        }
+
+        internal virtual void FOV(float FOV)
+        {
+            _cam.fieldOfView = FOV;
         }
 
         internal virtual void SetCullingMask()
