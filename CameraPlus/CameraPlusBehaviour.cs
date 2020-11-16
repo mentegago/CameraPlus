@@ -113,7 +113,7 @@ namespace CameraPlus
 
             Config = config;
             _isMainCamera = Path.GetFileName(Config.FilePath) == $"{Plugin.MainCamera}.cfg";
-            _contextMenuEnabled = !Environment.CommandLine.Contains("fpfc");
+            _contextMenuEnabled = Array.IndexOf(Environment.GetCommandLineArgs(), "fpfc") == -1;
 
             StartCoroutine(DelayedInit());
         }
