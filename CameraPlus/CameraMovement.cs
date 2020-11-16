@@ -30,9 +30,6 @@ namespace CameraPlus
         {
             if (to.name == "GameCore")
             {
-                //IBeatmapLevel level;
-                //Logger.Log($"SongID : {level.levelID}", LogLevel.Notice);
-
                 //var standardLevelSceneSetupDataSO = Resources.FindObjectsOfTypeAll<StandardLevelScenesTransitionSetupDataSO>().FirstOrDefault();
                 //if(standardLevelSceneSetupDataSO)
                 //{
@@ -109,12 +106,19 @@ namespace CameraPlus
             public bool LoadFromJson(string jsonString)
             {
                 Movements.Clear();
-                MovementScriptJson movementScriptJson;
-                movementScriptJson = JsonConvert.DeserializeObject<MovementScriptJson>(jsonString);
+                MovementScriptJson movementScriptJson=null;
+                try
+                {
+                    movementScriptJson = JsonConvert.DeserializeObject<MovementScriptJson>(jsonString);
+                }
+                catch (Exception ex)
+                {
+                    Logger.Log($"JSON file syntax error. {ex.Message}", LogLevel.Error);
+                }
                 if (movementScriptJson != null && movementScriptJson.Jsonmovement !=null)
                 {
-                    if (movementScriptJson.ActiveInPauseMenu)
-                        ActiveInPauseMenu = movementScriptJson.ActiveInPauseMenu;
+                    if (movementScriptJson.ActiveInPauseMenu != null)
+                        ActiveInPauseMenu = System.Convert.ToBoolean(movementScriptJson.ActiveInPauseMenu);
 
                     foreach (JSONMovement jsonmovement in movementScriptJson.Jsonmovement)
                     {
@@ -139,8 +143,8 @@ namespace CameraPlus
                         if (jsonmovement.Delay != null) newMovement.Delay = float.Parse(jsonmovement.Delay);
                         if (jsonmovement.Duration != null) newMovement.Duration = Mathf.Clamp(float.Parse(jsonmovement.Duration), 0.01f, float.MaxValue); // Make sure duration is at least 0.01 seconds, to avoid a divide by zero error
                         
-                        if (jsonmovement.EaseTransition)
-                            newMovement.EaseTransition = jsonmovement.EaseTransition;
+                        if (jsonmovement.EaseTransition != null)
+                            newMovement.EaseTransition = System.Convert.ToBoolean(jsonmovement.EaseTransition);
 
                         Movements.Add(newMovement);
                     }
@@ -191,7 +195,6 @@ namespace CameraPlus
             _cameraPlus.ThirdPersonPos = LerpVector3(StartPos, EndPos, Ease(movePerc));
             _cameraPlus.ThirdPersonRot = LerpVector3(StartRot, EndRot, Ease(movePerc));
             _cameraPlus.FOV(Mathf.Lerp(StartFOV,EndFOV,Ease(movePerc)));
-            Logger.Log($"{Ease(movePerc)},{StartFOV},{EndFOV}", LogLevel.Notice);
         }
 
         protected Vector3 LerpVector3(Vector3 from, Vector3 to, float percent)

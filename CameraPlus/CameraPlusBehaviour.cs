@@ -57,6 +57,7 @@ namespace CameraPlus
         protected bool _thirdPerson;
         public Vector3 ThirdPersonPos;
         public Vector3 ThirdPersonRot;
+        public Vector3 PlayerOffset;
         public Config Config;
 
         protected RenderTexture _camRenderTexture;
@@ -348,6 +349,8 @@ namespace CameraPlus
                 AddMovementScript();
                 Logger.Log($"Add MoveScript \"{Path.GetFileName(Config.movementScriptPath)}\" successfully initialized! {Convert.ToString(_cam.cullingMask, 16)}");
             }
+
+            //multiplayerConnectedPlayerSpectatingSpot = Resources.FindObjectsOfTypeAll<MultiplayerConnectedPlayerSpectatingSpot>().FirstOrDefault();
         }
 
         [DllImport("user32.dll")]
@@ -385,6 +388,8 @@ namespace CameraPlus
                 }
             }
             HandleMouseEvents();
+            //PlayerOffset = multiplayerConnectedPlayerSpectatingSpot.transform.position;
+            //Logger.Log($"Player Offset : {PlayerOffset.x},{PlayerOffset.y},{PlayerOffset.z}", LogLevel.Notice);
         }
 
         protected virtual void LateUpdate()
@@ -424,7 +429,7 @@ namespace CameraPlus
         private void HandleThirdPerson360()
         {
             if (!_beatLineManager || !Config.use360Camera || !_environmentSpawnRotation) return;
-
+            
             float b;
             if (_beatLineManager.isMidRotationValid)
             {
@@ -452,7 +457,7 @@ namespace CameraPlus
             ThirdPersonPos = new Vector3(ThirdPersonPos.x, Config.cam360UpOffset, ThirdPersonPos.z);
         }
 
-        protected void AddMovementScript()
+        public void AddMovementScript()
         {
             if (Config.movementScriptPath != String.Empty)
             {
@@ -467,6 +472,22 @@ namespace CameraPlus
                     _cameraMovement = _cam.gameObject.AddComponent<CameraMovement>();
                 else
                     return;
+                if (_cameraMovement.Init(this))
+                {
+                    ThirdPersonPos = Config.Position;
+                    ThirdPersonRot = Config.Rotation;
+                    Config.thirdPerson = true;
+                    ThirdPerson = true;
+                    CreateScreenRenderTexture();
+                }
+            }
+        }
+        public void ClearMovementScript()
+        {
+            if (Config.movementScriptPath == String.Empty)
+            {
+                if (_cameraMovement)
+                    _cameraMovement.Shutdown();
                 if (_cameraMovement.Init(this))
                 {
                     ThirdPersonPos = Config.Position;

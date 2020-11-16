@@ -67,14 +67,14 @@ namespace CameraPlus
         [JsonProperty("Delay")]
         public string Delay { get; set; }
         [JsonProperty("EaseTransition")]
-        public bool EaseTransition { get; set; }
+        public string EaseTransition { get; set; }
     }
 
     [JsonObject("MovementScriptJson")]
     public class MovementScriptJson
     {
         [JsonProperty("ActiveInPauseMenu")]
-        public bool ActiveInPauseMenu { get; set; }
+        public string ActiveInPauseMenu { get; set; }
         [JsonProperty("Movements")]
         public JSONMovement[] Jsonmovement { get; set; }
     }

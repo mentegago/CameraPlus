@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using LogLevel = IPA.Logging.Logger.Level;
 
 namespace CameraPlus
@@ -18,28 +19,32 @@ namespace CameraPlus
         internal Vector2 mousePosition;
         internal bool showMenu;
         internal bool layoutMode = false;
+        internal bool scriptMode = false;
         internal bool profileMode = false;
         internal float amountMove = 0.1f;
         internal float amountRot = 0.1f;
         internal CameraPlusBehaviour parentBehaviour;
+        internal string[] scriptName;
+        internal int scriptPage;
         public void Awake()
         {
         }
         public void EnableMenu(Vector2 mousePos, CameraPlusBehaviour parentBehaviour)
         {
             this.enabled = true;
-     //       Console.WriteLine("Enable Menu");
             mousePosition = mousePos;
             showMenu = true;
             this.parentBehaviour = parentBehaviour;
             layoutMode = false;
+            scriptMode = false;
             profileMode = false;
+            scriptName = null;
+            scriptPage = 0;
         }
         public void DisableMenu()
         {
             if (!this) return;
             this.enabled = false;
-     //       Console.WriteLine("Disable Menu");
             showMenu = false;
         }
         void OnGUI()
@@ -61,7 +66,7 @@ namespace CameraPlus
                 GUI.Box(new Rect(menuPos.x - 5, menuPos.y, 310, 470), "CameraPlus" + parentBehaviour.name);
                 GUI.Box(new Rect(menuPos.x - 5, menuPos.y, 310, 470), "CameraPlus" + parentBehaviour.name);
                 GUI.Box(new Rect(menuPos.x - 5, menuPos.y, 310, 470), "CameraPlus" + parentBehaviour.name);
-                if (!layoutMode && !profileMode)
+                if (!layoutMode && !profileMode && !scriptMode)
                 {
                     if (GUI.Button(new Rect(menuPos.x, menuPos.y + 25, 120, 30), new GUIContent("Add New Camera")))
                     {
@@ -178,16 +183,14 @@ namespace CameraPlus
                         parentBehaviour.CloseContextMenu();
                         parentBehaviour.Config.Save();
                     }
-                    if (GUI.Button(new Rect(menuPos.x+130, menuPos.y + 225, 170, 30), new GUIContent(parentBehaviour.Config.movementAudioSync ? "ScriptSyncUnity" : "ScriptSyncAudio")))
-                    {
-                        parentBehaviour.Config.movementAudioSync = !parentBehaviour.Config.movementAudioSync;
-                        parentBehaviour.SetCullingMask();
-                        parentBehaviour.CloseContextMenu();
-                        parentBehaviour.Config.Save();
-                    }
                     if (GUI.Button(new Rect(menuPos.x, menuPos.y + 265, 300, 30), new GUIContent("Profile Saver")))
                     {
                         profileMode = true;
+                    }
+                    if (GUI.Button(new Rect(menuPos.x, menuPos.y + 305, 300, 30), new GUIContent("MovementScript")))
+                    {
+                        scriptMode = true;
+                        scriptName = CameraUtilities.MovementScriptList();
                     }
                     /*
                     if (GUI.Button(new Rect(menuPos.x, menuPos.y + 385, 300, 30), new GUIContent("Spawn 38 Cameras")))
@@ -460,12 +463,51 @@ namespace CameraPlus
                         parentBehaviour.Config.Save();
                     }
                     //Close
-                    if (GUI.Button(new Rect(menuPos.x, menuPos.y + 430, 290, 30), new GUIContent("Close Layout Menu")))
+                    if (GUI.Button(new Rect(menuPos.x, menuPos.y + 430, 300, 30), new GUIContent("Close Layout Menu")))
                     {
                         layoutMode = false;
                     }
+                }
+                else if (scriptMode)
+                {
+                    if (GUI.Button(new Rect(menuPos.x, menuPos.y + 25, 300, 30), new GUIContent(parentBehaviour.Config.movementAudioSync ? "to Movementscript with UnityTimer" : "to Movementscript Sync Audio")))
+                    {
+                        parentBehaviour.Config.movementAudioSync = !parentBehaviour.Config.movementAudioSync;
+                        parentBehaviour.SetCullingMask();
+                        parentBehaviour.Config.Save();
+                    }
 
-
+                    if (GUI.Button(new Rect(menuPos.x, menuPos.y + 105, 80, 30), new GUIContent("<")))
+                    {
+                        if(scriptPage > 0) scriptPage--;
+                    }
+                    GUI.Box(new Rect(menuPos.x + 80, menuPos.y + 105, 140, 30), new GUIContent($"{scriptPage + 1} / {Math.Ceiling(Decimal.Parse(scriptName.Length.ToString()) / 5)}"));
+                    if (GUI.Button(new Rect(menuPos.x +220, menuPos.y + 105, 80, 30), new GUIContent(">")))
+                    {
+                        if (scriptPage < Math.Ceiling(Decimal.Parse(scriptName.Length.ToString()) / 5) - 1) scriptPage++;
+                    }
+                    for (int i = scriptPage * 5 ; i < scriptPage * 5 + 5; i++) {
+                        if (i < scriptName.Length)
+                        {
+                            if (GUI.Button(new Rect(menuPos.x, menuPos.y + (i - scriptPage * 5) * 35 + 145, 300, 30),  new GUIContent(scriptName[i])))
+                            {
+                                parentBehaviour.Config.movementScriptPath = scriptName[i];
+                                parentBehaviour.Config.Save();
+                                parentBehaviour.AddMovementScript();
+                            }
+                        }
+                    }
+                    if (GUI.Button(new Rect(menuPos.x, menuPos.y + 330, 300, 30), new GUIContent("Movement Off")))
+                    {
+                        parentBehaviour.Config.movementScriptPath = String.Empty;
+                        parentBehaviour.Config.Save();
+                        parentBehaviour.ClearMovementScript();
+                    }
+                    //Close
+                    if (GUI.Button(new Rect(menuPos.x, menuPos.y + 430, 300, 30), new GUIContent("Close MovementScript Menu")))
+                    {
+                        scriptMode = false;
+                    }
                 }
                 else if (profileMode)
                 {
@@ -508,7 +550,7 @@ namespace CameraPlus
                         Plugin.Instance._profileChanger.ProfileChange(null);
                     }
                     */
-                    if (GUI.Button(new Rect(menuPos.x, menuPos.y + 430, 290, 30), new GUIContent("Close Profile Menu")))
+                    if (GUI.Button(new Rect(menuPos.x, menuPos.y + 430, 300, 30), new GUIContent("Close Profile Menu")))
                         profileMode = false;
                 }
 

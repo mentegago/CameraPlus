@@ -184,6 +184,15 @@ namespace CameraPlus
             }
         }
 
+        public static string[] MovementScriptList()
+        {
+            string[] spath = Directory.GetFiles(Path.Combine(UnityGame.UserDataPath, Plugin.Name, "Scripts"), "*.json");
+            string[] scriptList = new string[spath.Length];
+            for(int i = 0; i < spath.Length; i++)
+                scriptList[i] = Path.GetFileName(spath[i]);
+            return scriptList;
+        }
+
         public static IEnumerator Spawn38Cameras()
         {
             lock (Plugin.Instance.Cameras)
