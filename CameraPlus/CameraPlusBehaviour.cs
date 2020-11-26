@@ -507,7 +507,7 @@ namespace CameraPlus
                 if (SceneManager.GetActiveScene().name != "GameCore") return;
 
                 int count = 0;
-                foreach (AvatarVisualController PlayerPlace in Resources.FindObjectsOfTypeAll<AvatarVisualController>())
+                foreach (MultiplayerConnectedPlayerFacade PlayerPlace in Resources.FindObjectsOfTypeAll<MultiplayerConnectedPlayerFacade>())
                 {
                     if (Config.MultiPlayerNumber == count && PlayerPlace.isActiveAndEnabled)
                     {
