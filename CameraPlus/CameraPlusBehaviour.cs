@@ -57,7 +57,8 @@ namespace CameraPlus
         protected bool _thirdPerson;
         public Vector3 ThirdPersonPos;
         public Vector3 ThirdPersonRot;
-        public Vector3 PlayerOffset;
+        public Vector3 OffsetPosition;
+        public Vector3 OffsetAngle;
         public Config Config;
 
         protected RenderTexture _camRenderTexture;
@@ -113,7 +114,7 @@ namespace CameraPlus
 
             Config = config;
             _isMainCamera = Path.GetFileName(Config.FilePath) == $"{Plugin.MainCamera}.cfg";
-            _contextMenuEnabled = !Environment.CommandLine.Contains("fpfc");
+            _contextMenuEnabled = Array.IndexOf(Environment.GetCommandLineArgs(), "fpfc") == -1;
 
             StartCoroutine(DelayedInit());
         }
@@ -349,8 +350,6 @@ namespace CameraPlus
                 AddMovementScript();
                 Logger.Log($"Add MoveScript \"{Path.GetFileName(Config.movementScriptPath)}\" successfully initialized! {Convert.ToString(_cam.cullingMask, 16)}");
             }
-
-            //multiplayerConnectedPlayerSpectatingSpot = Resources.FindObjectsOfTypeAll<MultiplayerConnectedPlayerSpectatingSpot>().FirstOrDefault();
         }
 
         [DllImport("user32.dll")]
@@ -396,16 +395,37 @@ namespace CameraPlus
         {
             try
             {
+                OffsetPosition = new Vector3();
+                OffsetAngle = new Vector3();
+
                 var camera = _mainCamera.transform;
+
+                HandleMultiPlayerLobby();
+                HandleMultiPlayerGame();
 
                 if (ThirdPerson)
                 {
-
                     HandleThirdPerson360();
+
                     transform.position = ThirdPersonPos;
                     transform.eulerAngles = ThirdPersonRot;
                     _cameraCube.position = ThirdPersonPos;
                     _cameraCube.eulerAngles = ThirdPersonRot;
+
+                    if (OffsetPosition != Vector3.zero && OffsetAngle != Vector3.zero)
+                    {
+                        transform.position = ThirdPersonPos + OffsetPosition;
+                        transform.eulerAngles = ThirdPersonRot + OffsetAngle;
+                        _cameraCube.position = ThirdPersonPos + OffsetPosition;
+                        _cameraCube.eulerAngles = ThirdPersonRot + OffsetAngle;
+
+                        Quaternion angle = Quaternion.AngleAxis(OffsetAngle.y, Vector3.up);
+                        transform.position -= OffsetPosition;
+                        transform.position = angle * transform.position;
+                        transform.position += OffsetPosition;
+                        _cameraCube.position = transform.position;
+                    }
+
                     return;
                 }
                 //     Console.WriteLine(Config.FirstPersonPositionOffset.ToString());
@@ -423,7 +443,7 @@ namespace CameraPlus
                     transform.rotation = rot * Quaternion.Euler(0, 0, -(rot.eulerAngles.z));
                 }
             }
-            catch { }
+            catch{ }
         }
 
         private void HandleThirdPerson360()
@@ -457,6 +477,52 @@ namespace CameraPlus
             ThirdPersonPos = new Vector3(ThirdPersonPos.x, Config.cam360UpOffset, ThirdPersonPos.z);
         }
 
+        private void HandleMultiPlayerLobby()
+        {
+            try
+            {
+                int count = 0;
+                MultiplayerLobbyController LobbyContoroller = Resources.FindObjectsOfTypeAll<MultiplayerLobbyController>().FirstOrDefault();
+                if (LobbyContoroller == null || !LobbyContoroller.isActiveAndEnabled) return;
+
+                foreach (MultiplayerLobbyAvatarPlace LobbyAvatarPlace in Resources.FindObjectsOfTypeAll<MultiplayerLobbyAvatarPlace>())
+                {
+                    count++;
+                    if (Config.MultiPlayerNumber == count && LobbyAvatarPlace.isActiveAndEnabled)
+                    {
+                        OffsetPosition = LobbyAvatarPlace.transform.position;
+                        OffsetAngle = LobbyAvatarPlace.transform.eulerAngles;
+                        break;
+                    }
+                }
+            }catch(Exception ex)
+            {
+                Logger.Log($"HandleMultiPlayerLobby Error {ex.Message}", LogLevel.Notice);
+            }
+        }
+        private void HandleMultiPlayerGame()
+        {
+            try
+            {
+                if (SceneManager.GetActiveScene().name != "GameCore") return;
+
+                int count = 0;
+                foreach (AvatarVisualController PlayerPlace in Resources.FindObjectsOfTypeAll<AvatarVisualController>())
+                {
+                    if (Config.MultiPlayerNumber == count && PlayerPlace.isActiveAndEnabled)
+                    {
+                        OffsetPosition = PlayerPlace.transform.position;
+                        OffsetAngle = PlayerPlace.transform.eulerAngles;
+                        break;
+                    }
+                    count++;
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.Log($"HandleMultiPlayerGame Error {ex.Message}", LogLevel.Notice);
+            }
+        }
         public void AddMovementScript()
         {
             if (Config.movementScriptPath != String.Empty)

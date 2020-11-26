@@ -218,29 +218,37 @@ namespace CameraPlus
                         parentBehaviour.CloseContextMenu();
                     }
                     //Layer
-                    GUI.Box(new Rect(menuPos.x, menuPos.y + 60, 140, 55), "Layer: " + parentBehaviour.Config.layer);
-                    if (GUI.Button(new Rect(menuPos.x+5, menuPos.y + 80, 60, 30), new GUIContent("-")))
+                    GUI.Box(new Rect(menuPos.x, menuPos.y + 60, 100, 55), "Layer: " + parentBehaviour.Config.layer);
+                    if (GUI.Button(new Rect(menuPos.x+5, menuPos.y + 80, 40, 30), new GUIContent("-")))
                     {
                         parentBehaviour.Config.layer--;
                         parentBehaviour.CreateScreenRenderTexture();
                         parentBehaviour.Config.Save();
                     }
-                    if (GUI.Button(new Rect(menuPos.x + 75, menuPos.y + 80, 60, 30), new GUIContent("+")))
+                    if (GUI.Button(new Rect(menuPos.x + 55, menuPos.y + 80, 40, 30), new GUIContent("+")))
                     {
                         parentBehaviour.Config.layer++;
                         parentBehaviour.CreateScreenRenderTexture();
                         parentBehaviour.Config.Save();
                     }
+                    //MultiPlayerOffset
+                    GUI.Box(new Rect(menuPos.x + 100, menuPos.y + 60, 100, 55), "Multiplay Offset");
+                    if (GUI.Button(new Rect(menuPos.x + 105, menuPos.y + 80, 90, 30), new GUIContent(parentBehaviour.Config.MultiPlayerNumber == 4 ? "Self Camera" : $"Player {parentBehaviour.Config.MultiPlayerNumber + 2}")))
+                    {
+                        parentBehaviour.Config.MultiPlayerNumber++;
+                        if (parentBehaviour.Config.MultiPlayerNumber >= 5) parentBehaviour.Config.MultiPlayerNumber = 0;
+                        parentBehaviour.Config.Save();
+                    }
                     //FOV
-                    GUI.Box(new Rect(menuPos.x+155, menuPos.y + 60, 140, 55), "FOV: " + parentBehaviour.Config.fov);
-                    if (GUI.Button(new Rect(menuPos.x+160, menuPos.y + 80, 60, 30), new GUIContent("-")))
+                    GUI.Box(new Rect(menuPos.x+200, menuPos.y + 60, 100, 55), "FOV: " + parentBehaviour.Config.fov);
+                    if (GUI.Button(new Rect(menuPos.x+205, menuPos.y + 80, 40, 30), new GUIContent("-")))
                     {
                         parentBehaviour.Config.fov--;
                         parentBehaviour.SetFOV();
                         parentBehaviour.CreateScreenRenderTexture();
                         parentBehaviour.Config.Save();
                     }
-                    if (GUI.Button(new Rect(menuPos.x + 230, menuPos.y + 80, 60, 30), new GUIContent("+")))
+                    if (GUI.Button(new Rect(menuPos.x + 255, menuPos.y + 80, 40, 30), new GUIContent("+")))
                     {
                         parentBehaviour.Config.fov++;
                         parentBehaviour.SetFOV();

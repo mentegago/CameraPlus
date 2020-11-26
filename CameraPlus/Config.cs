@@ -48,6 +48,8 @@ namespace CameraPlus
         public int screenPosX;
         public int screenPosY;
 
+        public int MultiPlayerNumber;
+
         public int layer = -1000;
 
         public bool fitToCanvas = false;
