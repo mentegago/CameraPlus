@@ -107,6 +107,7 @@ namespace CameraPlus
         public static bool anyInstanceBusy = false;
         private static bool _contextMenuEnabled = true;
 
+        private MultiplayerPlayersManager playersManager=null;
         public virtual void Init(Config config)
         {
             DontDestroyOnLoad(gameObject);
@@ -212,11 +213,16 @@ namespace CameraPlus
             CameraMovement.CreateExampleScript();
 
             Plugin.Instance.ActiveSceneChanged += SceneManager_activeSceneChanged;
-
             //      FirstPersonOffset = Config.FirstPersonPositionOffset;
             //       FirstPersonRotationOffset = Config.FirstPersonRotationOffset;
             SceneManager_activeSceneChanged(new Scene(), new Scene());
             Logger.Log($"Camera \"{Path.GetFileName(Config.FilePath)}\" successfully initialized! {Convert.ToString(_cam.cullingMask,16)}");
+
+            if (!Plugin.Instance.MultiplayerSessionInit)
+            {
+                Plugin.Instance.MultiplayerSessionInit = true;
+                MultiplayerSession.Init();
+            }
         }
 
         protected virtual void OnDestroy()
@@ -495,32 +501,35 @@ namespace CameraPlus
                         break;
                     }
                 }
-            }catch(Exception ex)
+            }
+            catch(Exception ex)
             {
-                Logger.Log($"HandleMultiPlayerLobby Error {ex.Message}", LogLevel.Notice);
+                Logger.Log($"HandleMultiPlayerLobby Error {ex.Message}", LogLevel.Error);
             }
         }
         private void HandleMultiPlayerGame()
         {
             try
             {
-                if (SceneManager.GetActiveScene().name != "GameCore") return;
-
-                int count = 0;
-                foreach (MultiplayerConnectedPlayerFacade PlayerPlace in Resources.FindObjectsOfTypeAll<MultiplayerConnectedPlayerFacade>())
+                if (SceneManager.GetActiveScene().name == "GameCore" && MultiplayerSession.ConnectedMultiplay)
                 {
-                    if (Config.MultiPlayerNumber == count && PlayerPlace.isActiveAndEnabled)
+                    MultiplayerConnectedPlayerFacade player = null;
+                    bool TryPlayerFacade;
+                    if (playersManager == null) playersManager = Resources.FindObjectsOfTypeAll<MultiplayerPlayersManager>().FirstOrDefault();
+                    if (Config.MultiPlayerNumber < MultiplayerSession.connectedPlayers.Count)
                     {
-                        OffsetPosition = PlayerPlace.transform.position;
-                        OffsetAngle = PlayerPlace.transform.eulerAngles;
-                        break;
+                        TryPlayerFacade = playersManager.TryGetConnectedPlayerController(MultiplayerSession.connectedPlayers[Config.MultiPlayerNumber].userId, out player);
+                        if (TryPlayerFacade && player != null)
+                        {
+                            OffsetPosition = player.transform.position;
+                            OffsetAngle = player.transform.eulerAngles;
+                        }
                     }
-                    count++;
                 }
             }
             catch (Exception ex)
             {
-                Logger.Log($"HandleMultiPlayerGame Error {ex.Message}", LogLevel.Notice);
+                Logger.Log($"{this.name} HandleMultiPlayerGame Error {ex.Message}", LogLevel.Error);
             }
         }
         public void AddMovementScript()

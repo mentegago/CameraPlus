@@ -31,6 +31,8 @@ namespace CameraPlus
         public ProfileChanger _profileChanger;
         public string _currentProfile;
 
+        public bool MultiplayerSessionInit;
+
         [Init]
         public void Init(IPALogger logger)
         {
@@ -83,9 +85,10 @@ namespace CameraPlus
             CameraProfiles.CreateMainDirectory();
 
             _profileChanger = new ProfileChanger();
-
+            MultiplayerSessionInit = false;
             Logger.Log($"{Plugin.Name} has started", LogLevel.Notice);
         }
+
 
         public void OnActiveSceneChanged(Scene from, Scene to)
         {
@@ -140,10 +143,12 @@ namespace CameraPlus
         [OnExit]
         public void OnApplicationQuit()
         {
+            MultiplayerSession.Close();
             _harmony.UnpatchAll("com.brian91292.beatsaber.cameraplus");
         }
 
         public void OnSceneLoaded(Scene scene, LoadSceneMode sceneMode) { }
+
         public void OnSceneUnloaded(Scene scene) { }
         public void OnUpdate() { }
 
@@ -157,5 +162,7 @@ namespace CameraPlus
                 CameraPlusBehaviour.wasWithinBorder = false;
             }
         }
+
+
     }
 }
