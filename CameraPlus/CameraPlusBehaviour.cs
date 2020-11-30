@@ -107,7 +107,6 @@ namespace CameraPlus
         public static bool anyInstanceBusy = false;
         private static bool _contextMenuEnabled = true;
 
-        private MultiplayerPlayersManager playersManager=null;
         public virtual void Init(Config config)
         {
             DontDestroyOnLoad(gameObject);
@@ -487,22 +486,20 @@ namespace CameraPlus
         {
             try
             {
-                int count = 0;
-                MultiplayerLobbyController LobbyContoroller = Resources.FindObjectsOfTypeAll<MultiplayerLobbyController>().FirstOrDefault();
-                if (LobbyContoroller == null || !LobbyContoroller.isActiveAndEnabled) return;
+                if (MultiplayerSession.LobbyContoroller == null || !MultiplayerSession.LobbyContoroller.isActiveAndEnabled || Config.MultiPlayerNumber == 0) return;
+                if (MultiplayerSession.LobbyAvatarPlace.Count == 0) MultiplayerSession.LoadLobbyAvatarPlace();
 
-                foreach (MultiplayerLobbyAvatarPlace LobbyAvatarPlace in Resources.FindObjectsOfTypeAll<MultiplayerLobbyAvatarPlace>())
+                for (int i=0; i< MultiplayerSession.LobbyAvatarPlace.Count;i++)
                 {
-                    count++;
-                    if (Config.MultiPlayerNumber == count && LobbyAvatarPlace.isActiveAndEnabled)
+                    if (i==Config.MultiPlayerNumber - 1)
                     {
-                        OffsetPosition = LobbyAvatarPlace.transform.position;
-                        OffsetAngle = LobbyAvatarPlace.transform.eulerAngles;
+                        OffsetPosition = MultiplayerSession.LobbyAvatarPlace[i].position;
+                        OffsetAngle = MultiplayerSession.LobbyAvatarPlace[i].eulerAngles;
                         break;
                     }
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 Logger.Log($"HandleMultiPlayerLobby Error {ex.Message}", LogLevel.Error);
             }
@@ -515,14 +512,25 @@ namespace CameraPlus
                 {
                     MultiplayerConnectedPlayerFacade player = null;
                     bool TryPlayerFacade;
-                    if (playersManager == null) playersManager = Resources.FindObjectsOfTypeAll<MultiplayerPlayersManager>().FirstOrDefault();
-                    if (Config.MultiPlayerNumber < MultiplayerSession.connectedPlayers.Count)
+                    if (MultiplayerSession.playersManager == null)
                     {
-                        TryPlayerFacade = playersManager.TryGetConnectedPlayerController(MultiplayerSession.connectedPlayers[Config.MultiPlayerNumber].userId, out player);
-                        if (TryPlayerFacade && player != null)
+                        MultiplayerSession.playersManager = Resources.FindObjectsOfTypeAll<MultiplayerPlayersManager>().FirstOrDefault();
+                        Logger.Log($"{this.name} Set MultiplayerPlayersManager", LogLevel.Notice);
+                    }
+                    if (Config.MultiPlayerNumber != 0 && MultiplayerSession.playersManager != null)
+                    {
+                        foreach(IConnectedPlayer connectedPlayer in MultiplayerSession.connectedPlayers)
                         {
-                            OffsetPosition = player.transform.position;
-                            OffsetAngle = player.transform.eulerAngles;
+                            if (Config.MultiPlayerNumber - 1 == connectedPlayer.sortIndex)
+                            {
+                                TryPlayerFacade = MultiplayerSession.playersManager.TryGetConnectedPlayerController(connectedPlayer.userId, out player);
+                                if (TryPlayerFacade && player != null)
+                                {
+                                    OffsetPosition = player.transform.position;
+                                    OffsetAngle = player.transform.eulerAngles;
+                                }
+                                break;
+                            }
                         }
                     }
                 }

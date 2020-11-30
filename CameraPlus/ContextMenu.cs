@@ -232,11 +232,11 @@ namespace CameraPlus
                         parentBehaviour.Config.Save();
                     }
                     //MultiPlayerOffset
-                    GUI.Box(new Rect(menuPos.x + 100, menuPos.y + 60, 100, 55), "Multiplay Offset");
-                    if (GUI.Button(new Rect(menuPos.x + 105, menuPos.y + 80, 90, 30), new GUIContent(parentBehaviour.Config.MultiPlayerNumber == 4 ? "Self Camera" : $"Player {parentBehaviour.Config.MultiPlayerNumber + 2}")))
+                    GUI.Box(new Rect(menuPos.x + 100, menuPos.y + 60, 100, 55), "Multiplayer");
+                    if (GUI.Button(new Rect(menuPos.x + 105, menuPos.y + 80, 90, 30), new GUIContent(parentBehaviour.Config.MultiPlayerNumber == 5 ? "FollowUpOff" : $"Player {parentBehaviour.Config.MultiPlayerNumber + 1}")))
                     {
                         parentBehaviour.Config.MultiPlayerNumber++;
-                        if (parentBehaviour.Config.MultiPlayerNumber >= 5) parentBehaviour.Config.MultiPlayerNumber = 0;
+                        if (parentBehaviour.Config.MultiPlayerNumber > 5) parentBehaviour.Config.MultiPlayerNumber = 0;
                         parentBehaviour.Config.Save();
                     }
                     //FOV
