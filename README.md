@@ -38,6 +38,7 @@ Edit that file to configure Profile change:
 | **GameProfile**             | Enter the profile name to be read in the Game scene.                                         |
 | **CurrentProfile**          | It is currently not working. This is for the next version.                                   |
 | **CameraQuadLayer**         | Changes the display layer of the third person camera. Basically, do not move it from zero.   |
+| **ForceDisableSmoothCamera**| Automatically turn off SmoothCamera at game launch.                                          |
 ### Profile Name
 ![ProfileName](https://github.com/Snow1226/CameraPlus/blob/master/ScreenShot_ProfileChange.png)
 
