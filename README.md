@@ -84,6 +84,8 @@ Edit that file to configure CameraPlus:
 | **screenHeight**            | Height of the camera render area                                                             |
 | **screenPosX**              | X position of the camera in the Beat Saber window                                            |
 | **screenPosY**              | Y position of the camera in the Beat Saber window                                            |
+| **MultiplayerNumber         | Shift the central axis of the camera to the participants in the official mulch.              |
+|                             |  (0=Off, 1=Host, 2~=Participants)                                                            |
 | **layer**                   | Layer to render the camera on **(HIGHER NUMBER = top)**                                      |
 | **fitToCanvas**             | Force camera to stretch to fit window                                                        |
 | **transparentWalls**        | Make Walls appear transparent on the camera                                                  |
@@ -111,7 +113,8 @@ ex)
         "StartPos": {              "StartPos"         : Camera start position (the center of the play area is 0,0,0).
             "x": 2,
             "y": 1.75,
-            "z": -2
+            "z": -2,
+            "FOV": 90              "FOV"              : StartFOV (Optional)
         },
         "StartRot": {              "StartRot"         : The rotation at which the camera starts (0,0,0 looks straight at the main menu).
             "x": 15,
@@ -121,7 +124,8 @@ ex)
         "EndPos": {                "EndPos"           : The position where the camera ends.
             "x": 2,
             "y": 1,
-            "z": 9
+            "z": 9,
+            "FOV": 40              "FOV"              : EndFOV (Optional)
         },
         "EndRot": {                "EndRot"           : The rotation at which the camera ends.
             "x": 15,
