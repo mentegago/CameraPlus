@@ -85,7 +85,7 @@ Edit that file to configure CameraPlus:
 | **screenHeight**            | Height of the camera render area                                                             |
 | **screenPosX**              | X position of the camera in the Beat Saber window                                            |
 | **screenPosY**              | Y position of the camera in the Beat Saber window                                            |
-| **MultiplayerNumber         | Shift the central axis of the camera to the participants in the official mulch.              |
+| **MultiplayerNumber**       | Shift the central axis of the camera to the participants in the official mulch.              |
 |                             |  (0=Off, 1=Host, 2~=Participants)                                                            |
 | **layer**                   | Layer to render the camera on **(HIGHER NUMBER = top)**                                      |
 | **fitToCanvas**             | Force camera to stretch to fit window                                                        |
