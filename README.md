@@ -51,51 +51,53 @@ Example) MenuProfile = "CameraPlusProfile"
 After you run the game once, a `cameraplus.cfg` file is created within the folder Beat Saber\UserData\CameraPlus. Any cfg files located in this folder will be used to render additional cameras.
 Edit that file to configure CameraPlus:
 
-| Parameter                   | Description                                                                                  |
-|-----------------------------|----------------------------------------------------------------------------------------------|
-| **fov**                     | Horizontal field of view of the camera                                                       |
-| **antiAliasing**            | Anti-aliasing setting for the camera (1, 2, 4 or 8 only)                                     |
-| **renderScale**             | The resolution scale of the camera relative to game window (similar to supersampling for VR) |
-| **positionSmooth**          | How much position should smooth **(SMALLER NUMBER = SMOOTHER)**                              |
-| **rotationSmooth**          | How much rotation should smooth **(SMALLER NUMBER = SMOOTHER)**                              |
-| **cam360Smoothness**        | How smoothly the 360 cam snaps to lane changes **(SMALLER NUMBER = SMOOTHER)**               |
-| **cam360RotateControlNew**  | Set to False if you don't like the new 360 degree control.                                   |
-| **thirdPerson**             | Whether third person camera is enabled                                                       |
-| **showThirdPersonCamera**   | Whether or not the third person camera is visible                                            |
-| **use360Camera**            | Whether the 360 camera is used                                                               |
-| **posx**                    | X position of third person camera                                                            |
-| **posy**                    | Y position of third person camera                                                            |
-| **posz**                    | Z position of third person camera                                                            |
-| **angx**                    | X rotation of third person camera                                                            |
-| **angy**                    | Y rotation of third person camera                                                            |
-| **angz**                    | Z rotation of third person camera                                                            |
-| **firstPersonPosOffsetX**   | X position offset of first person camera                                                     |
-| **firstPersonPosOffsetY**   | Y position offset of first person camera                                                     |
-| **firstPersonPosOffsetZ**   | Z position offset of first person camera                                                     |
-| **firstPersonRotOffsetX**   | X rotation offset of first person camera                                                     |
-| **firstPersonRotOffsetY**   | Y rotation offset of first person camera                                                     |
-| **firstPersonRotOffsetZ**   | Z rotation offset of first person camera                                                     |
-| **cam360ForwardOffset**     | 360 camera position offset forwards                                                          |
-| **cam360UpOffset**          | 360 camera position offset upwards                                                           |
-| **cam360RightOffset**       | 360 camera position offset to the right                                                      |
-| **cam360XTilt**             | X tilt rotation relative to the forward of 360 camera                                        |
-| **cam360ZTilt**             | Z tilt rotation relative to the forward of 360 camera                                        |
-| **cam360YTilt**             | The Y tilt rotation OFFSET on the 360 camera                                                 |
-| **screenWidth**             | Width of the camera render area                                                              |
-| **screenHeight**            | Height of the camera render area                                                             |
-| **screenPosX**              | X position of the camera in the Beat Saber window                                            |
-| **screenPosY**              | Y position of the camera in the Beat Saber window                                            |
-| **MultiplayerNumber**       | Shift the central axis of the camera to the participants in the official mulch.              |
-|                             |  (0=Off, 1=Host, 2~=Participants)                                                            |
-| **layer**                   | Layer to render the camera on **(HIGHER NUMBER = top)**                                      |
-| **fitToCanvas**             | Force camera to stretch to fit window                                                        |
-| **transparentWalls**        | Make Walls appear transparent on the camera                                                  |
-| **forceFirstPersonUpRight** | Lock rotation of first person camera on Z axis to keep the camera upright                    |
-| **Avatar**                  | Switch avatar display layer                                                                  |
-| **debri**                   | Switches between In-Game setting linkage, forced display, and forced off for Notes Debris.   |
-| **displayUI**               | The cam+ screen toggles the UI display, hiding EnhancedStreamChat is currently not supported.|
-| **movementScriptPath**      | Enter the script file name, including the json extension.                                    |
-| **movementAudioSync**       | Syncs the transitional process of the move script to the game audio.                         |
+| Parameter                     | Description                                                                                     |
+|-------------------------------|-------------------------------------------------------------------------------------------------|
+| **LockScreen**                | Locks the window from being resized or moved.                                                   |
+| **fov**                       | Horizontal field of view of the camera                                                          |
+| **antiAliasing**              | Anti-aliasing setting for the camera (1, 2, 4 or 8 only)                                        |
+| **renderScale**               | The resolution scale of the camera relative to game window (similar to supersampling for VR)    |
+| **positionSmooth**            | How much position should smooth **(SMALLER NUMBER = SMOOTHER)**                                 |
+| **rotationSmooth**            | How much rotation should smooth **(SMALLER NUMBER = SMOOTHER)**                                 |
+| **cam360Smoothness**          | How smoothly the 360 cam snaps to lane changes **(SMALLER NUMBER = SMOOTHER)**                  |
+| **cam360RotateControlNew**    | Set to False if you don't like the new 360 degree control.                                      |
+| **thirdPerson**               | Whether third person camera is enabled                                                          |
+| **showThirdPersonCamera**     | Whether or not the third person camera is visible                                               |
+| **use360Camera**              | Whether the 360 camera is used                                                                  |
+| **posx**                      | X position of third person camera                                                               |
+| **posy**                      | Y position of third person camera                                                               |
+| **posz**                      | Z position of third person camera                                                               |
+| **angx**                      | X rotation of third person camera                                                               |
+| **angy**                      | Y rotation of third person camera                                                               |
+| **angz**                      | Z rotation of third person camera                                                               |
+| **firstPersonPosOffsetX**     | X position offset of first person camera                                                        |
+| **firstPersonPosOffsetY**     | Y position offset of first person camera                                                        |
+| **firstPersonPosOffsetZ**     | Z position offset of first person camera                                                        |
+| **firstPersonRotOffsetX**     | X rotation offset of first person camera                                                        |
+| **firstPersonRotOffsetY**     | Y rotation offset of first person camera                                                        |
+| **firstPersonRotOffsetZ**     | Z rotation offset of first person camera                                                        |
+| **cam360ForwardOffset**       | 360 camera position offset forwards                                                             |
+| **cam360UpOffset**            | 360 camera position offset upwards                                                              |
+| **cam360RightOffset**         | 360 camera position offset to the right                                                         |
+| **cam360XTilt**               | X tilt rotation relative to the forward of 360 camera                                           |
+| **cam360ZTilt**               | Z tilt rotation relative to the forward of 360 camera                                           |
+| **cam360YTilt**               | The Y tilt rotation OFFSET on the 360 camera                                                    |
+| **screenWidth**               | Width of the camera render area                                                                 |
+| **screenHeight**              | Height of the camera render area                                                                |
+| **screenPosX**                | X position of the camera in the Beat Saber window                                               |
+| **screenPosY**                | Y position of the camera in the Beat Saber window                                               |
+| **MultiplayerNumber**         | Shift the central axis of the camera to the participants in the official mulch.                 |
+|                               |  (0=Off, 1=Host, 2~=Participants)                                                               |
+| **DisplayMultiPlayerNameInfo**| Displays player information in the upper left corner of the screen during official multiplayer. |
+| **layer**                     | Layer to render the camera on **(HIGHER NUMBER = top)**                                         |
+| **fitToCanvas**               | Force camera to stretch to fit window                                                           |
+| **transparentWalls**          | Make Walls appear transparent on the camera                                                     |
+| **forceFirstPersonUpRight**   | Lock rotation of first person camera on Z axis to keep the camera upright                       |
+| **Avatar**                    | Switch avatar display layer                                                                     |
+| **debri**                     | Use "link" to follow the game settings, and "show" and "hide" to force display/hide.            |
+| **HideUI**                    | Hide the official UI in the cam+ screen.                                                        |
+| **movementScriptPath**        | Enter the script file name, including the json extension.                                       |
+| **movementAudioSync**         | Syncs the transitional process of the move script to the game audio.                            |
 
 ## Movement Script
 The sample script described in MovementScriptPath is located in the "Beat Saber\UserData\CameraPlus\Scripts" folder.

@@ -602,7 +602,7 @@ namespace CameraPlus
                         parentBehaviour.Config.MultiPlayerNumber = 5;
                         parentBehaviour.Config.Save();
                     }
-                    if (GUI.Button(new Rect(menuPos.x + 75, menuPos.y + 80, 150, 30), new GUIContent("Tracking Off"), parentBehaviour.Config.MultiPlayerNumber == 0 ? CustomEnableStyle : CustomDisableStyle))
+                    if (GUI.Button(new Rect(menuPos.x + 75, menuPos.y + 80, 150, 30), new GUIContent("Tracking Camera Off"), parentBehaviour.Config.MultiPlayerNumber == 0 ? CustomEnableStyle : CustomDisableStyle))
                     {
                         parentBehaviour.Config.MultiPlayerNumber = 0;
                         parentBehaviour.Config.Save();
