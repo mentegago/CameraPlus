@@ -26,6 +26,7 @@ namespace CameraPlus
         internal CameraPlusBehaviour parentBehaviour;
         internal string[] scriptName;
         internal int scriptPage;
+        internal Texture2D texture = null;
         public void Awake()
         {
         }
@@ -40,6 +41,10 @@ namespace CameraPlus
             profileMode = false;
             scriptName = null;
             scriptPage = 0;
+            if (this.parentBehaviour.Config.LockScreen)
+                texture = Utils.LoadTextureFromResources("CameraPlus.Resources.Lock.png");
+            else
+                texture = Utils.LoadTextureFromResources("CameraPlus.Resources.UnLock.png");
         }
         public void DisableMenu()
         {
@@ -193,11 +198,29 @@ namespace CameraPlus
                         scriptName = CameraUtilities.MovementScriptList();
                     }
                     /*
+                    if (GUI.Button(new Rect(menuPos.x, menuPos.y + 345, 300, 30), new GUIContent(parentBehaviour.Config.Orthographics ? "Perspective" : "Orthographics")))
+                    {
+                        parentBehaviour.Config.Orthographics = !parentBehaviour.Config.Orthographics;
+                        parentBehaviour.Config.Save();
+                        parentBehaviour.CloseContextMenu();
+                        parentBehaviour.CreateScreenRenderTexture();
+                    }
+                    */
+                    /*
                     if (GUI.Button(new Rect(menuPos.x, menuPos.y + 385, 300, 30), new GUIContent("Spawn 38 Cameras")))
                     {
                         parentBehaviour.StartCoroutine(CameraUtilities.Spawn38Cameras());
                         parentBehaviour.CloseContextMenu();
                     }*/
+                    if (GUI.Button(new Rect(menuPos.x, menuPos.y, 20, 20), texture))
+                    {
+                        parentBehaviour.Config.LockScreen = !parentBehaviour.Config.LockScreen;
+                        parentBehaviour.Config.Save();
+                        if (this.parentBehaviour.Config.LockScreen)
+                            texture = Utils.LoadTextureFromResources("CameraPlus.Resources.Lock.png");
+                        else
+                            texture = Utils.LoadTextureFromResources("CameraPlus.Resources.UnLock.png");
+                    }
                     if (GUI.Button(new Rect(menuPos.x, menuPos.y + 430, 300, 30), new GUIContent("Close Menu")))
                     {
                         parentBehaviour.CloseContextMenu();
@@ -497,7 +520,11 @@ namespace CameraPlus
                     for (int i = scriptPage * 5 ; i < scriptPage * 5 + 5; i++) {
                         if (i < scriptName.Length)
                         {
-                            if (GUI.Button(new Rect(menuPos.x, menuPos.y + (i - scriptPage * 5) * 35 + 145, 300, 30),  new GUIContent(scriptName[i])))
+                            if (CameraUtilities.CurrentMovementScript(parentBehaviour.Config.movementScriptPath) == scriptName[i])
+                            {
+                                GUI.Box(new Rect(menuPos.x, menuPos.y + (i - scriptPage * 5) * 35 + 145, 300, 30), new GUIContent(scriptName[i]));
+                            }
+                            else if (GUI.Button(new Rect(menuPos.x, menuPos.y + (i - scriptPage * 5) * 35 + 145, 300, 30),  new GUIContent(scriptName[i])))
                             {
                                 parentBehaviour.Config.movementScriptPath = scriptName[i];
                                 parentBehaviour.Config.Save();

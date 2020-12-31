@@ -106,6 +106,7 @@ namespace CameraPlus
         public static bool wasWithinBorder = false;
         public static bool anyInstanceBusy = false;
         private static bool _contextMenuEnabled = true;
+        private MultiplayerScoreProvider ScoreProvider = null;
 
         public virtual void Init(Config config)
         {
@@ -308,7 +309,15 @@ namespace CameraPlus
                     Config.screenWidth = Screen.width;
                     Config.screenHeight = Screen.height;
                 }
-
+                /*
+                _cam.orthographic = Config.Orthographics;
+                if (Config.Orthographics)
+                {
+                    _cam.orthographicSize = Config.fov / 10;
+                    _cam.farClipPlane = 10;
+                    _cam.nearClipPlane = 2;
+                }
+                */
                 _lastRenderUpdate = DateTime.Now;
                 //GetScaledScreenResolution(Config.renderScale, out var scaledWidth, out var scaledHeight);
                 _camRenderTexture.width = Mathf.Clamp(Mathf.RoundToInt(Config.screenWidth * Config.renderScale), 1, int.MaxValue);
@@ -816,7 +825,7 @@ namespace CameraPlus
                 }
             }
 
-            if (holdingLeftClick && !Config.fitToCanvas)
+            if (holdingLeftClick && !Config.fitToCanvas && !Config.LockScreen)
             {
                 if (!_mouseHeld)
                 {
@@ -892,7 +901,41 @@ namespace CameraPlus
                 anyInstanceBusy = false;
             }
         }
+        void OnGUI()
+        {
+            if (MultiplayerSession.connectedPlayers != null && Config.DisplayMultiPlayerNameInfo)
+            {
+                foreach (IConnectedPlayer connectedPlayer in MultiplayerSession.connectedPlayers)
+                {
+                    if (Config.MultiPlayerNumber - 1 == connectedPlayer.sortIndex)
+                    {
+                        int size = 0;
+                        GUI.skin.label.fontSize = Config.screenWidth / 8;
+                        size = GUI.skin.label.fontSize + 15;
+                        GUI.Label(new Rect(Config.screenPosX, Config.screenPosY, Config.screenWidth, GUI.skin.label.fontSize + 15), connectedPlayer.userName);
 
+                        if (SceneManager.GetActiveScene().name == "GameCore" && MultiplayerSession.ConnectedMultiplay)
+                        {
+                            if (ScoreProvider == null)
+                                ScoreProvider = Resources.FindObjectsOfTypeAll<MultiplayerScoreProvider>().FirstOrDefault();
+
+                            foreach (MultiplayerScoreProvider.RankedPlayer rankedPlayer in ScoreProvider.rankedPlayers)
+                            {
+                                if (rankedPlayer.userId == connectedPlayer.userId)
+                                {
+                                    GUI.skin.label.fontSize = 30;
+                                    GUI.Label(new Rect(Config.screenPosX, Config.screenPosY + size + 45, Config.screenWidth, 40), String.Format("{0:#,0}", rankedPlayer.score));
+                                    GUI.Label(new Rect(Config.screenPosX, Config.screenPosY + size + 5, Config.screenWidth, 40), "Rank " + ScoreProvider.GetPositionOfPlayer(connectedPlayer.userId).ToString());
+                                    break;
+                                }
+                            }
+                            break;
+                        }
+                    }
+                }
+
+            }
+        }
         void DisplayContextMenu()
         {
             if (_contextMenu == null)

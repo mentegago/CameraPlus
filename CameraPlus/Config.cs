@@ -7,6 +7,7 @@ namespace CameraPlus
     public class Config
     {
         public string FilePath { get; }
+        public bool LockScreen = false;
         public float fov = 50;
         public int antiAliasing = 2;
         public float renderScale = 1;
@@ -48,7 +49,9 @@ namespace CameraPlus
         public int screenPosX;
         public int screenPosY;
 
-        public int MultiPlayerNumber;
+        //public bool Orthographics = false;
+        public int MultiPlayerNumber = 0;
+        public bool DisplayMultiPlayerNameInfo = false;
 
         public int layer = -1000;
 
