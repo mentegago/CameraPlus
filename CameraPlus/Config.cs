@@ -60,7 +60,7 @@ namespace CameraPlus
         public bool forceFirstPersonUpRight = false;
         public bool avatar = true;
         public string debri = "link";
-        public bool displayUI = false;
+        public bool HideUI = false;
         public string movementScriptPath = String.Empty;
         public bool movementAudioSync = true;
         //public int maxFps = 90;

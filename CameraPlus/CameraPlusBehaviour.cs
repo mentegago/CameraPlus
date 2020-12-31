@@ -664,7 +664,7 @@ namespace CameraPlus
                 else
                     _cam.cullingMask &= ~(1 << NotesDebriLayer);
             }
-            if (Config.displayUI)
+            if (Config.HideUI)
                 _cam.cullingMask &= ~(1 << UILayer);
             else
                 _cam.cullingMask |= (1 << UILayer);
