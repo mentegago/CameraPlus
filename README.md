@@ -1,20 +1,12 @@
 # CameraPlus
 CameraPlus is a Beat Saber mod that allows for multiple wide FOV cameras with smoothed movement, which makes for a much more pleasant overall spectator experience.
-# Download
-[Release Page](https://github.com/Snow1226/CameraPlus/releases)
-### Make sure to disable the base game's "Smooth Camera" If you wish to use CameraPlus
-[Video Comparison](https://youtu.be/MysLXKSXGTY)  
-[Third Person Preview](https://youtu.be/ltIhpt-n6b8)
-### Right Click Menu Recently Renovated, Appearance may differ from what is shown in this video
-The video is an old one. The right-click menu has now been changed.
-[![How to use CameraPlus](https://i.imgur.com/UbKrHAF.png)](https://www.youtube.com/watch?v=RpYoMiKJygQ)
-### Profile switching has been implemented. (Thanks to Auros!)
-[Click here for an example of how the profile system works (Fefeland Thanks for the video!)](https://streamable.com/018xl)
 
-# Installing
+# stable version Installing
 1. Use the Mod Assistant : https://github.com/Assistant/ModAssistant/releases
 		It is the easiest method, it will do all these steps below in 1 click.
-	
+# Latest version Download
+The version here may be a version that has not yet been registered with ModAssistant, or a version that will not be registered.
+[Release Page](https://github.com/Snow1226/CameraPlus/releases)
 ### To install manually:
 	1b. Make sure that Beat Saber is not running.
 	2b. Extract the contents of the zip into Beat Saber's installation folder.
@@ -22,6 +14,10 @@ The video is an old one. The right-click menu has now been changed.
 		For Steam: \steamapps\common\Beat Saber\
 		(The folder that contains Beat Saber.exe)
 	3b. Done! You've installed the CameraPlus Plugin.
+
+# Make sure to disable the base game's "Smooth Camera" If you wish to use CameraPlus
+The latest version will automatically force SmoothCamera to turn off. If you want to turn it on, please change the setting in UserData/CameraPlus.ini. (See RootConfig below).
+
 # Usage
 To edit the settings of any camera in real time, right click on the Beat Saber game window! A context menu will appear with options specific to the camera that you right clicked on!
 
@@ -36,6 +32,8 @@ Edit that file to configure Profile change:
 | **ProfileSceneChange**      | When set to True, profile switching is enabled in the Menu scene and Game scene.             |
 | **MenuProfile**             | Enter the profile name to be read in the Menu scene.                                         |
 | **GameProfile**             | Enter the profile name to be read in the Game scene.                                         |
+| **MultiplayerProfile**      | Enter the profile name to be read in the Multiplay scene.                                    |
+|                             | If value here, the profile will not be switched between the multiplayer lobby and the game.  |
 | **CurrentProfile**          | It is currently not working. This is for the next version.                                   |
 | **CameraQuadLayer**         | Changes the display layer of the third person camera. Basically, do not move it from zero.   |
 | **ForceDisableSmoothCamera**| Automatically turn off SmoothCamera at game launch.                                          |
@@ -139,7 +137,7 @@ ex)
         "Delay": 0,                "Delay"            : the time to wait before proceeding to the next move.
         "EaseTransition": true     "EaseTransition"   : If false, the transition between start / end will be linear. Otherwise, the transition is slower from the beginning to the end and faster.
 
-    }]
+    }
 }
 ```
 

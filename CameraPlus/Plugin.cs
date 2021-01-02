@@ -107,11 +107,11 @@ namespace CameraPlus
             {
                 if (_rootConfig.ProfileSceneChange)
                 {
-                    if (to.name == "GameCore" && _rootConfig.GameProfile != "" && !MultiplayerSession.ConnectedMultiplay)
+                    if (to.name == "GameCore" && _rootConfig.GameProfile != "" && (!MultiplayerSession.ConnectedMultiplay || _rootConfig.MultiplayerProfile=="" ))
                     {
                         _profileChanger.ProfileChange(_rootConfig.GameProfile);
                     }
-                    else if ((to.name == "MenuCore" || to.name == "HealthWarning") && _rootConfig.MenuProfile != "" && !MultiplayerSession.ConnectedMultiplay)
+                    else if ((to.name == "MenuCore" || to.name == "HealthWarning") && _rootConfig.MenuProfile != "" && (!MultiplayerSession.ConnectedMultiplay || _rootConfig.MultiplayerProfile == ""))
                     {
                         _profileChanger.ProfileChange(_rootConfig.MenuProfile);
                     }
