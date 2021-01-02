@@ -38,7 +38,7 @@ Edit that file to configure Profile change:
 | **CameraQuadLayer**         | Changes the display layer of the third person camera. Basically, do not move it from zero.   |
 | **ForceDisableSmoothCamera**| Automatically turn off SmoothCamera at game launch.                                          |
 ### Profile Name
-![ProfileName](https://github.com/Snow1226/CameraPlus/blob/master/ScreenShot_ProfileChange.png)
+![ProfileName](https://github.com/Snow1226/CameraPlus/blob/master/img/Menu_08_ProfileMenu.png)
 
 Open the Profile menu from Profile Saver in the right-click menu.
 The profile name is displayed under Cullently Selected.
