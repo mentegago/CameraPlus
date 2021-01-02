@@ -653,12 +653,42 @@ namespace CameraPlus
                     }
                     if (Plugin.Instance._rootConfig.ProfileSceneChange)
                     {
-                        GUI.Box(new Rect(menuPos.x, menuPos.y + 285, 290, 30), "Menu Scene Profile : " + (Plugin.Instance._rootConfig.MenuProfile));
-                        GUI.Box(new Rect(menuPos.x, menuPos.y + 315, 290, 30), "Game Scene Profile : " + (Plugin.Instance._rootConfig.GameProfile));
-                        if (GUI.Button(new Rect(menuPos.x, menuPos.y + 345, 140, 30), new GUIContent("Set Menu Selected")))
+                        GUI.Box(new Rect(menuPos.x + 35, menuPos.y + 275, 260, 30), "Menu Scene Profile : " + (Plugin.Instance._rootConfig.MenuProfile));
+                        GUI.Box(new Rect(menuPos.x + 35, menuPos.y + 305, 260, 30), "Game Scene Profile : " + (Plugin.Instance._rootConfig.GameProfile));
+                        GUI.Box(new Rect(menuPos.x + 35, menuPos.y + 335, 260, 30), "Multiplay Profile : " + (Plugin.Instance._rootConfig.MultiplayerProfile));
+                        if (GUI.Button(new Rect(menuPos.x + 5, menuPos.y + 275, 30, 30), "X"))
+                        {
+                            if (Plugin.Instance._rootConfig.MenuProfile!=string.Empty)
+                                Plugin.Instance._rootConfig.MenuProfile = string.Empty;
+                            Plugin.Instance._rootConfig.Save();
+                        }
+                        if (GUI.Button(new Rect(menuPos.x + 5, menuPos.y + 305, 30, 30), "X"))
+                        {
+                            if (Plugin.Instance._rootConfig.GameProfile != string.Empty)
+                                Plugin.Instance._rootConfig.GameProfile = string.Empty;
+                            Plugin.Instance._rootConfig.Save();
+                        }
+                        if (GUI.Button(new Rect(menuPos.x + 5, menuPos.y + 335, 30, 30), "X"))
+                        {
+                            if (Plugin.Instance._rootConfig.MultiplayerProfile != string.Empty)
+                                Plugin.Instance._rootConfig.MultiplayerProfile = string.Empty;
+                            Plugin.Instance._rootConfig.Save();
+                        }
+                        if (GUI.Button(new Rect(menuPos.x, menuPos.y + 365, 140, 25), new GUIContent("Set Menu Selected")))
+                        {
                             Plugin.Instance._rootConfig.MenuProfile = CameraProfiles.currentlySelected;
-                        if (GUI.Button(new Rect(menuPos.x + 150, menuPos.y + 345, 140, 30), new GUIContent("Set Game Selected")))
+                            Plugin.Instance._rootConfig.Save();
+                        }
+                        if (GUI.Button(new Rect(menuPos.x + 150, menuPos.y + 365, 140, 25), new GUIContent("Set Game Selected")))
+                        {
                             Plugin.Instance._rootConfig.GameProfile = CameraProfiles.currentlySelected;
+                            Plugin.Instance._rootConfig.Save();
+                        }
+                        if (GUI.Button(new Rect(menuPos.x , menuPos.y + 395, 290, 25), new GUIContent("Set Multiplayer Selected")))
+                        {
+                            Plugin.Instance._rootConfig.MultiplayerProfile = CameraProfiles.currentlySelected;
+                            Plugin.Instance._rootConfig.Save();
+                        }
                     }
                     /*
                     if (GUI.Button(new Rect(menuPos.x, menuPos.y + 390, 290, 30), new GUIContent(Plugin.Instance._rootConfig.ProfileLoadCopyMethod ? "To Folder Reference Method" : "To File Copy Method")))

@@ -63,6 +63,9 @@ namespace CameraPlus
             Logger.Log($"ConnectedPlayer---------------", LogLevel.Info);
             for (int i = 0; i < connectedPlayers.Count; i++)
                 Logger.Log($"ConnectedPlayer {connectedPlayers[i].userName},{connectedPlayers[i].sortIndex}", LogLevel.Info);
+
+            if (Plugin.Instance._rootConfig.MultiplayerProfile != "")
+                Plugin.Instance._profileChanger.ProfileChange(Plugin.Instance._rootConfig.MultiplayerProfile);
         }
         private static void OnSessionDisconnected(DisconnectedReason reason)
         {
@@ -70,6 +73,8 @@ namespace CameraPlus
             connectedPlayers.Clear();
             LobbyAvatarPlace.Clear();
             Logger.Log($"SessionManager Disconnected {reason}", LogLevel.Info);
+            if (Plugin.Instance._rootConfig.MenuProfile != "")
+                Plugin.Instance._profileChanger.ProfileChange(Plugin.Instance._rootConfig.MenuProfile);
         }
         private static void OnSessionPlayerConnected(IConnectedPlayer player)
         {
