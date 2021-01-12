@@ -44,6 +44,8 @@ namespace CameraPlus
         public float cam360UpOffset = 2.2f;
         public float cam360RightOffset = 0f;
 
+        public bool NoodleTrack = false;
+
         public int screenWidth = Screen.width;
         public int screenHeight = Screen.height;
         public int screenPosX;

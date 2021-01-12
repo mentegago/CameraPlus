@@ -72,13 +72,9 @@ namespace CameraPlus
                 GUI.Box(new Rect(menuPos.x - 5, menuPos.y, 310, 470), "CameraPlus" + parentBehaviour.name);
 
                 CustomEnableStyle = new GUIStyle(GUI.skin.button);
-                //CustomEnableStyle.normal.textColor = Color.white;
-                //CustomEnableStyle.hover.textColor = Color.white;
                 CustomEnableStyle.normal.background = CustomEnableStyle.active.background;
                 CustomEnableStyle.hover.background = CustomEnableStyle.active.background;
                 CustomDisableStyle = new GUIStyle(GUI.skin.button);
-                //CustomDisableStyle.normal.textColor = Color.white;
-                //CustomDisableStyle.hover.textColor = Color.white;
 
                 if (MenuMode == 0)
                 {
@@ -300,6 +296,19 @@ namespace CameraPlus
                     {
                         parentBehaviour.Config.avatar = false;
                         parentBehaviour.SetCullingMask();
+                        parentBehaviour.Config.Save();
+                    }
+
+                    //Camera Tracking to NoodleExtensions AssignPlayerToTrack
+                    GUI.Box(new Rect(menuPos.x, menuPos.y + 355, 300, 55), "Tracking NoodleExtension PlayerToTrack");
+                    if (GUI.Button(new Rect(menuPos.x + 5, menuPos.y + 375, 145, 30), new GUIContent("Tracking On"), parentBehaviour.Config.NoodleTrack ? CustomEnableStyle : CustomDisableStyle))
+                    {
+                        parentBehaviour.Config.NoodleTrack = true;
+                        parentBehaviour.Config.Save();
+                    }
+                    if (GUI.Button(new Rect(menuPos.x + 150, menuPos.y + 375, 145, 30), new GUIContent("Tracking Off"), !parentBehaviour.Config.NoodleTrack ? CustomEnableStyle : CustomDisableStyle))
+                    {
+                        parentBehaviour.Config.NoodleTrack = false;
                         parentBehaviour.Config.Save();
                     }
 

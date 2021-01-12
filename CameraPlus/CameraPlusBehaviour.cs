@@ -107,6 +107,8 @@ namespace CameraPlus
         public static bool anyInstanceBusy = false;
         private static bool _contextMenuEnabled = true;
         private MultiplayerScoreProvider ScoreProvider = null;
+        private GameObject adjustOffset;
+        private GameObject adjustParent;
 
         public virtual void Init(Config config)
         {
@@ -364,6 +366,18 @@ namespace CameraPlus
                 AddMovementScript();
                 Logger.Log($"Add MoveScript \"{Path.GetFileName(Config.movementScriptPath)}\" successfully initialized! {Convert.ToString(_cam.cullingMask, 16)}");
             }
+            if (to.name != "GameCore")
+            {
+                foreach (CameraPlusInstance c in Plugin.Instance.Cameras.Values.ToArray())
+                {
+                    if (c.Instance.name == this.name)
+                    {
+                        transform.SetParent(c.Instance.transform);
+                        break;
+                    }
+                }
+
+            }
         }
 
         [DllImport("user32.dll")]
@@ -401,16 +415,14 @@ namespace CameraPlus
                 }
             }
             HandleMouseEvents();
-            //PlayerOffset = multiplayerConnectedPlayerSpectatingSpot.transform.position;
-            //Logger.Log($"Player Offset : {PlayerOffset.x},{PlayerOffset.y},{PlayerOffset.z}", LogLevel.Notice);
         }
 
         protected virtual void LateUpdate()
         {
             try
             {
-                OffsetPosition = new Vector3();
-                OffsetAngle = new Vector3();
+                OffsetPosition = Vector3.zero;
+                OffsetAngle = Vector3.zero;
 
                 var camera = _mainCamera.transform;
 
@@ -421,10 +433,33 @@ namespace CameraPlus
                 {
                     HandleThirdPerson360();
 
-                    transform.position = ThirdPersonPos;
-                    transform.eulerAngles = ThirdPersonRot;
-                    _cameraCube.position = ThirdPersonPos;
-                    _cameraCube.eulerAngles = ThirdPersonRot;
+                    if (Config.NoodleTrack && SceneManager.GetActiveScene().name == "GameCore")
+                    {
+                        if (adjustOffset == null)
+                        {
+                            adjustOffset = new GameObject("OriginTarget");
+                            adjustParent = new GameObject("OriginParent");
+                            adjustOffset.transform.SetParent(adjustParent.transform);
+                            Plugin.Instance._origin = new GameObject("OriginParent").transform;
+                        }
+                        adjustParent.transform.position = Plugin.Instance._origin.position;
+                        adjustParent.transform.eulerAngles = Plugin.Instance._origin.eulerAngles;
+
+                        adjustOffset.transform.localPosition = ThirdPersonPos;
+                        adjustOffset.transform.localEulerAngles = ThirdPersonRot;
+
+                        transform.position = adjustOffset.transform.position;
+                        transform.eulerAngles = adjustOffset.transform.eulerAngles;
+                        _cameraCube.position = adjustOffset.transform.position;
+                        _cameraCube.eulerAngles = adjustOffset.transform.eulerAngles;
+                    }
+                    else
+                    {
+                        transform.position = ThirdPersonPos;
+                        transform.eulerAngles = ThirdPersonRot;
+                        _cameraCube.position = ThirdPersonPos;
+                        _cameraCube.eulerAngles = ThirdPersonRot;
+                    }
 
                     if (OffsetPosition != Vector3.zero && OffsetAngle != Vector3.zero)
                     {
@@ -432,12 +467,10 @@ namespace CameraPlus
                         transform.eulerAngles = ThirdPersonRot + OffsetAngle;
                         _cameraCube.position = ThirdPersonPos + OffsetPosition;
                         _cameraCube.eulerAngles = ThirdPersonRot + OffsetAngle;
-
                         Quaternion angle = Quaternion.AngleAxis(OffsetAngle.y, Vector3.up);
                         transform.position -= OffsetPosition;
                         transform.position = angle * transform.position;
                         transform.position += OffsetPosition;
-                        _cameraCube.position = transform.position;
                     }
 
                     return;

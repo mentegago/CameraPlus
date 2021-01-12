@@ -33,6 +33,9 @@ namespace CameraPlus
 
         public bool MultiplayerSessionInit;
 
+        public Transform _origin;
+        public VRCenterAdjust vrCenterAdjust;
+
         [Init]
         public void Init(IPALogger logger)
         {
@@ -136,6 +139,12 @@ namespace CameraPlus
             }
             if (to.name == "GameCore" || to.name == "MenuCore" || to.name == "MenuViewControllers" || to.name == "HealthWarning")
             {
+                GameObject gameObject = GameObject.Find("LocalPlayerGameCore/Origin");
+                if (gameObject == null)
+                    _origin = null;
+                else
+                    _origin = gameObject.transform;
+
                 CameraUtilities.SetAllCameraCulling();
             }
         }
