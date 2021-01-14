@@ -366,18 +366,6 @@ namespace CameraPlus
                 AddMovementScript();
                 Logger.Log($"Add MoveScript \"{Path.GetFileName(Config.movementScriptPath)}\" successfully initialized! {Convert.ToString(_cam.cullingMask, 16)}");
             }
-            if (to.name != "GameCore")
-            {
-                foreach (CameraPlusInstance c in Plugin.Instance.Cameras.Values.ToArray())
-                {
-                    if (c.Instance.name == this.name)
-                    {
-                        transform.SetParent(c.Instance.transform);
-                        break;
-                    }
-                }
-
-            }
         }
 
         [DllImport("user32.dll")]
@@ -665,42 +653,44 @@ namespace CameraPlus
 
         internal virtual void SetCullingMask()
         {
-            _cam.cullingMask = Camera.main.cullingMask;
+            int builder = Camera.main.cullingMask;
             if (Config.transparentWalls)
-                _cam.cullingMask &= ~(1 << TransparentWallsPatch.WallLayerMask);
+                builder &= ~(1 << TransparentWallsPatch.WallLayerMask);
             else
-                _cam.cullingMask |= (1 << TransparentWallsPatch.WallLayerMask);
+                builder |= (1 << TransparentWallsPatch.WallLayerMask);
             if (Config.avatar)
             {
                 if (Config.thirdPerson || Config.use360Camera)
                 {
-                    _cam.cullingMask |= 1 << OnlyInThirdPerson;
-                    _cam.cullingMask &= ~(1 << OnlyInFirstPerson);
+                    builder |= 1 << OnlyInThirdPerson;
+                    builder &= ~(1 << OnlyInFirstPerson);
                 }
                 else
                 {
-                    _cam.cullingMask |= 1 << OnlyInFirstPerson;
-                    _cam.cullingMask &= ~(1 << OnlyInThirdPerson);
+                    builder |= 1 << OnlyInFirstPerson;
+                    builder &= ~(1 << OnlyInThirdPerson);
                 }
-                _cam.cullingMask |= 1 << AlwaysVisible;
-             }
+                builder |= 1 << AlwaysVisible;
+            }
             else
             {
-                _cam.cullingMask &= ~(1 << OnlyInThirdPerson);
-                _cam.cullingMask &= ~(1 << OnlyInFirstPerson);
-                _cam.cullingMask &= ~(1 << AlwaysVisible);
+                builder &= ~(1 << OnlyInThirdPerson);
+                builder &= ~(1 << OnlyInFirstPerson);
+                builder &= ~(1 << AlwaysVisible);
             }
-            if (Config.debri!="link")
+            if (Config.debri != "link")
             {
-                if (Config.debri=="show")
-                    _cam.cullingMask |= (1 << NotesDebriLayer);
+                if (Config.debri == "show")
+                    builder |= (1 << NotesDebriLayer);
                 else
-                    _cam.cullingMask &= ~(1 << NotesDebriLayer);
+                    builder &= ~(1 << NotesDebriLayer);
             }
             if (Config.HideUI)
-                _cam.cullingMask &= ~(1 << UILayer);
+                builder &= ~(1 << UILayer);
             else
-                _cam.cullingMask |= (1 << UILayer);
+                builder |= (1 << UILayer);
+
+            _cam.cullingMask = builder;
         }
 
         public bool IsWithinRenderArea(Vector2 mousePos, Config c)
