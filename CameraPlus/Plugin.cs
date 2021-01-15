@@ -34,7 +34,7 @@ namespace CameraPlus
         public bool MultiplayerSessionInit;
 
         public Transform _origin;
-        public VRCenterAdjust vrCenterAdjust;
+        private bool isRestartingSong = false;
 
         [Init]
         public void Init(IPALogger logger)
@@ -92,25 +92,42 @@ namespace CameraPlus
             Logger.Log($"{Plugin.Name} has started", LogLevel.Notice);
         }
 
-
         public void OnActiveSceneChanged(Scene from, Scene to)
         {
+            if (isRestartingSong && to.name != "GameCore") return;
             SharedCoroutineStarter.instance.StartCoroutine(DelayedActiveSceneChanged(from, to));
+        }
+
+        [HarmonyPatch(typeof(StandardLevelRestartController))]
+        [HarmonyPatch("RestartLevel")]
+        class hookRestart
+        {
+            static void Prefix()
+            {
+                Instance.isRestartingSong = true;
+            }
         }
 
         private IEnumerator DelayedActiveSceneChanged(Scene from, Scene to)
         {
-            yield return new WaitForSeconds(0.5f);
-            // If any new cameras have been added to the config folder, render them
-            // if(to.name == )
+            bool isRestart = isRestartingSong;
+            isRestartingSong = false;
 
-            CameraUtilities.ReloadCameras();
+
+            if (!isRestart)
+                CameraUtilities.ReloadCameras();
+
+            IEnumerator waitForcam()
+            {
+                yield return new WaitForSeconds(0.01f);
+                while (Camera.main == null) yield return new WaitForSeconds(0.05f);
+            }
 
             if (ActiveSceneChanged != null)
             {
-                if (_rootConfig.ProfileSceneChange)
+                if (_rootConfig.ProfileSceneChange && !isRestart)
                 {
-                    if (to.name == "GameCore" && _rootConfig.GameProfile != "" && (!MultiplayerSession.ConnectedMultiplay || _rootConfig.MultiplayerProfile=="" ))
+                    if (to.name == "GameCore" && _rootConfig.GameProfile != "" && (!MultiplayerSession.ConnectedMultiplay || _rootConfig.MultiplayerProfile == ""))
                     {
                         _profileChanger.ProfileChange(_rootConfig.GameProfile);
                     }
@@ -120,8 +137,7 @@ namespace CameraPlus
                     }
                 }
 
-                yield return new WaitForSeconds(1.0f);
-                while (Camera.main == null) yield return null;
+                yield return waitForcam();
 
                 // Invoke each activeSceneChanged event
                 foreach (var func in ActiveSceneChanged?.GetInvocationList())
@@ -137,15 +153,16 @@ namespace CameraPlus
                     }
                 }
             }
+
+            yield return waitForcam();
+
             if (to.name == "GameCore" || to.name == "MenuCore" || to.name == "MenuViewControllers" || to.name == "HealthWarning")
             {
-                GameObject gameObject = GameObject.Find("LocalPlayerGameCore/Origin");
-                if (gameObject == null)
-                    _origin = null;
-                else
-                    _origin = gameObject.transform;
-
                 CameraUtilities.SetAllCameraCulling();
+
+                if (isRestart)
+                    yield return new WaitForSeconds(0.1f);
+                _origin = GameObject.Find("LocalPlayerGameCore/Origin")?.transform;
             }
         }
 
@@ -164,7 +181,7 @@ namespace CameraPlus
         public void OnFixedUpdate()
         {
             // Fix the cursor when the user resizes the main camera to be smaller than the canvas size and they hover over the black portion of the canvas
-            if (CameraPlusBehaviour.currentCursor != CameraPlusBehaviour.CursorType.None && !CameraPlusBehaviour.anyInstanceBusy && 
+            if (CameraPlusBehaviour.currentCursor != CameraPlusBehaviour.CursorType.None && !CameraPlusBehaviour.anyInstanceBusy &&
                 CameraPlusBehaviour.wasWithinBorder && CameraPlusBehaviour.GetTopmostInstanceAtCursorPos() == null)
             {
                 CameraPlusBehaviour.SetCursor(CameraPlusBehaviour.CursorType.None);
