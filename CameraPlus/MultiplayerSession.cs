@@ -64,7 +64,7 @@ namespace CameraPlus
             for (int i = 0; i < connectedPlayers.Count; i++)
                 Logger.Log($"ConnectedPlayer {connectedPlayers[i].userName},{connectedPlayers[i].sortIndex}", LogLevel.Info);
 
-            if (Plugin.Instance._rootConfig.MultiplayerProfile != "")
+            if (Plugin.Instance._rootConfig.MultiplayerProfile != "" && Plugin.Instance._rootConfig.ProfileSceneChange)
                 Plugin.Instance._profileChanger.ProfileChange(Plugin.Instance._rootConfig.MultiplayerProfile);
         }
         private static void OnSessionDisconnected(DisconnectedReason reason)
@@ -73,7 +73,7 @@ namespace CameraPlus
             connectedPlayers.Clear();
             LobbyAvatarPlace.Clear();
             Logger.Log($"SessionManager Disconnected {reason}", LogLevel.Info);
-            if (Plugin.Instance._rootConfig.MenuProfile != "")
+            if (Plugin.Instance._rootConfig.MenuProfile != "" && Plugin.Instance._rootConfig.ProfileSceneChange)
                 Plugin.Instance._profileChanger.ProfileChange(Plugin.Instance._rootConfig.MenuProfile);
         }
         private static void OnSessionPlayerConnected(IConnectedPlayer player)
@@ -113,7 +113,14 @@ namespace CameraPlus
                     LobbyOffset = multiLobbyAvatarPlace.transform;
                     LobbyAvatarPlace.Add(LobbyOffset);
                 }
-                LobbyAvatarPlace.Select(tr => new { tr.position }).Distinct();
+                //LobbyAvatarPlace.Select(tr => new { tr.position }).Distinct();
+                LobbyAvatarPlace = LobbyAvatarPlace.GroupBy(p => p.position)
+                                                    .Select(g => g.First())
+                                                    .ToList();
+
+                for (int i = 0; i < LobbyAvatarPlace.Count; i++)
+                    Logger.Log($"Find LobbyAvatarPlace {i}: {LobbyAvatarPlace[i].position.x},{LobbyAvatarPlace[i].position.y},{LobbyAvatarPlace[i].position.z}", LogLevel.Notice);
+
                 LobbyAvatarPlace = LobbyAvatarPlace.OrderByDescending(tr => tr.position.x).ToList();
                 for (int i = 0; i < LobbyAvatarPlace.Count ; i++)
                 {
