@@ -107,7 +107,10 @@ ex)
 2. movementScriptpath = "ExampleMovementScript.json"
 
 **for Users of locales that use commas for decimal points**
+
 If the move script doesn't work, enclose the number in double quotation marks. Also, use commas for decimal points.
+
+
 ```xml
 {
     "ActiveInPauseMenu": true,     "ActiveInPauseMenu": Determines whether the camera pauses when pausing the game.
