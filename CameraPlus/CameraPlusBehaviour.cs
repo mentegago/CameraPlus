@@ -453,12 +453,13 @@ namespace CameraPlus
                     {
                         transform.position = ThirdPersonPos + OffsetPosition;
                         transform.eulerAngles = ThirdPersonRot + OffsetAngle;
-                        _cameraCube.position = ThirdPersonPos + OffsetPosition;
-                        _cameraCube.eulerAngles = ThirdPersonRot + OffsetAngle;
                         Quaternion angle = Quaternion.AngleAxis(OffsetAngle.y, Vector3.up);
                         transform.position -= OffsetPosition;
                         transform.position = angle * transform.position;
                         transform.position += OffsetPosition;
+
+                        _cameraCube.position = transform.position;
+                        _cameraCube.eulerAngles = transform.eulerAngles;
                     }
 
                     return;
@@ -517,14 +518,14 @@ namespace CameraPlus
             try
             {
                 if (MultiplayerSession.LobbyContoroller == null || !MultiplayerSession.LobbyContoroller.isActiveAndEnabled || Config.MultiPlayerNumber == 0) return;
-                if (MultiplayerSession.LobbyAvatarPlace.Count == 0) MultiplayerSession.LoadLobbyAvatarPlace();
+                if (MultiplayerSession.LobbyAvatarPlaceList.Count == 0) MultiplayerSession.LoadLobbyAvatarPlace();
 
-                for (int i=0; i< MultiplayerSession.LobbyAvatarPlace.Count;i++)
+                for (int i=0; i< MultiplayerSession.LobbyAvatarPlaceList.Count;i++)
                 {
                     if (i==Config.MultiPlayerNumber - 1)
                     {
-                        OffsetPosition = MultiplayerSession.LobbyAvatarPlace[i].position;
-                        OffsetAngle = MultiplayerSession.LobbyAvatarPlace[i].eulerAngles;
+                        OffsetPosition = MultiplayerSession.LobbyAvatarPlaceList[i].position;
+                        OffsetAngle = MultiplayerSession.LobbyAvatarPlaceList[i].eulerAngles;
                         break;
                     }
                 }
