@@ -585,7 +585,7 @@ namespace CameraPlus
                 else if (MenuMode == 3)
                 {
                     //MultiPlayerOffset
-                    GUI.Box(new Rect(menuPos.x, menuPos.y + 25, 300, 90), "Multiplayer tracking camera");
+                    GUI.Box(new Rect(menuPos.x, menuPos.y + 25, 300, 120), "Multiplayer tracking camera");
                     if (GUI.Button(new Rect(menuPos.x +5, menuPos.y + 45, 55, 30), new GUIContent("Player1"), parentBehaviour.Config.MultiPlayerNumber == 1 ? CustomEnableStyle : CustomDisableStyle))
                     {
                         parentBehaviour.Config.MultiPlayerNumber=1;
@@ -611,20 +611,42 @@ namespace CameraPlus
                         parentBehaviour.Config.MultiPlayerNumber = 5;
                         parentBehaviour.Config.Save();
                     }
-                    if (GUI.Button(new Rect(menuPos.x + 75, menuPos.y + 80, 150, 30), new GUIContent("Tracking Camera Off"), parentBehaviour.Config.MultiPlayerNumber == 0 ? CustomEnableStyle : CustomDisableStyle))
+                    if (GUI.Button(new Rect(menuPos.x + 5, menuPos.y + 80, 145, 30), new GUIContent("Extension"), parentBehaviour.Config.MultiPlayerNumber > 5 ? CustomEnableStyle : CustomDisableStyle))
+                    {
+                        parentBehaviour.Config.MultiPlayerNumber = 6;
+                        parentBehaviour.Config.Save();
+                    }
+                    if(parentBehaviour.Config.MultiPlayerNumber > 5)
+                    {
+                        if (GUI.Button(new Rect(menuPos.x + 150, menuPos.y + 80, 50, 30), new GUIContent("<")))
+                        {
+                            if(parentBehaviour.Config.MultiPlayerNumber -1 > 5)
+                                parentBehaviour.Config.MultiPlayerNumber--;
+                            parentBehaviour.Config.Save();
+                        }
+                        GUI.Box(new Rect(menuPos.x + 200, menuPos.y + 80, 50, 30), parentBehaviour.Config.MultiPlayerNumber.ToString());
+                        if (GUI.Button(new Rect(menuPos.x + 250, menuPos.y + 80, 50, 30), new GUIContent(">")))
+                        {
+                            if (parentBehaviour.Config.MultiPlayerNumber + 1 <= 100)
+                                parentBehaviour.Config.MultiPlayerNumber++;
+                            parentBehaviour.Config.Save();
+                        }
+                    }
+
+                    if (GUI.Button(new Rect(menuPos.x + 75, menuPos.y + 115, 150, 30), new GUIContent("Tracking Camera Off"), parentBehaviour.Config.MultiPlayerNumber == 0 ? CustomEnableStyle : CustomDisableStyle))
                     {
                         parentBehaviour.Config.MultiPlayerNumber = 0;
                         parentBehaviour.Config.Save();
                     }
 
                     //Display Name, Rand and Score
-                    GUI.Box(new Rect(menuPos.x, menuPos.y + 115, 300, 55), "Display Multiplayer Name, Rank and Score");
-                    if (GUI.Button(new Rect(menuPos.x + 5, menuPos.y + 135, 145, 30), new GUIContent("Show Info"), parentBehaviour.Config.DisplayMultiPlayerNameInfo ? CustomEnableStyle : CustomDisableStyle))
+                    GUI.Box(new Rect(menuPos.x, menuPos.y + 170, 300, 55), "Display Multiplayer Name, Rank and Score");
+                    if (GUI.Button(new Rect(menuPos.x + 5, menuPos.y + 190, 145, 30), new GUIContent("Show Info"), parentBehaviour.Config.DisplayMultiPlayerNameInfo ? CustomEnableStyle : CustomDisableStyle))
                     {
                         parentBehaviour.Config.DisplayMultiPlayerNameInfo = true;
                         parentBehaviour.Config.Save();
                     }
-                    if (GUI.Button(new Rect(menuPos.x + 150, menuPos.y + 135, 145, 30), new GUIContent("Hide Info"), !parentBehaviour.Config.DisplayMultiPlayerNameInfo ? CustomEnableStyle : CustomDisableStyle))
+                    if (GUI.Button(new Rect(menuPos.x + 150, menuPos.y + 190, 145, 30), new GUIContent("Hide Info"), !parentBehaviour.Config.DisplayMultiPlayerNameInfo ? CustomEnableStyle : CustomDisableStyle))
                     {
                         parentBehaviour.Config.DisplayMultiPlayerNameInfo = false;
                         parentBehaviour.Config.Save();

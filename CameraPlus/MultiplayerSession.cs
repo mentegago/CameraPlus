@@ -108,12 +108,13 @@ namespace CameraPlus
             {
                 Transform LobbyOffset;
                 LobbyAvatarPlaceList.Clear();
-                MultiplayerLobbyAvatarPlace[] allLobbyAvatarPlace = Resources.FindObjectsOfTypeAll<MultiplayerLobbyAvatarPlace>();
-                Logger.Log($"Find LobbyAvatarPlace {allLobbyAvatarPlace.Length}",LogLevel.Notice);
-                foreach (MultiplayerLobbyAvatarPlace multiLobbyAvatarPlace in allLobbyAvatarPlace)
+                foreach (MultiplayerLobbyAvatarPlace multiLobbyAvatarPlace in Resources.FindObjectsOfTypeAll<MultiplayerLobbyAvatarPlace>())
                 {
-                    LobbyOffset = multiLobbyAvatarPlace.transform;
-                    LobbyAvatarPlaceList.Add(LobbyOffset);
+                    if (multiLobbyAvatarPlace.isActiveAndEnabled)
+                    {
+                        LobbyOffset = multiLobbyAvatarPlace.transform;
+                        LobbyAvatarPlaceList.Add(LobbyOffset);
+                    }
                 }
                 LobbyAvatarPlaceList = LobbyAvatarPlaceList.GroupBy(p => p.position)
                                                     .Select(g => g.First())
@@ -123,25 +124,25 @@ namespace CameraPlus
                     LobbyAvatarPlaceList.Clear();
                     return;
                 }
-                for (int i = 0; i < LobbyAvatarPlaceList.Count; i++)
-                    Logger.Log($"Find LobbyAvatarPlace {i}: {LobbyAvatarPlaceList[i].position.x},{LobbyAvatarPlaceList[i].position.y},{LobbyAvatarPlaceList[i].position.z}", LogLevel.Notice);
-
-                LobbyAvatarPlaceList = LobbyAvatarPlaceList.OrderByDescending(tr => tr.position.x).ToList();
-                for (int i = 0; i < LobbyAvatarPlaceList.Count ; i++)
+                List<Transform> SortAvatarPlacetList = LobbyAvatarPlaceList.OrderBy(tr => tr.position.z).ToList();
+                LobbyAvatarPlaceList.Clear();
+                for (int i=0; i < SortAvatarPlacetList.Count; i++)
                 {
-                    if (LobbyAvatarPlaceList[i].position == Vector3.zero)
-                    {
-                        Transform tr = LobbyAvatarPlaceList[i];
-                        LobbyAvatarPlaceList.RemoveAt(i);
-                        LobbyAvatarPlaceList.Insert(0, tr);
-                        break;
-                    }
+                    if (SortAvatarPlacetList[i].position.x >= 0)
+                        LobbyAvatarPlaceList.Add(SortAvatarPlacetList[i]);
                 }
+                for (int i = SortAvatarPlacetList.Count-1; i > 0; i--)
+                {
+                    if (SortAvatarPlacetList[i].position.x < 0)
+                        LobbyAvatarPlaceList.Add(SortAvatarPlacetList[i]);
+                }
+
                 List<Transform> Tr= ShiftLobbyPositionList(LocalPlayerSortIndex());
                 if (Tr != null) LobbyAvatarPlaceList = Tr;
                 else
                     Logger.Log($"LobbyAvatarPlace SortError", LogLevel.Info);
-                
+                for (int i = 0; i < LobbyAvatarPlaceList.Count; i++)
+                    Logger.Log($"Find LobbyAvatarPlace {i}: {LobbyAvatarPlaceList[i].position.x},{LobbyAvatarPlaceList[i].position.y},{LobbyAvatarPlaceList[i].position.z}", LogLevel.Notice);
             }
             catch {
                 Logger.Log($"Unable to LoadLobbyAvatarPlace", LogLevel.Error);
