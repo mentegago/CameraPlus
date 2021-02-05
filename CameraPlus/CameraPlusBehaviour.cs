@@ -692,8 +692,8 @@ namespace CameraPlus
                 builder &= ~(1 << UILayer);
             else
                 builder |= (1 << UILayer);
-            builder &= ~(1 << (int)CustomNoteLayer);
-            builder |= 1 << (int)NoteLayer;
+            builder &= ~(1 << CustomNoteLayer);
+            builder |= 1 << NoteLayer;
             _cam.cullingMask = builder;
         }
 
