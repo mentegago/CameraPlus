@@ -32,6 +32,8 @@ namespace CameraPlus
         protected const int OnlyInFirstPerson = 6; //Moved to an empty layer because layer 4 overlapped the floor
         protected const int NotesDebriLayer = 9;
         protected const int AlwaysVisible = 10;
+        protected const int NoteLayer = 8;
+        protected const int CustomNoteLayer = 24;
 
         public bool ThirdPerson {
             get { return _thirdPerson; }
@@ -690,7 +692,8 @@ namespace CameraPlus
                 builder &= ~(1 << UILayer);
             else
                 builder |= (1 << UILayer);
-
+            builder &= ~(1 << (int)CustomNoteLayer);
+            builder |= 1 << (int)NoteLayer;
             _cam.cullingMask = builder;
         }
 
