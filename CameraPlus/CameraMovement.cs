@@ -8,6 +8,7 @@ using LogLevel = IPA.Logging.Logger.Level;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using Newtonsoft.Json;
+using System.Globalization;
 using System.Runtime.InteropServices;
 
 
@@ -107,6 +108,8 @@ namespace CameraPlus
             {
                 Movements.Clear();
                 MovementScriptJson movementScriptJson=null;
+                string sep = CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator;
+                string sepCheck = (sep == "." ? "," : ".");
                 try
                 {
                     movementScriptJson = JsonConvert.DeserializeObject<MovementScriptJson>(jsonString);
@@ -125,23 +128,35 @@ namespace CameraPlus
                         Movements newMovement = new Movements();
                         StartPos startPos = jsonmovement.startPos;
                         StartRot startRot = jsonmovement.startRot;
-                        if (startPos.x != null) newMovement.StartPos = new Vector3(float.Parse(startPos.x), float.Parse(startPos.y), float.Parse(startPos.z));
-                        if (startRot.x != null) newMovement.StartRot = new Vector3(float.Parse(startRot.x), float.Parse(startRot.y), float.Parse(startRot.z));
+ 
+                        if (startPos.x != null) newMovement.StartPos = new Vector3(float.Parse(startPos.x.Contains(sepCheck) ? startPos.x.Replace(sepCheck, sep) : startPos.x), 
+                                                                                    float.Parse(startPos.y.Contains(sepCheck) ? startPos.y.Replace(sepCheck, sep) : startPos.y), 
+                                                                                    float.Parse(startPos.z.Contains(sepCheck) ? startPos.z.Replace(sepCheck, sep) : startPos.z));
+                        if (startRot.x != null) newMovement.StartRot = new Vector3(float.Parse(startRot.x.Contains(sepCheck) ? startRot.x.Replace(sepCheck, sep) : startRot.x),
+                                                                                    float.Parse(startRot.y.Contains(sepCheck) ? startRot.y.Replace(sepCheck, sep) : startRot.y),
+                                                                                    float.Parse(startRot.z.Contains(sepCheck) ? startRot.z.Replace(sepCheck, sep) : startRot.z));
                         if (startPos.FOV != null)
-                            newMovement.StartFOV = float.Parse(startPos.FOV);
+                            newMovement.StartFOV = float.Parse(startPos.FOV.Contains(sepCheck) ? startPos.FOV.Replace(sepCheck, sep) : startPos.FOV);
                         else
                             newMovement.StartFOV = 0;
                         EndPos endPos = jsonmovement.endPos;
                         EndRot endRot = jsonmovement.endRot;
+
                         if (endPos.x != null) newMovement.EndPos = new Vector3(float.Parse(endPos.x), float.Parse(endPos.y), float.Parse(endPos.z));
                         if (endRot.x != null) newMovement.EndRot = new Vector3(float.Parse(endRot.x), float.Parse(endRot.y), float.Parse(endRot.z));
+                        if (endPos.x != null) newMovement.EndPos = new Vector3(float.Parse(endPos.x.Contains(sepCheck) ? endPos.x.Replace(sepCheck, sep) : endPos.x),
+                                                                                    float.Parse(endPos.y.Contains(sepCheck) ? endPos.y.Replace(sepCheck, sep) : endPos.y),
+                                                                                    float.Parse(endPos.z.Contains(sepCheck) ? endPos.z.Replace(sepCheck, sep) : endPos.z));
+                        if (endRot.x != null) newMovement.EndRot = new Vector3(float.Parse(endRot.x.Contains(sepCheck) ? endRot.x.Replace(sepCheck, sep) : endRot.x),
+                                                                                    float.Parse(endRot.y.Contains(sepCheck) ? endRot.y.Replace(sepCheck, sep) : endRot.y),
+                                                                                    float.Parse(endRot.z.Contains(sepCheck) ? endRot.z.Replace(sepCheck, sep) : endRot.z));
                         if (endPos.FOV != null)
-                            newMovement.EndFOV = float.Parse(endPos.FOV);
+                            newMovement.EndFOV = float.Parse(endPos.FOV.Contains(sepCheck) ? endPos.FOV.Replace(sepCheck, sep) : endPos.FOV);
                         else
                             newMovement.EndFOV = 0;
 
-                        if (jsonmovement.Delay != null) newMovement.Delay = float.Parse(jsonmovement.Delay);
-                        if (jsonmovement.Duration != null) newMovement.Duration = Mathf.Clamp(float.Parse(jsonmovement.Duration), 0.01f, float.MaxValue); // Make sure duration is at least 0.01 seconds, to avoid a divide by zero error
+                        if (jsonmovement.Delay != null) newMovement.Delay = float.Parse(jsonmovement.Delay.Contains(sepCheck) ? jsonmovement.Delay.Replace(sepCheck,sep) : jsonmovement.Delay);
+                        if (jsonmovement.Duration != null) newMovement.Duration = Mathf.Clamp(float.Parse(jsonmovement.Duration.Contains(sepCheck) ? jsonmovement.Duration.Replace(sepCheck, sep) : jsonmovement.Duration), 0.01f, float.MaxValue); // Make sure duration is at least 0.01 seconds, to avoid a divide by zero error
                         
                         if (jsonmovement.EaseTransition != null)
                             newMovement.EaseTransition = System.Convert.ToBoolean(jsonmovement.EaseTransition);
