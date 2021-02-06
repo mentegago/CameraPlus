@@ -941,7 +941,8 @@ namespace CameraPlus
 
                         GUI.skin.label.fontSize = Config.screenWidth / 8;
                         size = GUI.skin.label.fontSize + 15;
-                        GUI.Label(new Rect(Config.screenPosX, offsetY - Config.screenPosY, Config.screenWidth, GUI.skin.label.fontSize + 15), connectedPlayer.userName);
+
+                        GUI.Label(new Rect(Config.screenPosX, Screen.height-Config.screenPosY - Config.screenHeight, Config.screenWidth, GUI.skin.label.fontSize + 15), connectedPlayer.userName);
 
                         if (SceneManager.GetActiveScene().name == "GameCore" && MultiplayerSession.ConnectedMultiplay)
                         {
@@ -953,8 +954,8 @@ namespace CameraPlus
                                 if (rankedPlayer.userId == connectedPlayer.userId)
                                 {
                                     GUI.skin.label.fontSize = 30;
-                                    GUI.Label(new Rect(Config.screenPosX, offsetY - Config.screenPosY + size + 45, Config.screenWidth, 40), String.Format("{0:#,0}", rankedPlayer.score));
-                                    GUI.Label(new Rect(Config.screenPosX, offsetY - Config.screenPosY + size + 5, Config.screenWidth, 40), "Rank " + ScoreProvider.GetPositionOfPlayer(connectedPlayer.userId).ToString());
+                                    GUI.Label(new Rect(Config.screenPosX, Config.screenPosY - Config.screenHeight - offsetY + size + 45, Config.screenWidth, 40), String.Format("{0:#,0}", rankedPlayer.score));
+                                    GUI.Label(new Rect(Config.screenPosX, Config.screenPosY - Config.screenHeight - offsetY + size + 5, Config.screenWidth, 40), "Rank " + ScoreProvider.GetPositionOfPlayer(connectedPlayer.userId).ToString());
                                     break;
                                 }
                             }
