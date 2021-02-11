@@ -144,6 +144,10 @@
     <EmbeddedResource Include="Resources\Lock.png" />
     <EmbeddedResource Include="Resources\UnLock.png" />
   </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\CameraLock.png" />
+    <EmbeddedResource Include="Resources\CameraUnlock.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>

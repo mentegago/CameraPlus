@@ -25,6 +25,7 @@ namespace CameraPlus
         internal string[] scriptName;
         internal int scriptPage;
         internal Texture2D texture = null;
+        internal Texture2D Cameratexture = null;
         internal GUIStyle CustomEnableStyle = null;
         internal GUIStyle CustomDisableStyle = null;
 
@@ -45,6 +46,10 @@ namespace CameraPlus
                 texture = Utils.LoadTextureFromResources("CameraPlus.Resources.Lock.png");
             else
                 texture = Utils.LoadTextureFromResources("CameraPlus.Resources.UnLock.png");
+            if (this.parentBehaviour.Config.LockCamera)
+                Cameratexture = Utils.LoadTextureFromResources("CameraPlus.Resources.CameraLock.png");
+            else
+                Cameratexture = Utils.LoadTextureFromResources("CameraPlus.Resources.CameraUnlock.png");
         }
         public void DisableMenu()
         {
@@ -88,6 +93,17 @@ namespace CameraPlus
                             texture = Utils.LoadTextureFromResources("CameraPlus.Resources.UnLock.png");
                     }
                     GUI.Box(new Rect(menuPos.x + 35, menuPos.y + 25, 115, 30), new GUIContent(parentBehaviour.Config.LockScreen ? "Locked Screen" : "Unlocked Screen"));
+
+                    if (GUI.Button(new Rect(menuPos.x + 150, menuPos.y + 25, 30, 30), Cameratexture))
+                    {
+                        parentBehaviour.Config.LockCamera = !parentBehaviour.Config.LockCamera;
+                        parentBehaviour.Config.Save();
+                        if (this.parentBehaviour.Config.LockCamera)
+                            Cameratexture = Utils.LoadTextureFromResources("CameraPlus.Resources.CameraLock.png");
+                        else
+                            Cameratexture = Utils.LoadTextureFromResources("CameraPlus.Resources.CameraUnlock.png");
+                    }
+                    GUI.Box(new Rect(menuPos.x + 185, menuPos.y + 25, 115, 30), new GUIContent(parentBehaviour.Config.LockCamera ? "Locked Camera" : "Unlocked Camera"));
 
                     if (GUI.Button(new Rect(menuPos.x + 5, menuPos.y + 60, 145, 60), new GUIContent("Add New Camera")))
                     {

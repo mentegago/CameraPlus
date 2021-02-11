@@ -8,6 +8,7 @@ namespace CameraPlus
     {
         public string FilePath { get; }
         public bool LockScreen = false;
+        public bool LockCamera = false;
         public float fov = 50;
         public int antiAliasing = 2;
         public float renderScale = 1;

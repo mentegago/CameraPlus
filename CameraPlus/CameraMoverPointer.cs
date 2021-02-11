@@ -71,7 +71,7 @@ namespace CameraPlus
 
         protected virtual void LateUpdate()
         {
-            if (_grabbingController != null)
+            if (_grabbingController != null && !_cameraPlus.Config.LockCamera)
             {
                 var diff = _grabbingController.verticalAxisValue * Time.unscaledDeltaTime;
                 if (_grabPos.magnitude > MinScrollDistance)
