@@ -10,7 +10,7 @@ using HarmonyLib;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using System.IO;
-using Newtonsoft.Json;
+using CameraPlus.HarmonyPatches;
 
 namespace CameraPlus
 {
@@ -109,7 +109,10 @@ namespace CameraPlus
                 {
                     if (to.name == "GameCore" && _rootConfig.GameProfile != "" && (!MultiplayerSession.ConnectedMultiplay || _rootConfig.MultiplayerProfile == ""))
                     {
-                        _profileChanger.ProfileChange(_rootConfig.GameProfile);
+                        if (LevelDataPatch.is360Level && _rootConfig.RotateProfile !="")
+                            _profileChanger.ProfileChange(_rootConfig.RotateProfile);
+                        else
+                            _profileChanger.ProfileChange(_rootConfig.GameProfile);
                     }
                     else if ((to.name == "MenuCore" || to.name == "HealthWarning") && _rootConfig.MenuProfile != "" && (!MultiplayerSession.ConnectedMultiplay || _rootConfig.MultiplayerProfile == ""))
                     {

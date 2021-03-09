@@ -11,6 +11,7 @@ namespace CameraPlus
         public bool ProfileSceneChange = false;
         public string MenuProfile = "";
         public string GameProfile = "";
+        public string RotateProfile = "";
         public string MultiplayerProfile = "";
         public bool ProfileLoadCopyMethod = false;
         public int CameraQuadLayer = 0;
