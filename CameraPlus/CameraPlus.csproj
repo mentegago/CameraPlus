@@ -118,7 +118,6 @@
     <Compile Include="CameraProfiles.cs" />
     <Compile Include="CameraUtilities.cs" />
     <Compile Include="Config.cs" />
-    <Compile Include="ConfigEntity.cs" />
     <Compile Include="ContextMenu.cs" />
     <Compile Include="HarmonyPatches\DisableSmoothCamera.cs" />
     <Compile Include="Logger.cs" />
