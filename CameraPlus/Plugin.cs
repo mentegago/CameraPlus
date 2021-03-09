@@ -43,26 +43,6 @@ namespace CameraPlus
             Logger.Log("Logger prepared", LogLevel.Debug);
             string path = Path.Combine(UnityGame.UserDataPath, $"{Plugin.Name}.ini");
             _rootConfig = new RootConfig(path);
-            if (_rootConfig.ForceDisableSmoothCamera)
-            {
-                try
-                {
-                    string gameCfgPath = Path.Combine(Application.persistentDataPath, "settings.cfg");
-                    var settings = JsonConvert.DeserializeObject<ConfigEntity>(File.ReadAllText(gameCfgPath));
-                    if (settings.version == "1.6.0")
-                    {
-                        if (settings.smoothCameraEnabled == 1)
-                        {
-                            settings.smoothCameraEnabled = 0;
-                            File.WriteAllText(gameCfgPath, JsonConvert.SerializeObject(settings));
-                        }
-                    }
-                }
-                catch (Exception e)
-                {
-                    Logger.Log($"Fail SmoothCamera off {e.Message}", LogLevel.Error);
-                }
-            }
         }
 
         [OnStart]

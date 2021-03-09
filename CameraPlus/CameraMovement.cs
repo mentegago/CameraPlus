@@ -14,59 +14,6 @@ using System.Runtime.InteropServices;
 
 namespace CameraPlus
 {
-    public class SongCameraMovement : CameraMovement
-    {
-        public override bool Init(CameraPlusBehaviour cameraPlus)
-        {
-            if (Utils.IsModInstalled("BS_Utils"))
-            {
-                _cameraPlus = cameraPlus;
-                Plugin.Instance.ActiveSceneChanged += OnActiveSceneChanged;
-                return true;
-            }
-            return false;
-        }
-        
-        public override void OnActiveSceneChanged(Scene from, Scene to)
-        {
-            if (to.name == "GameCore")
-            {
-                //var standardLevelSceneSetupDataSO = Resources.FindObjectsOfTypeAll<StandardLevelScenesTransitionSetupDataSO>().FirstOrDefault();
-                //if(standardLevelSceneSetupDataSO)
-                //{
-                //    foreach(var pair in standardLevelSceneSetupDataSO.sceneInfoSceneSetupDataPairs)
-                //    {
-                //        if(pair.data is GameplayCoreSceneSetupData)
-                //        {
-                //            var sceneSetupData = (GameplayCoreSceneSetupData)pair.data;
-
-                //            var level = sceneSetupData.difficultyBeatmap.level;
-                //            Plugin.Log($"Level: {level.levelID}");
-                //            if (level is SongLoaderPlugin.OverrideClasses.CustomLevel)
-                //            {
-                //                if (LoadCameraData(Path.Combine((level as SongLoaderPlugin.OverrideClasses.CustomLevel).customSongInfo.path, "CameraMovementData.json")))
-                //                    data.ActiveInPauseMenu = false;
-                //            }
-                //        }
-                //    }
-                //}
-            }
-            else if(dataLoaded)
-            {
-                dataLoaded = false;
-                _cameraPlus.ThirdPersonPos = _cameraPlus.Config.Position;
-                _cameraPlus.ThirdPersonRot = _cameraPlus.Config.Rotation;
-            }
-            base.OnActiveSceneChanged(from, to);
-        }
-
-        public override void Shutdown()
-        {
-            Plugin.Instance.ActiveSceneChanged -= OnActiveSceneChanged;
-            Destroy(this);
-        }
-    }
-
     public class CameraMovement : MonoBehaviour
     {
         protected CameraPlusBehaviour _cameraPlus;

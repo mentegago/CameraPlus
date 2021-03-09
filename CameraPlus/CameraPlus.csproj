@@ -120,6 +120,7 @@
     <Compile Include="Config.cs" />
     <Compile Include="ConfigEntity.cs" />
     <Compile Include="ContextMenu.cs" />
+    <Compile Include="HarmonyPatches\DisableSmoothCamera.cs" />
     <Compile Include="Logger.cs" />
     <Compile Include="MultiplayerSession.cs" />
     <Compile Include="Plugin.cs" />
@@ -129,7 +130,7 @@
     <Compile Include="RootConfig.cs" />
     <Compile Include="ScreenCameraBehaviour.cs" />
     <Compile Include="CameraMovement.cs" />
-    <Compile Include="TransparentWallsPatch.cs" />
+    <Compile Include="HarmonyPatches\TransparentWallsPatch.cs" />
     <Compile Include="Utilities.cs" />
   </ItemGroup>
   <ItemGroup>

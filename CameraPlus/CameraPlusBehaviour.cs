@@ -11,6 +11,7 @@ using UnityEngine.XR;
 using UnityEngine.SceneManagement;
 using VRUIControls;
 using Screen = UnityEngine.Screen;
+using CameraPlus.HarmonyPatches;
 
 namespace CameraPlus
 {
@@ -581,7 +582,7 @@ namespace CameraPlus
                     _cameraMovement.Shutdown();
 
                 if (Config.movementScriptPath == "SongMovementScript")
-                    _cameraMovement = _cam.gameObject.AddComponent<SongCameraMovement>();
+                    _cameraMovement = _cam.gameObject.AddComponent<CameraMovement>();
                 else if (File.Exists(Config.movementScriptPath) || 
                         File.Exists(Path.Combine(UnityGame.UserDataPath, Plugin.Name, "Scripts", Config.movementScriptPath)) || 
                         File.Exists(Path.Combine(UnityGame.UserDataPath, Plugin.Name, "Scripts", Path.GetFileName(Config.movementScriptPath))))
@@ -954,8 +955,8 @@ namespace CameraPlus
                                 if (rankedPlayer.userId == connectedPlayer.userId)
                                 {
                                     GUI.skin.label.fontSize = 30;
-                                    GUI.Label(new Rect(Config.screenPosX, Config.screenPosY - Config.screenHeight - offsetY + size + 45, Config.screenWidth, 40), String.Format("{0:#,0}", rankedPlayer.score));
-                                    GUI.Label(new Rect(Config.screenPosX, Config.screenPosY - Config.screenHeight - offsetY + size + 5, Config.screenWidth, 40), "Rank " + ScoreProvider.GetPositionOfPlayer(connectedPlayer.userId).ToString());
+                                    GUI.Label(new Rect(Config.screenPosX, Screen.height - Config.screenPosY - Config.screenHeight + size + 45, Config.screenWidth, 40), String.Format("{0:#,0}", rankedPlayer.score));
+                                    GUI.Label(new Rect(Config.screenPosX, Screen.height - Config.screenPosY - Config.screenHeight + size + 5, Config.screenWidth, 40), "Rank " + ScoreProvider.GetPositionOfPlayer(connectedPlayer.userId).ToString());
                                     break;
                                 }
                             }
