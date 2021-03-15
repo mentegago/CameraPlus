@@ -16,8 +16,8 @@ The version here may be a version that has not yet been registered with ModAssis
 		(The folder that contains Beat Saber.exe)
 	3b. Done! You've installed the CameraPlus Plugin.
 
-### Make sure to disable the base game's "Smooth Camera" If you wish to use CameraPlus
-The latest version will automatically force SmoothCamera to turn off. If you want to turn it on, please change the setting in UserData/CameraPlus.ini. (See RootConfig below).
+### When using CameraPlus, "SmoothCamera" is disabled in the base game.
+The latest version will automatically force SmoothCamera to be turned off, ignoring the game's settings.
 
 # Usage
 To edit the settings of any camera in real time, right click on the Beat Saber game window! A context menu will appear with options specific to the camera that you right clicked on!
