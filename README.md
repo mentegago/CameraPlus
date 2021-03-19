@@ -1,9 +1,10 @@
 # CameraPlus
 CameraPlus is a Beat Saber mod that allows for multiple wide FOV cameras with smoothed movement, which makes for a much more pleasant overall spectator experience.
 
-# stable version Installing
-1. Use the Mod Assistant : https://github.com/Assistant/ModAssistant/releases
-		It is the easiest method, it will do all these steps below in 1 click.
+ModAssistant has released [Camera2](https://github.com/kinsi55/CS_BeatSaber_Camera2), which is newly designed and lighter.
+Therefore, CameraPlus is no longer registered in ModAssistant.
+This is the version where I will add the features I want without permission.
+
 # Latest version Download
 The version here may be a version that has not yet been registered with ModAssistant, or a version that will not be registered.
 [Release Page](https://github.com/Snow1226/CameraPlus/releases)
@@ -15,8 +16,8 @@ The version here may be a version that has not yet been registered with ModAssis
 		(The folder that contains Beat Saber.exe)
 	3b. Done! You've installed the CameraPlus Plugin.
 
-### Make sure to disable the base game's "Smooth Camera" If you wish to use CameraPlus
-The latest version will automatically force SmoothCamera to turn off. If you want to turn it on, please change the setting in UserData/CameraPlus.ini. (See RootConfig below).
+### When using CameraPlus, "SmoothCamera" is disabled in the base game.
+The latest version will automatically force SmoothCamera to be turned off, ignoring the game's settings.
 
 # Usage
 To edit the settings of any camera in real time, right click on the Beat Saber game window! A context menu will appear with options specific to the camera that you right clicked on!
