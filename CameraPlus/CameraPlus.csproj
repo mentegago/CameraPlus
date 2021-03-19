@@ -121,6 +121,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Camera2Utils\Camera2Scenes.cs" />
     <Compile Include="CameraMovementJson.cs" />
     <Compile Include="CameraMoverPointer.cs" />
     <Compile Include="CameraPlusInstance.cs" />
@@ -128,8 +129,12 @@
     <Compile Include="CameraUtilities.cs" />
     <Compile Include="Config.cs" />
     <Compile Include="ContextMenu.cs" />
+    <Compile Include="Camera2Utils\Camera2Config.cs" />
+    <Compile Include="Camera2Utils\Camera2ConfigExporter.cs" />
+    <Compile Include="HarmonyPatches\CustomPreviewBeatmapLevelPatch.cs" />
     <Compile Include="HarmonyPatches\DisableSmoothCamera.cs" />
     <Compile Include="HarmonyPatches\LevelDataPatch.cs" />
+    <Compile Include="HarmonyPatches\RoomAdjustPatch.cs" />
     <Compile Include="Logger.cs" />
     <Compile Include="MultiplayerSession.cs" />
     <Compile Include="Plugin.cs" />

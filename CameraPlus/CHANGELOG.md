@@ -1,3 +1,43 @@
+# v4.8.1 Changes
+- Trial implementation of configuration converter to Camera2.
+- Fixed a bug in NoodlePlayerTrack when changing RoomAdjust.
+- Start implementation of SongScript.
+- Fixed a typo in ExampleMovementScript.json. For those who cannot get it to work, delete the saved sample once and the correct file will be generated.
+
+# v4.8.0 Changes
+- Fixed the multiplayer status display screen being out of sync again. Functions taken from Camera2
+- Add 90/360 degree profiles. Change the way to turn off Smoothcamera.
+# v4.7.6 Changes
+- Fixed a situation where enabling TransportWall when Bloom is off would only result in translucency. 
+  Thanks for sharing the patch, Kinsi55!
+# v4.7.5
+- Added an option to prevent accidentally grabbing and moving the camera quad.
+# v4.7.4
+- Fixed the part that fails to get multiplayer lobby position.
+- Fixed incorrect positioning of the camera quad in multi-mode.
+- 10 player mode support for MultiplayerExtension + BeatTogether
+- Fixed the display position of multiplayer status display (name, score and rank).
+- Merged features for Custom Notes.
+# v4.7.0 for game version 1.13.2
+- Function to follow the camera to NoodleExtension's AssignPlayerToTrack (optional, off by default)
+- Fixed a possible duplication of camera locations in the multiplayer lobby.
+- Fixed an issue where flickering would occur at the start of a song.
+  (This was noticeable when used with the "Gotta go fast" mod, and kinsi55 helped me with this.
+# v4.6.0
+- Since the number of setting items has increased considerably, the UI has been reorganized.
+- More options to display name, rank, and score during multiplayer.
+- Added profile switching for multiplayer. Currently the profile is the same for lobby and game.
+# v4.5.0
+- Changed the JSON library from SimpleJSON to JSON.net.
+- Add MovementScript selection to the right-click menu
+- Add Added FOV control to the MovementScript.
+- Add MultiplayCamera
+# v4.4.2
+- Fixed an issue with the new profile system not saving when there is no profile (thanks to Fefeland for contacting me)
+- Fixed an error that was occurring when playing online.
+- Multiplayer spectator mode is not currently supported.
+- Considering offsetting it due to the fact that the player's position is no longer at the origin.
+
 # v3.1.0 Changes
 - New song camera movement script!
    * Same as the old camera movement script, except it gets automatically read from the song directory (if it exists) when a song is played!

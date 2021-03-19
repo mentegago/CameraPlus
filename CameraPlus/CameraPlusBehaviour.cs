@@ -211,7 +211,7 @@ namespace CameraPlus
             }
 
             // Add our camera movement script if the movement script path is set
-            if (Config.movementScriptPath != String.Empty)
+            if (Config.movementScriptPath != String.Empty || Config.songSpecificScript)
                 AddMovementScript();
 
             SetCullingMask();
@@ -364,10 +364,21 @@ namespace CameraPlus
             _moverPointer = pointer.gameObject.AddComponent<CameraMoverPointer>();
             _moverPointer.Init(this, _cameraCube);
 
-            if (to.name == "GameCore" && Config.movementScriptPath != String.Empty && Config.movementAudioSync)
+            if (to.name == "GameCore")
             {
                 AddMovementScript();
                 Logger.Log($"Add MoveScript \"{Path.GetFileName(Config.movementScriptPath)}\" successfully initialized! {Convert.ToString(_cam.cullingMask, 16)}");
+            }
+            else
+            {
+                if (Config.movementAudioSync)
+                {
+                    ThirdPersonPos = Config.Position;
+                    ThirdPersonRot = Config.Rotation;
+                    Config.thirdPerson = true;
+                    ThirdPerson = true;
+                    CreateScreenRenderTexture();
+                }
             }
         }
 
@@ -433,9 +444,9 @@ namespace CameraPlus
                             adjustOffset.transform.SetParent(adjustParent.transform);
                             Plugin.Instance._origin = new GameObject("OriginParent").transform;
                         }
-                        adjustParent.transform.position = Plugin.Instance._origin.position;
-                        adjustParent.transform.eulerAngles = Plugin.Instance._origin.eulerAngles;
-
+                        adjustParent.transform.position = Plugin.Instance._origin.position - RoomAdjustPatch.position;
+                        adjustParent.transform.localRotation = Plugin.Instance._origin.localRotation * Quaternion.Inverse(RoomAdjustPatch.rotation);
+                        
                         adjustOffset.transform.localPosition = ThirdPersonPos;
                         adjustOffset.transform.localEulerAngles = ThirdPersonRot;
 
@@ -576,20 +587,24 @@ namespace CameraPlus
         }
         public void AddMovementScript()
         {
-            if (Config.movementScriptPath != String.Empty)
+            string songScriptPath;
+            if (Config.movementScriptPath != String.Empty || Config.songSpecificScript)
             {
                 if (_cameraMovement)
                     _cameraMovement.Shutdown();
-
-                if (Config.movementScriptPath == "SongMovementScript")
-                    _cameraMovement = _cam.gameObject.AddComponent<CameraMovement>();
+                if (CustomPreviewBeatmapLevelPatch.customLevelPath != String.Empty)
+                    songScriptPath = Path.Combine(CustomPreviewBeatmapLevelPatch.customLevelPath, "SongScript.json");
+                else
+                    songScriptPath = "SongScript";
+                if (Config.songSpecificScript && File.Exists(songScriptPath))
+                        _cameraMovement = _cam.gameObject.AddComponent<CameraMovement>();
                 else if (File.Exists(Config.movementScriptPath) || 
                         File.Exists(Path.Combine(UnityGame.UserDataPath, Plugin.Name, "Scripts", Config.movementScriptPath)) || 
                         File.Exists(Path.Combine(UnityGame.UserDataPath, Plugin.Name, "Scripts", Path.GetFileName(Config.movementScriptPath))))
                     _cameraMovement = _cam.gameObject.AddComponent<CameraMovement>();
                 else
                     return;
-                if (_cameraMovement.Init(this))
+                if (_cameraMovement.Init(this, Config.songSpecificScript))
                 {
                     ThirdPersonPos = Config.Position;
                     ThirdPersonRot = Config.Rotation;
@@ -605,7 +620,7 @@ namespace CameraPlus
             {
                 if (_cameraMovement)
                     _cameraMovement.Shutdown();
-                if (_cameraMovement.Init(this))
+                if (_cameraMovement.Init(this,Config.songSpecificScript))
                 {
                     ThirdPersonPos = Config.Position;
                     ThirdPersonRot = Config.Rotation;

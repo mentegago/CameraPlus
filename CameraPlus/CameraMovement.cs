@@ -10,7 +10,7 @@ using UnityEngine.SceneManagement;
 using Newtonsoft.Json;
 using System.Globalization;
 using System.Runtime.InteropServices;
-
+using CameraPlus.HarmonyPatches;
 
 namespace CameraPlus
 {
@@ -164,7 +164,7 @@ namespace CameraPlus
             return new Vector3(Mathf.LerpAngle(from.x, to.x, percent), Mathf.LerpAngle(from.y, to.y, percent), Mathf.LerpAngle(from.z, to.z, percent));
         }
 
-        public virtual bool Init(CameraPlusBehaviour cameraPlus)
+        public virtual bool Init(CameraPlusBehaviour cameraPlus, bool useSongSpecificScript)
         {
             if (_audioTimeSyncController == null)
             {
@@ -172,7 +172,14 @@ namespace CameraPlus
             }
             _cameraPlus = cameraPlus;
             Plugin.Instance.ActiveSceneChanged += OnActiveSceneChanged;
-            return LoadCameraData(cameraPlus.Config.movementScriptPath);
+            Logger.Log($"{Path.Combine(CustomPreviewBeatmapLevelPatch.customLevelPath, "SongScript.json")}", LogLevel.Notice);
+            if (useSongSpecificScript && File.Exists(Path.Combine(CustomPreviewBeatmapLevelPatch.customLevelPath, "SongScript.json")))
+            {
+                Logger.Log("Find SongScript", LogLevel.Notice);
+                return LoadCameraData(Path.Combine(CustomPreviewBeatmapLevelPatch.customLevelPath, "SongScript.json"));
+            }
+            else
+                return LoadCameraData(cameraPlus.Config.movementScriptPath);
         }
 
         public virtual void Shutdown()
@@ -202,13 +209,10 @@ namespace CameraPlus
             if (File.Exists(pathFile))
                 path = pathFile;
             else if (File.Exists(Path.Combine(UnityGame.UserDataPath, Plugin.Name, "Scripts", pathFile)))
-            {
                 path = Path.Combine(UnityGame.UserDataPath, Plugin.Name, "Scripts", pathFile);
-            }
             else if (File.Exists(Path.Combine(UnityGame.UserDataPath, Plugin.Name, "Scripts", Path.GetFileName(pathFile))))
-            {
                 path = Path.Combine(UnityGame.UserDataPath, Plugin.Name, "Scripts", Path.GetFileName(pathFile));
-            }
+
             if (File.Exists(path))
             {
                 string jsonText = File.ReadAllText(path);

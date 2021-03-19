@@ -1,6 +1,7 @@
 ﻿using System;
 using UnityEngine;
 using LogLevel = IPA.Logging.Logger.Level;
+using CameraPlus.Camera2Utils;
 
 namespace CameraPlus
 {
@@ -95,18 +96,31 @@ namespace CameraPlus
                         else
                             texture = Utils.LoadTextureFromResources("CameraPlus.Resources.UnLock.png");
                     }
-                    GUI.Box(new Rect(menuPos.x + 35, menuPos.y + 25, 115, 30), new GUIContent(parentBehaviour.Config.LockScreen ? "Locked Screen" : "Unlocked Screen"));
+                    GUI.Box(new Rect(menuPos.x + 35, menuPos.y + 25, 115, 30), new GUIContent(parentBehaviour.Config.LockScreen ? "Locked Screen" : "Unlocked Screen"), ProfileStyle);
 
                     if (GUI.Button(new Rect(menuPos.x + 150, menuPos.y + 25, 30, 30), Cameratexture))
                     {
-                        parentBehaviour.Config.LockCamera = !parentBehaviour.Config.LockCamera;
+                        if (!parentBehaviour.Config.LockCamera)
+                        {
+                            parentBehaviour.Config.LockCamera = true;
+                            parentBehaviour.Config.LockCameraDrag = false;
+                        }
+                        else if(parentBehaviour.Config.LockCamera && !parentBehaviour.Config.LockCameraDrag)
+                        {
+                            parentBehaviour.Config.LockCameraDrag = true;
+                        }
+                        else
+                        {
+                            parentBehaviour.Config.LockCamera = false;
+                            parentBehaviour.Config.LockCameraDrag = false;
+                        }
                         parentBehaviour.Config.Save();
                         if (this.parentBehaviour.Config.LockCamera)
                             Cameratexture = Utils.LoadTextureFromResources("CameraPlus.Resources.CameraLock.png");
                         else
                             Cameratexture = Utils.LoadTextureFromResources("CameraPlus.Resources.CameraUnlock.png");
                     }
-                    GUI.Box(new Rect(menuPos.x + 185, menuPos.y + 25, 115, 30), new GUIContent(parentBehaviour.Config.LockCamera ? "Locked Camera" : "Unlocked Camera"));
+                    GUI.Box(new Rect(menuPos.x + 185, menuPos.y + 25, 115, 30), new GUIContent(parentBehaviour.Config.LockCameraDrag ? "ResetDrag Camera" : (parentBehaviour.Config.LockCamera ? "Locked Camera" : "Unlocked Camera")), ProfileStyle);
 
                     if (GUI.Button(new Rect(menuPos.x + 5, menuPos.y + 60, 145, 60), new GUIContent("Add New Camera")))
                     {
@@ -199,7 +213,11 @@ namespace CameraPlus
                         MenuMode = 5;
                         scriptName = CameraUtilities.MovementScriptList();
                     }
-                    /*
+                    if (GUI.Button(new Rect(menuPos.x + 5, menuPos.y + 385, 145, 40), new GUIContent("Camera2 Converter")))
+                    {
+                        MenuMode = 6;
+                        Camera2ConfigExporter.Init();
+                    }                    /*
                     if (GUI.Button(new Rect(menuPos.x, menuPos.y + 345, 300, 30), new GUIContent(parentBehaviour.Config.Orthographics ? "Perspective" : "Orthographics")))
                     {
                         parentBehaviour.Config.Orthographics = !parentBehaviour.Config.Orthographics;
@@ -713,7 +731,7 @@ namespace CameraPlus
                         GUI.Box(new Rect(menuPos.x + 30, menuPos.y + 260, 270, 30), "Game Scene  : " + (Plugin.Instance._rootConfig.GameProfile), ProfileStyle);
                         GUI.Box(new Rect(menuPos.x + 30, menuPos.y + 290, 270, 30), "Game 90/360 : " + (Plugin.Instance._rootConfig.RotateProfile), ProfileStyle);
                         GUI.Box(new Rect(menuPos.x + 30, menuPos.y + 320, 270, 30), "Multiplayer : " + (Plugin.Instance._rootConfig.MultiplayerProfile), ProfileStyle);
-                        if (GUI.Button(new Rect(menuPos.x, menuPos.y + 240, 30, 30), "X"))
+                        if (GUI.Button(new Rect(menuPos.x, menuPos.y + 230, 30, 30), "X"))
                         {
                             if (Plugin.Instance._rootConfig.MenuProfile!=string.Empty)
                                 Plugin.Instance._rootConfig.MenuProfile = string.Empty;
@@ -785,12 +803,27 @@ namespace CameraPlus
                         parentBehaviour.Config.Save();
                     }
 
-                    if (GUI.Button(new Rect(menuPos.x, menuPos.y + 105, 80, 30), new GUIContent("<")))
+                    GUI.Box(new Rect(menuPos.x, menuPos.y + 80, 300, 55), new GUIContent("Song-specific script"));
+                    if (GUI.Button(new Rect(menuPos.x + 5, menuPos.y + 100, 145, 30), new GUIContent("Enable"), parentBehaviour.Config.songSpecificScript ? CustomEnableStyle : CustomDisableStyle))
+                    {
+                        parentBehaviour.Config.songSpecificScript = true;
+                        parentBehaviour.SetCullingMask();
+                        parentBehaviour.Config.Save();
+                        parentBehaviour.AddMovementScript();
+                    }
+                    if (GUI.Button(new Rect(menuPos.x + 150, menuPos.y + 100, 145, 30), new GUIContent("Disable"), !parentBehaviour.Config.songSpecificScript ? CustomEnableStyle : CustomDisableStyle))
+                    {
+                        parentBehaviour.Config.songSpecificScript = false;
+                        parentBehaviour.SetCullingMask();
+                        parentBehaviour.Config.Save();
+                    }
+
+                    if (GUI.Button(new Rect(menuPos.x, menuPos.y + 140, 80, 30), new GUIContent("<")))
                     {
                         if (scriptPage > 0) scriptPage--;
                     }
-                    GUI.Box(new Rect(menuPos.x + 80, menuPos.y + 105, 140, 30), new GUIContent($"{scriptPage + 1} / {Math.Ceiling(Decimal.Parse(scriptName.Length.ToString()) / 5)}"));
-                    if (GUI.Button(new Rect(menuPos.x + 220, menuPos.y + 105, 80, 30), new GUIContent(">")))
+                    GUI.Box(new Rect(menuPos.x + 80, menuPos.y + 140, 140, 30), new GUIContent($"{scriptPage + 1} / {Math.Ceiling(Decimal.Parse(scriptName.Length.ToString()) / 5)}"));
+                    if (GUI.Button(new Rect(menuPos.x + 220, menuPos.y + 140, 80, 30), new GUIContent(">")))
                     {
                         if (scriptPage < Math.Ceiling(Decimal.Parse(scriptName.Length.ToString()) / 5) - 1) scriptPage++;
                     }
@@ -798,7 +831,7 @@ namespace CameraPlus
                     {
                         if (i < scriptName.Length)
                         {
-                            if (GUI.Button(new Rect(menuPos.x, menuPos.y + (i - scriptPage * 5) * 35 + 145, 300, 30), new GUIContent(scriptName[i]), CameraUtilities.CurrentMovementScript(parentBehaviour.Config.movementScriptPath) == scriptName[i] ? CustomEnableStyle : CustomDisableStyle))
+                            if (GUI.Button(new Rect(menuPos.x, menuPos.y + (i - scriptPage * 5) * 35 + 175, 300, 30), new GUIContent(scriptName[i]), CameraUtilities.CurrentMovementScript(parentBehaviour.Config.movementScriptPath) == scriptName[i] ? CustomEnableStyle : CustomDisableStyle))
                             {
                                 parentBehaviour.Config.movementScriptPath = scriptName[i];
                                 parentBehaviour.Config.Save();
@@ -806,7 +839,7 @@ namespace CameraPlus
                             }
                         }
                     }
-                    if (GUI.Button(new Rect(menuPos.x + 50, menuPos.y + 330, 200, 40), new GUIContent("Movement Off")))
+                    if (GUI.Button(new Rect(menuPos.x + 50, menuPos.y + 360, 200, 40), new GUIContent("Movement Off"), CameraUtilities.CurrentMovementScript(parentBehaviour.Config.movementScriptPath)==string.Empty ? CustomEnableStyle : CustomDisableStyle))
                     {
                         if (parentBehaviour.Config.movementScriptPath != string.Empty)
                         {
@@ -821,7 +854,34 @@ namespace CameraPlus
                         MenuMode = 0;
                     }
                 }
+                else if (MenuMode == 6)
+                {
+                    GUI.Box(new Rect(menuPos.x, menuPos.y + 25, 300, 120), "Select scene to import from Camera2");
+                    if (GUI.Button(new Rect(menuPos.x+5, menuPos.y + 50, 140, 25), new GUIContent("<")))
+                        Camera2ConfigExporter.TrySceneSetLast(Camera2ConfigExporter.currentlyScenesSelected);
+                    if (GUI.Button(new Rect(menuPos.x + 155, menuPos.y + 50, 140, 25), new GUIContent(">")))
+                        Camera2ConfigExporter.SetSceneNext(Camera2ConfigExporter.currentlyScenesSelected);
+                    if (GUI.Button(new Rect(menuPos.x + 30, menuPos.y + 80, 230, 60), new GUIContent("Currently Selected:\n" + Camera2ConfigExporter.currentlyScenesSelected)))
+                        Camera2ConfigExporter.SetSceneNext(Camera2ConfigExporter.currentlyScenesSelected);
 
+                    GUI.Box(new Rect(menuPos.x, menuPos.y + 160, 300, 120), "Select profile Export to Scene in Camera2");
+                    if (GUI.Button(new Rect(menuPos.x + 5, menuPos.y + 185, 140, 25), new GUIContent("<")))
+                        CameraProfiles.TrySetLast(CameraProfiles.currentlySelected);
+                    if (GUI.Button(new Rect(menuPos.x + 155, menuPos.y + 185, 140, 25), new GUIContent(">")))
+                        CameraProfiles.SetNext(CameraProfiles.currentlySelected);
+                    if (GUI.Button(new Rect(menuPos.x + 30, menuPos.y + 215, 230, 60), new GUIContent("Currently Selected:\n" + CameraProfiles.currentlySelected)))
+                        CameraProfiles.SetNext(CameraProfiles.currentlySelected);
+
+                    if (GUI.Button(new Rect(menuPos.x + 5, menuPos.y + 290, 295, 25), new GUIContent("Export to Selected Scene")))
+                        Camera2ConfigExporter.ExportCamera2Scene();
+
+                    if (GUI.Button(new Rect(menuPos.x + 5, menuPos.y + 320, 295, 25), new GUIContent("Import to New Profile")))
+                        Camera2ConfigExporter.LoadCamera2Scene();
+
+
+                    if (GUI.Button(new Rect(menuPos.x, menuPos.y + 430, 300, 30), new GUIContent("Close Camera2 Convert Menu")))
+                        MenuMode = 0;
+                }
                 GUI.matrix = originalMatrix;
             }
         }

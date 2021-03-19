@@ -4,7 +4,7 @@ using UnityEngine;
 namespace CameraPlus.HarmonyPatches
 {
     [HarmonyPatch(typeof(StretchableObstacle), nameof(StretchableObstacle.SetSizeAndColor))]
-    class TransparentWallsPatch
+    internal class TransparentWallsPatch
     {
         public static int WallLayerMask = 25;
         static void Postfix(Transform ____obstacleCore, ref ParametricBoxFakeGlowController ____obstacleFakeGlow)

@@ -5,7 +5,7 @@ using HarmonyLib;
 namespace CameraPlus.HarmonyPatches
 {
 	[HarmonyPatch]
-	class DisableSmoothCamera
+	internal class DisableSmoothCamera
 	{
 		static bool Prefix()
 		{

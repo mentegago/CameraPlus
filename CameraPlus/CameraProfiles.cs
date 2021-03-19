@@ -100,15 +100,20 @@ namespace CameraPlus
                 Directory.Delete(Path.Combine(pPath, "Profiles", name), true);
         }
 
-        public static string GetNextProfileName()
+        public static string GetNextProfileName(string BaseName = "")
         {
-            DirectoryInfo dir = new DirectoryInfo(Path.Combine(pPath, "Profiles"));
-            DirectoryInfo[] dirs = dir.GetDirectories();
             int index = 1;
             string folName = "CameraPlusProfile";
+            string bname;
+            if (BaseName == "")
+                bname = "CameraPlusProfile";
+            else
+                bname = BaseName;
+            DirectoryInfo dir = new DirectoryInfo(Path.Combine(pPath, "Profiles"));
+            DirectoryInfo[] dirs = dir.GetDirectories($"{bname}*");
             foreach (var dire in dirs)
             {
-                folName = $"CameraPlusProfile{index.ToString()}";
+                folName = $"{bname}{index.ToString()}";
                 index++;
             }
             return folName;
@@ -154,6 +159,11 @@ namespace CameraPlus
                     DirectoryCopy(subdir.FullName, temppath, copySubDirs);
                 }
             }
+        }
+        public static void DirectoryCreate(string sourceDirName)
+        {
+            if (!Directory.Exists(sourceDirName))
+                Directory.CreateDirectory(sourceDirName);
         }
     }
     public class ProfileChanger : MonoBehaviour

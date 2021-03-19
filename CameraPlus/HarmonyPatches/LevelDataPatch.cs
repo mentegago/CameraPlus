@@ -8,7 +8,7 @@ using LogLevel = IPA.Logging.Logger.Level;
 namespace CameraPlus.HarmonyPatches
 {
 	[HarmonyPatch]
-	class LevelDataPatch
+	internal class LevelDataPatch
 	{
 		public static IDifficultyBeatmap difficultyBeatmap;
 		public static bool is360Level = false;

@@ -109,7 +109,8 @@ namespace CameraPlus
             config.angy = rot.y;
             config.angz = rot.z;
 
-            config.Save();
+            if(!config.LockCameraDrag)
+                config.Save();
         }
     }
 }
