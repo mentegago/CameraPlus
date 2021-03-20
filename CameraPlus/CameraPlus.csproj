@@ -140,7 +140,6 @@
     <Compile Include="Plugin.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="CameraPlusBehaviour.cs" />
-    <Compile Include="ReflectionUtil.cs" />
     <Compile Include="RootConfig.cs" />
     <Compile Include="ScreenCameraBehaviour.cs" />
     <Compile Include="CameraMovement.cs" />

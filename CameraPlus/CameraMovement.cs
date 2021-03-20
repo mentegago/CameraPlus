@@ -167,15 +167,14 @@ namespace CameraPlus
         public virtual bool Init(CameraPlusBehaviour cameraPlus, bool useSongSpecificScript)
         {
             if (_audioTimeSyncController == null)
-            {
                 _audioTimeSyncController = Resources.FindObjectsOfTypeAll<AudioTimeSyncController>().FirstOrDefault();
-            }
+
             _cameraPlus = cameraPlus;
             Plugin.Instance.ActiveSceneChanged += OnActiveSceneChanged;
-            Logger.Log($"{Path.Combine(CustomPreviewBeatmapLevelPatch.customLevelPath, "SongScript.json")}", LogLevel.Notice);
+
             if (useSongSpecificScript && File.Exists(Path.Combine(CustomPreviewBeatmapLevelPatch.customLevelPath, "SongScript.json")))
             {
-                Logger.Log("Find SongScript", LogLevel.Notice);
+                Logger.Log($"{Path.Combine(CustomPreviewBeatmapLevelPatch.customLevelPath, "SongScript.json")}", LogLevel.Notice);
                 return LoadCameraData(Path.Combine(CustomPreviewBeatmapLevelPatch.customLevelPath, "SongScript.json"));
             }
             else

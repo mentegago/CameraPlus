@@ -48,7 +48,7 @@ namespace CameraPlus
                 texture = Utils.LoadTextureFromResources("CameraPlus.Resources.Lock.png");
             else
                 texture = Utils.LoadTextureFromResources("CameraPlus.Resources.UnLock.png");
-            if (this.parentBehaviour.Config.LockCamera)
+            if (this.parentBehaviour.Config.LockCamera || this.parentBehaviour.Config.LockCameraDrag)
                 Cameratexture = Utils.LoadTextureFromResources("CameraPlus.Resources.CameraLock.png");
             else
                 Cameratexture = Utils.LoadTextureFromResources("CameraPlus.Resources.CameraUnlock.png");
@@ -100,25 +100,25 @@ namespace CameraPlus
 
                     if (GUI.Button(new Rect(menuPos.x + 150, menuPos.y + 25, 30, 30), Cameratexture))
                     {
-                        if (!parentBehaviour.Config.LockCamera)
+                        if (!parentBehaviour.Config.LockCamera && !parentBehaviour.Config.LockCameraDrag)
                         {
                             parentBehaviour.Config.LockCamera = true;
                             parentBehaviour.Config.LockCameraDrag = false;
+                            Cameratexture = Utils.LoadTextureFromResources("CameraPlus.Resources.CameraLock.png");
                         }
                         else if(parentBehaviour.Config.LockCamera && !parentBehaviour.Config.LockCameraDrag)
                         {
+                            parentBehaviour.Config.LockCamera = false;
                             parentBehaviour.Config.LockCameraDrag = true;
+                            Cameratexture = Utils.LoadTextureFromResources("CameraPlus.Resources.CameraLock.png");
                         }
                         else
                         {
                             parentBehaviour.Config.LockCamera = false;
                             parentBehaviour.Config.LockCameraDrag = false;
+                            Cameratexture = Utils.LoadTextureFromResources("CameraPlus.Resources.CameraUnlock.png");
                         }
                         parentBehaviour.Config.Save();
-                        if (this.parentBehaviour.Config.LockCamera)
-                            Cameratexture = Utils.LoadTextureFromResources("CameraPlus.Resources.CameraLock.png");
-                        else
-                            Cameratexture = Utils.LoadTextureFromResources("CameraPlus.Resources.CameraUnlock.png");
                     }
                     GUI.Box(new Rect(menuPos.x + 185, menuPos.y + 25, 115, 30), new GUIContent(parentBehaviour.Config.LockCameraDrag ? "ResetDrag Camera" : (parentBehaviour.Config.LockCamera ? "Locked Camera" : "Unlocked Camera")), ProfileStyle);
 
@@ -816,6 +816,10 @@ namespace CameraPlus
                         parentBehaviour.Config.songSpecificScript = false;
                         parentBehaviour.SetCullingMask();
                         parentBehaviour.Config.Save();
+                        if (parentBehaviour.Config.movementScriptPath == string.Empty)
+                            parentBehaviour.ClearMovementScript();
+                        else
+                            parentBehaviour.AddMovementScript();
                     }
 
                     if (GUI.Button(new Rect(menuPos.x, menuPos.y + 140, 80, 30), new GUIContent("<")))
@@ -845,7 +849,8 @@ namespace CameraPlus
                         {
                             parentBehaviour.Config.movementScriptPath = String.Empty;
                             parentBehaviour.Config.Save();
-                            parentBehaviour.ClearMovementScript();
+                            if (!parentBehaviour.Config.songSpecificScript)
+                                parentBehaviour.ClearMovementScript();
                         }
                     }
                     //Close

@@ -1,4 +1,4 @@
-# v4.8.1 Changes
+# v4.9.0 Changes
 - Trial implementation of configuration converter to Camera2.
 - Fixed a bug in NoodlePlayerTrack when changing RoomAdjust.
 - Start implementation of SongScript.
