@@ -15,7 +15,6 @@ namespace CameraPlus
         public string MultiplayerProfile = "";
         public bool ProfileLoadCopyMethod = false;
         public int CameraQuadLayer = 0;
-        public bool ForceDisableSmoothCamera = true;
 
         public event Action<RootConfig> ConfigChangedEvent;
 
