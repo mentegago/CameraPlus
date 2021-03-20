@@ -34,7 +34,7 @@ Press <kbd>F1</kbd> to toggle the main camera between first and third person.
 ## Movement Script
 [Movement Script in wiki](https://github.com/Snow1226/CameraPlus/wiki/MovementScript)
 
-If you need help, ask us at the Beat Saber Mod Group Discord Server:  
+## If you need help, ask us at the Beat Saber Mod Group Discord Server:  
 https://discord.gg/BeatSaberMods
 
 ## For developers
