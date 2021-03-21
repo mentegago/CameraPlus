@@ -141,6 +141,7 @@ namespace CameraPlus
 
             if (to.name == "GameCore" || to.name == "MenuCore" || to.name == "MenuViewControllers" || to.name == "HealthWarning")
             {
+                CameraUtilities.SetAllCameraCulling();
                 if (isRestart)
                     yield return new WaitForSeconds(0.1f);
                 _origin = GameObject.Find("LocalPlayerGameCore/Origin")?.transform;

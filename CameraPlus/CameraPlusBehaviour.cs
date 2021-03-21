@@ -385,7 +385,7 @@ namespace CameraPlus
             yield return new WaitForSeconds(0.05f);
             string scriptpath = AddMovementScript();
             Logger.Log($"{this.name} Add MoveScript \"{Path.GetFileName(scriptpath)}\" successfully initialized! {Convert.ToString(_cam.cullingMask, 16)}");
-            SetCullingMask();
+            //SetCullingMask();
         }
 
         [DllImport("user32.dll")]
