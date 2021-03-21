@@ -258,6 +258,7 @@ namespace CameraPlus
         protected virtual void ReadConfig()
         {
             ThirdPerson = Config.thirdPerson;
+            Logger.Log($"ReadConfig {ThirdPerson.ToString()}", LogLevel.Notice);
 
             if (!ThirdPerson)
             {
@@ -367,17 +368,8 @@ namespace CameraPlus
             if (to.name == "GameCore")
                 SharedCoroutineStarter.instance.StartCoroutine(Delayed_activeSceneChanged(from, to));
             else
-            {
                 if (Config.movementAudioSync || (!Config.movementAudioSync && Config.movementScriptPath==string.Empty))
-                {
                     ClearMovementScript();
-                    ThirdPersonPos = Config.Position;
-                    ThirdPersonRot = Config.Rotation;
-                    Config.thirdPerson = true;
-                    ThirdPerson = true;
-                    CreateScreenRenderTexture();
-                }
-            }
         }
 
         private IEnumerator Delayed_activeSceneChanged(Scene from, Scene to)
@@ -634,8 +626,6 @@ namespace CameraPlus
             _cameraMovement = null;
             ThirdPersonPos = Config.Position;
             ThirdPersonRot = Config.Rotation;
-            Config.thirdPerson = true;
-            ThirdPerson = true;
             CreateScreenRenderTexture();
         }
 

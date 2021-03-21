@@ -99,7 +99,7 @@ namespace CameraPlus
 
             IEnumerator waitForcam()
             {
-                yield return new WaitForSeconds(0.01f);
+                yield return new WaitForSeconds(0.1f);
                 while (Camera.main == null) yield return new WaitForSeconds(0.05f);
             }
 
