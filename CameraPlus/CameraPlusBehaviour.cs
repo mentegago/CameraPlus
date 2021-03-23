@@ -258,7 +258,6 @@ namespace CameraPlus
         protected virtual void ReadConfig()
         {
             ThirdPerson = Config.thirdPerson;
-            Logger.Log($"ReadConfig {ThirdPerson.ToString()}", LogLevel.Notice);
 
             if (!ThirdPerson)
             {
