@@ -69,6 +69,9 @@ namespace CameraPlus
         public string movementScriptPath = String.Empty;
         public bool movementAudioSync = true;
         public bool songSpecificScript = false;
+        public string VMCProtocolMode = "disable";
+        public string VMCProtocolAddress = "127.0.0.1";
+        public int VMCProtocolPort = 39540;
         //public int maxFps = 90;
 
         public event Action<Config> ConfigChangedEvent;
@@ -303,8 +306,8 @@ namespace CameraPlus
                 config2.type = Camera2Utils.CameraType.FirstPerson.ToString();
             config2.FOV = fov;
             config2.layer = layer;
-            config2.antiAliasing = antiAliasing;
-            config2.renderScale = renderScale;
+            config2.antiAliasing = (antiAliasing > 2) ? antiAliasing : 2;
+            config2.renderScale = (renderScale > 1.2f) ? renderScale : 1.2f ;
             config2.viewRect.x = screenPosX;
             config2.viewRect.y = screenPosY;
             config2.viewRect.width = fitToCanvas ? -1 : screenWidth;

@@ -1,3 +1,11 @@
+# v4.10.0 Changes
+- VMCProtocol implementation (Sender uses OSC Jack, Receiver depends on VMC Vatar)  
+- Added some numerical restrictions to the camera 2 converter  
+# v4.9.2 Changes
+- ixed an issue where the first-person camera would switch to the third-person camera when switching profiles.  
+# v4.9.1 Changes
+- In v4.9.0, we changed the timing of the display layer control for the future.  
+However, it turned out that it was not working properly in some environments, so we changed it back.  
 # v4.9.0 Changes
 - Trial implementation of configuration converter to Camera2.
 - Fixed a bug in NoodlePlayerTrack when changing RoomAdjust.

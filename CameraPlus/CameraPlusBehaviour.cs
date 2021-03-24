@@ -12,6 +12,7 @@ using UnityEngine.SceneManagement;
 using VRUIControls;
 using Screen = UnityEngine.Screen;
 using CameraPlus.HarmonyPatches;
+using CameraPlus.VMCProtocol;
 
 namespace CameraPlus
 {
@@ -112,7 +113,11 @@ namespace CameraPlus
         private MultiplayerScoreProvider ScoreProvider = null;
         private GameObject adjustOffset;
         private GameObject adjustParent;
+        private ExternalSender externalSender;
 
+#if WithVMCAvatar
+        private VMCProtocol.VMCAvatarMarionette marionette;
+#endif
         public virtual void Init(Config config)
         {
             DontDestroyOnLoad(gameObject);
@@ -137,7 +142,6 @@ namespace CameraPlus
                 _contextMenu = MenuObj.AddComponent<ContextMenu>();
             }
             XRSettings.showDeviceView = false;
-
 
             var gameObj = Instantiate(_mainCamera.gameObject);
 
@@ -230,6 +234,37 @@ namespace CameraPlus
             }
         }
 
+        public void InitExternalSender()
+        {
+            if (Config.VMCProtocolMode == "sender")
+            {
+                externalSender = new GameObject("VMCProtocolCamera").AddComponent<ExternalSender>();
+                externalSender.SendCameraData(Config.VMCProtocolAddress, Config.VMCProtocolPort);
+                externalSender.camera = _cam;
+            }
+        }
+        public void InitExternalReceiver()
+        {
+#if WithVMCAvatar
+            if (Config.VMCProtocolMode == "receiver" && Plugin.Instance.ExistsVMCAvatar)
+            {
+                marionette = this.gameObject.AddComponent<VMCProtocol.VMCAvatarMarionette>();
+                ClearMovementScript();
+            }
+#endif
+        }
+        public void DestoryVMCProtocolObject()
+        {
+#if WithVMCAvatar
+            if (marionette)
+                Destroy(marionette);
+#endif
+            if (externalSender)
+                Destroy(externalSender);
+            if (Config.movementScriptPath != String.Empty || Config.songSpecificScript)
+                AddMovementScript();
+        }
+
         protected virtual void OnDestroy()
         {
             Config.ConfigChangedEvent -= PluginOnConfigChangedEvent;
@@ -242,6 +277,12 @@ namespace CameraPlus
 
             _camRenderTexture.Release();
 
+#if WithVMCAvatar
+            if (marionette)
+                Destroy(marionette);
+#endif
+            if (externalSender)
+                Destroy(externalSender);
             if (_screenCamera)
                 Destroy(_screenCamera.gameObject);
             if (_cameraCubeGO)
@@ -425,11 +466,22 @@ namespace CameraPlus
 
                 var camera = _mainCamera.transform;
 
-                HandleMultiPlayerLobby();
-                HandleMultiPlayerGame();
-
                 if (ThirdPerson)
                 {
+#if WithVMCAvatar
+                    if (Plugin.Instance.ExistsVMCAvatar)
+                        if (Config.VMCProtocolMode == "receiver" && marionette)
+                            if (marionette.receivedData)
+                            {
+                                _cam.transform.position = marionette.position;
+                                _cam.transform.rotation = marionette.rotate;
+                                _cam.fieldOfView = marionette.fov > 0 ? marionette.fov : Config.fov;
+                                return;
+                            }
+#endif
+                    HandleMultiPlayerLobby();
+                    HandleMultiPlayerGame();
+
                     HandleThirdPerson360();
 
                     if (Config.NoodleTrack && SceneManager.GetActiveScene().name == "GameCore")
@@ -472,7 +524,8 @@ namespace CameraPlus
                         _cameraCube.position = transform.position;
                         _cameraCube.eulerAngles = transform.eulerAngles;
                     }
-
+                    if(externalSender!=null & Config.VMCProtocolMode=="sender")
+                        externalSender.update = true;
                     return;
                 }
                 //     Console.WriteLine(Config.FirstPersonPositionOffset.ToString());
@@ -585,7 +638,7 @@ namespace CameraPlus
         public string AddMovementScript()
         {
             string songScriptPath = Config.movementScriptPath;
-
+            if (Config.VMCProtocolMode == "receiver") return "ExternalReceiver Enabled";
             if (Config.movementScriptPath != String.Empty || Config.songSpecificScript)
             {
                 if (_cameraMovement)

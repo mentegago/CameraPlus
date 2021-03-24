@@ -36,6 +36,8 @@ namespace CameraPlus
         public Transform _origin;
         private bool isRestartingSong = false;
 
+        public bool ExistsVMCAvatar = false;
+
         [Init]
         public void Init(IPALogger logger)
         {
@@ -70,6 +72,9 @@ namespace CameraPlus
             _profileChanger = new ProfileChanger();
             MultiplayerSessionInit = false;
             Logger.Log($"{Plugin.Name} has started", LogLevel.Notice);
+
+            if (Utils.IsModInstalled("VMCAvatar"))
+                ExistsVMCAvatar = true;
         }
 
         public void OnActiveSceneChanged(Scene from, Scene to)
