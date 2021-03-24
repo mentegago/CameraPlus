@@ -6,7 +6,7 @@ Therefore, CameraPlus is no longer registered in ModAssistant.
 This is the version where I will add the features I want without permission.  
 
 # Latest version Download
-The latest version can be downloaded from the following.
+The latest version can be downloaded from the following.  
 [Release Page](https://github.com/Snow1226/CameraPlus/releases)
 ### To install manually:
 	1. Make sure that Beat Saber is not running.
