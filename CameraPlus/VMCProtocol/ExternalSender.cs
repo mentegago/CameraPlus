@@ -56,7 +56,7 @@ namespace CameraPlus.VMCProtocol
         private void OnDestroy()
         {
             if (Instance == this)
-                Instance = null; // This MonoBehaviour is being destroyed, so set the static instance property to null.
+                Instance = null;
             try
             {
                 stopThread = true;
