@@ -473,8 +473,8 @@ namespace CameraPlus
                         if (Config.VMCProtocolMode == "receiver" && marionette)
                             if (marionette.receivedData)
                             {
-                                _cam.transform.position = marionette.position;
-                                _cam.transform.rotation = marionette.rotate;
+                                transform.position = marionette.position;
+                                transform.rotation = marionette.rotate;
                                 _cam.fieldOfView = marionette.fov > 0 ? marionette.fov : Config.fov;
                                 return;
                             }

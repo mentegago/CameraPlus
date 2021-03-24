@@ -12,6 +12,7 @@ namespace CameraPlus.VMCProtocol
         public Camera camera = null;
         public bool update = false;
         private OscClient Client;
+        private bool stopThread = false;
         public  void Awake(){}
 
         public void SendCameraData(string address="127.0.0.1", int port = 39540)
@@ -24,8 +25,9 @@ namespace CameraPlus.VMCProtocol
             }
             GameObject.DontDestroyOnLoad(this);
             Instance = this;
+            stopThread = false;
             this.Client = new OscClient(address, port);
-            Logger.Log($"Instance of {GetType().Name} Starting.", LogLevel.Warning);
+            Logger.Log($"Instance of {GetType().Name} Starting.", LogLevel.Notice);
             this.thread = new System.Threading.Thread(new ThreadStart(() =>
             {
                 while (true)
@@ -40,23 +42,33 @@ namespace CameraPlus.VMCProtocol
                              camera.fieldOfView});
                             update = false;
                         }
+                        if (stopThread)
+                            return;
                     }
                     catch (Exception e)
                     {
-                        Logger.Log($"{camera.name} ExternalSender Coroutine {e}", LogLevel.Error);
+                        Logger.Log($"{camera.name} ExternalSender Thread : {e}", LogLevel.Error);
                     }
                 }
             }));
             this.thread.Start();
         }
-
         private void OnDestroy()
         {
             if (Instance == this)
                 Instance = null; // This MonoBehaviour is being destroyed, so set the static instance property to null.
-
-            this.thread.Abort();
+            try
+            {
+                stopThread = true;
+                while (thread.IsAlive) { }
+                Logger.Log($"{camera.name} ExternalSender Close", LogLevel.Notice);
+            }
+            catch (Exception e)
+            {
+                Logger.Log($"{camera.name} ExternalSender Destroy : {e}", LogLevel.Error);
+            }
             this.Client.Dispose();
+
         }
     }
 }

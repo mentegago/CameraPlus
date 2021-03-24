@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Text.RegularExpressions;
 using UnityEngine;
 using LogLevel = IPA.Logging.Logger.Level;
 using CameraPlus.Camera2Utils;
+
 
 namespace CameraPlus
 {
@@ -981,8 +983,20 @@ namespace CameraPlus
                     }
                     if (parentBehaviour.Config.VMCProtocolMode == "sender")
                     {
-                        GUI.TextField(new Rect(menuPos.x, menuPos.y + 80, 300, 50), "127.0.0.1");
-
+                        GUI.Box(new Rect(menuPos.x, menuPos.y+80, 150, 45), new GUIContent("Address"));
+                        var addr = GUI.TextField(new Rect(menuPos.x, menuPos.y + 100, 150, 25), parentBehaviour.Config.VMCProtocolAddress);
+                        if (Regex.IsMatch(addr, @"\d{1,3}(\.\d{1,3}){3}(/\d{1,2})?"))
+                        {
+                            parentBehaviour.Config.VMCProtocolAddress = addr;
+                            parentBehaviour.Config.Save();
+                        }
+                        GUI.Box(new Rect(menuPos.x+150, menuPos.y+80, 150, 45), new GUIContent("Port"));
+                        var port = GUI.TextField(new Rect(menuPos.x+150, menuPos.y + 100, 150, 25), parentBehaviour.Config.VMCProtocolPort.ToString());
+                        if (int.TryParse(port, out int result))
+                        {
+                            parentBehaviour.Config.VMCProtocolPort = result;
+                            parentBehaviour.Config.Save();
+                        }
                     }
 
                     if (GUI.Button(new Rect(menuPos.x, menuPos.y + 430, 300, 30), new GUIContent("Close VMCProtocol Menu")))
