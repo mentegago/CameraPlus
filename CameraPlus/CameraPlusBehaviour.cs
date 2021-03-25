@@ -114,6 +114,8 @@ namespace CameraPlus
         private GameObject adjustOffset;
         private GameObject adjustParent;
         private ExternalSender externalSender;
+        private bool replaceFPFC = false;
+        private bool isFPFC = false;
 
 #if WithVMCAvatar
         private VMCProtocol.VMCAvatarMarionette marionette;
@@ -339,14 +341,17 @@ namespace CameraPlus
                         _screenCamera.SetCameraInfo(new Vector2(0, 0), new Vector2(0, 0), -1000);
 
                         _camRenderTexture.Release();
+
                     }
+                }
+                if (replaceFPFC)
+                {
+                    replace = true;
+                    replaceFPFC = false;
                 }
 
                 if (!replace)
-                {
-                    //Logger.Log("Don't need to replace");
                     return;
-                }
 
                 if (Config.fitToCanvas)
                 {
@@ -376,7 +381,11 @@ namespace CameraPlus
                 _cam.targetTexture = _camRenderTexture;
                 _previewMaterial.SetTexture("_MainTex", _camRenderTexture);
                 _screenCamera.SetRenderTexture(_camRenderTexture);
-                _screenCamera.SetCameraInfo(Config.ScreenPosition, Config.ScreenSize, Config.layer);
+
+                if (FPFCPatch.isInstanceFPFC && !FPFCPatch.instance.isActiveAndEnabled)
+                    _screenCamera.SetCameraInfo(Config.ScreenPosition, Config.ScreenSize, Config.layer + 1000);
+                else
+                    _screenCamera.SetCameraInfo(Config.ScreenPosition, Config.ScreenSize, Config.layer);
 
                 _prevFitToCanvas = Config.fitToCanvas;
                 _prevAA = Config.antiAliasing;
@@ -468,6 +477,13 @@ namespace CameraPlus
 
                 if (ThirdPerson)
                 {
+                    if (FPFCPatch.isInstanceFPFC)
+                        if (isFPFC != FPFCPatch.instance.isActiveAndEnabled)
+                        {
+                            isFPFC = FPFCPatch.instance.enabled;
+                            replaceFPFC = true;
+                            CreateScreenRenderTexture();
+                        }
 #if WithVMCAvatar
                     if (Plugin.Instance.ExistsVMCAvatar)
                         if (Config.VMCProtocolMode == "receiver" && marionette)

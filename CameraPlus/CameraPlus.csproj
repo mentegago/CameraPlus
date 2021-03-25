@@ -155,6 +155,7 @@
     <Compile Include="Camera2Utils\Camera2ConfigExporter.cs" />
     <Compile Include="HarmonyPatches\CustomPreviewBeatmapLevelPatch.cs" />
     <Compile Include="HarmonyPatches\DisableSmoothCamera.cs" />
+    <Compile Include="HarmonyPatches\FPFCPatch.cs" />
     <Compile Include="HarmonyPatches\LevelDataPatch.cs" />
     <Compile Include="HarmonyPatches\RoomAdjustPatch.cs" />
     <Compile Include="Logger.cs" />

@@ -33,6 +33,8 @@ namespace CameraPlus
         internal GUIStyle CustomDisableStyle = null;
         internal GUIStyle ProfileStyle = null;
 
+        private string ipNum =@"(25[0-5]|2[0-4]\d|[0-1]\d{2}|[1-9]?\d)";
+
         public void Awake()
         {
         }
@@ -985,7 +987,7 @@ namespace CameraPlus
                     {
                         GUI.Box(new Rect(menuPos.x, menuPos.y+80, 150, 45), new GUIContent("Address"));
                         var addr = GUI.TextField(new Rect(menuPos.x, menuPos.y + 100, 150, 25), parentBehaviour.Config.VMCProtocolAddress);
-                        if (Regex.IsMatch(addr, @"\d{1,3}(\.\d{1,3}){3}(/\d{1,2})?"))
+                        if (Regex.IsMatch(addr, ("^" + ipNum + "\\." + ipNum +"\\."+ipNum +"\\."+ipNum +"$")))
                         {
                             parentBehaviour.Config.VMCProtocolAddress = addr;
                             parentBehaviour.Config.Save();
