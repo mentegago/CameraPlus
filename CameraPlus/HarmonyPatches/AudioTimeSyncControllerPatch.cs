@@ -8,7 +8,9 @@ namespace CameraPlus.HarmonyPatches
         public static AudioTimeSyncController Instance = null;
         static void Postfix(AudioTimeSyncController __instance)
         {
+#if DEBUG
             Logger.Log("AudioTimeSyncController Awake");
+#endif
             Instance = __instance;
         }
     }
