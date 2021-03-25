@@ -32,7 +32,6 @@ namespace CameraPlus
         protected DateTime movementStartDateTime, movementEndDateTime, movementDelayEndDateTime;
         protected bool _paused = false;
         protected DateTime _pauseTime;
-        private AudioTimeSyncController _audioTimeSyncController;
 
         public class Movements
         {
@@ -135,13 +134,14 @@ namespace CameraPlus
 
             if (_cameraPlus.Config.movementAudioSync)
             {
-                if (_audioTimeSyncController == null) return;
+                if (AudioTimeSyncControllerPatch.Instance == null)
+                    return;
 
-                if (movementNextStartTime <= _audioTimeSyncController.songTime)
+                if (movementNextStartTime <= AudioTimeSyncControllerPatch.Instance.songTime)
                     UpdatePosAndRot();
 
                 float difference = movementEndTime - movementStartTime;
-                float current = _audioTimeSyncController.songTime - movementStartTime;
+                float current = AudioTimeSyncControllerPatch.Instance.songTime - movementStartTime;
                 if (difference != 0)
                     movePerc = Mathf.Clamp(current / difference, 0, 1);
             }
@@ -166,9 +166,6 @@ namespace CameraPlus
 
         public virtual bool Init(CameraPlusBehaviour cameraPlus, bool useSongSpecificScript)
         {
-            if (_audioTimeSyncController == null)
-                _audioTimeSyncController = Resources.FindObjectsOfTypeAll<AudioTimeSyncController>().FirstOrDefault();
-
             _cameraPlus = cameraPlus;
             Plugin.Instance.ActiveSceneChanged += OnActiveSceneChanged;
 

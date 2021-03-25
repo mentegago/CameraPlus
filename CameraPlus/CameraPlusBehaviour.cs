@@ -346,8 +346,11 @@ namespace CameraPlus
                 }
                 if (replaceFPFC)
                 {
-                    replace = true;
                     replaceFPFC = false;
+                    if (FPFCPatch.isInstanceFPFC && !FPFCPatch.instance.isActiveAndEnabled)
+                        _screenCamera.SetCameraInfo(Config.ScreenPosition, Config.ScreenSize, Config.layer + 1000);
+                    else
+                        _screenCamera.SetCameraInfo(Config.ScreenPosition, Config.ScreenSize, Config.layer);
                 }
 
                 if (!replace)
@@ -992,9 +995,7 @@ namespace CameraPlus
         void OnGUI()
         {
             if (MultiplayerSession.connectedPlayers != null && Config.DisplayMultiPlayerNameInfo)
-            {
                 foreach (IConnectedPlayer connectedPlayer in MultiplayerSession.connectedPlayers)
-                {
                     if (Config.MultiPlayerNumber - 1 == connectedPlayer.sortIndex)
                     {
                         int size = 0;
@@ -1011,7 +1012,6 @@ namespace CameraPlus
                                 ScoreProvider = Resources.FindObjectsOfTypeAll<MultiplayerScoreProvider>().FirstOrDefault();
 
                             foreach (MultiplayerScoreProvider.RankedPlayer rankedPlayer in ScoreProvider.rankedPlayers)
-                            {
                                 if (rankedPlayer.userId == connectedPlayer.userId)
                                 {
                                     GUI.skin.label.fontSize = 30;
@@ -1019,11 +1019,11 @@ namespace CameraPlus
                                     GUI.Label(new Rect(Config.screenPosX, Screen.height - Config.screenPosY - Config.screenHeight + size + 5, Config.screenWidth, 40), "Rank " + ScoreProvider.GetPositionOfPlayer(connectedPlayer.userId).ToString());
                                     break;
                                 }
-                            }
                             break;
                         }
                     }
-                }
+            if (SceneManager.GetActiveScene().name == "GameCore")
+            {
 
             }
         }

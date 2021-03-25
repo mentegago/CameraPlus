@@ -153,6 +153,7 @@
     <Compile Include="ContextMenu.cs" />
     <Compile Include="Camera2Utils\Camera2Config.cs" />
     <Compile Include="Camera2Utils\Camera2ConfigExporter.cs" />
+    <Compile Include="HarmonyPatches\AudioTimeSyncControllerPatch.cs" />
     <Compile Include="HarmonyPatches\CustomPreviewBeatmapLevelPatch.cs" />
     <Compile Include="HarmonyPatches\DisableSmoothCamera.cs" />
     <Compile Include="HarmonyPatches\FPFCPatch.cs" />
