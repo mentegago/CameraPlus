@@ -137,7 +137,7 @@ namespace CameraPlus
                 if (AudioTimeSyncControllerPatch.Instance == null)
                     return;
 
-                if (movementNextStartTime <= AudioTimeSyncControllerPatch.Instance.songTime)
+                while (movementNextStartTime <= AudioTimeSyncControllerPatch.Instance.songTime)
                     UpdatePosAndRot();
 
                 float difference = movementEndTime - movementStartTime;
