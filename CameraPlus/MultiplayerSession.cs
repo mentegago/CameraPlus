@@ -1,11 +1,9 @@
-﻿using System;
-using System.Reflection;
-using System.Collections;
+﻿
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using IPALogger = IPA.Logging.Logger;
 using LogLevel = IPA.Logging.Logger.Level;
+using CameraPlus.HarmonyPatches;
 
 namespace CameraPlus
 {
@@ -15,15 +13,13 @@ namespace CameraPlus
         public static List<IConnectedPlayer> connectedPlayers;
         public static bool ConnectedMultiplay;
         public static MultiplayerPlayersManager playersManager = null;
-        public static MultiplayerLobbyController LobbyContoroller = null;
         public static List<Transform> LobbyAvatarPlaceList;
-
-        public static void Init()
+        public static void Init(MultiplayerSessionManager sessionManager)
         {
             connectedPlayers = new List<IConnectedPlayer>();
             LobbyAvatarPlaceList = new List<Transform>();
             ConnectedMultiplay = false;
-            SessionManager = Resources.FindObjectsOfTypeAll<MultiplayerSessionManager>().FirstOrDefault();
+            SessionManager = sessionManager;
             if (SessionManager == null)
                 Logger.Log($"Unable to get MultiplayerSessionManager", LogLevel.Error);
             else
@@ -53,16 +49,12 @@ namespace CameraPlus
         {
             ConnectedMultiplay = true;
             connectedPlayers.Clear();
-            //playersManager = Resources.FindObjectsOfTypeAll<MultiplayerPlayersManager>().FirstOrDefault();
-
-            LobbyContoroller = Resources.FindObjectsOfTypeAll<MultiplayerLobbyController>().FirstOrDefault();
-            if (LobbyContoroller == null)
-                Logger.Log($"Unable to get LobbyContoroller", LogLevel.Error);
             connectedPlayers.Add(SessionManager.localPlayer);
+#if DEBUG
             Logger.Log($"ConnectedPlayer---------------", LogLevel.Info);
             for (int i = 0; i < connectedPlayers.Count; i++)
                 Logger.Log($"ConnectedPlayer {connectedPlayers[i].userName},{connectedPlayers[i].sortIndex}", LogLevel.Info);
-
+#endif
             if (Plugin.Instance._rootConfig.MultiplayerProfile != "" && Plugin.Instance._rootConfig.ProfileSceneChange)
                 Plugin.Instance._profileChanger.ProfileChange(Plugin.Instance._rootConfig.MultiplayerProfile);
             LoadLobbyAvatarPlace();
@@ -78,16 +70,14 @@ namespace CameraPlus
         }
         private static void OnSessionPlayerConnected(IConnectedPlayer player)
         {
-            //if (playersManager==null)
-            //    playersManager = Resources.FindObjectsOfTypeAll<MultiplayerPlayersManager>().FirstOrDefault();
-
             connectedPlayers.Add(player);
             connectedPlayers = connectedPlayers.OrderBy(pl => pl.sortIndex)
                     .ToList();
-
+#if DEBUG
             Logger.Log($"ConnectedPlayer---------------", LogLevel.Info);
             for (int i = 0; i < connectedPlayers.Count; i++)
                 Logger.Log($"ConnectedPlayer {connectedPlayers[i].userName},{connectedPlayers[i].sortIndex}", LogLevel.Info);
+#endif
         }
         private static void OnSessionPlayerDisconnected(IConnectedPlayer player)
         {
@@ -108,41 +98,22 @@ namespace CameraPlus
             {
                 Transform LobbyOffset;
                 LobbyAvatarPlaceList.Clear();
-                foreach (MultiplayerLobbyAvatarPlace multiLobbyAvatarPlace in Resources.FindObjectsOfTypeAll<MultiplayerLobbyAvatarPlace>())
+                if (!MultiplayerLobbyAvatarPlaceManagerPatch.Instance) return;
+                LobbyAvatarPlaceList.Add(MultiplayerLobbyAvatarPlaceManagerPatch.Instance.transform);
+                foreach (MultiplayerLobbyAvatarPlace multiLobbyAvatarPlace in MultiplayerLobbyAvatarPlaceManagerPatch.LobbyAvatarPlaces)
                 {
-                    if (multiLobbyAvatarPlace.isActiveAndEnabled)
-                    {
-                        LobbyOffset = multiLobbyAvatarPlace.transform;
-                        LobbyAvatarPlaceList.Add(LobbyOffset);
-                    }
+                    LobbyOffset = multiLobbyAvatarPlace.transform;
+                    LobbyAvatarPlaceList.Add(LobbyOffset);
                 }
-                LobbyAvatarPlaceList = LobbyAvatarPlaceList.GroupBy(p => p.position)
-                                                    .Select(g => g.First())
-                                                    .ToList();
-                if (LobbyAvatarPlaceList.Count <= 1)
-                {
-                    LobbyAvatarPlaceList.Clear();
-                    return;
-                }
-                List<Transform> SortAvatarPlacetList = LobbyAvatarPlaceList.OrderBy(tr => tr.position.z).ToList();
-                LobbyAvatarPlaceList.Clear();
-                for (int i=0; i < SortAvatarPlacetList.Count; i++)
-                {
-                    if (SortAvatarPlacetList[i].position.x >= 0)
-                        LobbyAvatarPlaceList.Add(SortAvatarPlacetList[i]);
-                }
-                for (int i = SortAvatarPlacetList.Count-1; i > 0; i--)
-                {
-                    if (SortAvatarPlacetList[i].position.x < 0)
-                        LobbyAvatarPlaceList.Add(SortAvatarPlacetList[i]);
-                }
-
                 List<Transform> Tr= ShiftLobbyPositionList(LocalPlayerSortIndex());
-                if (Tr != null) LobbyAvatarPlaceList = Tr;
+                if (Tr != null) 
+                    LobbyAvatarPlaceList = Tr;
                 else
                     Logger.Log($"LobbyAvatarPlace SortError", LogLevel.Info);
+#if DEBUG
                 for (int i = 0; i < LobbyAvatarPlaceList.Count; i++)
-                    Logger.Log($"Find LobbyAvatarPlace {i}: {LobbyAvatarPlaceList[i].position.x},{LobbyAvatarPlaceList[i].position.y},{LobbyAvatarPlaceList[i].position.z}", LogLevel.Notice);
+                    Logger.Log($"Find Sorted LobbyAvatarPlace {i}: {LobbyAvatarPlaceList[i].position.x},{LobbyAvatarPlaceList[i].position.y},{LobbyAvatarPlaceList[i].position.z}", LogLevel.Notice);
+#endif
             }
             catch {
                 Logger.Log($"Unable to LoadLobbyAvatarPlace", LogLevel.Error);

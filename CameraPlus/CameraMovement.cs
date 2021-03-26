@@ -9,7 +9,6 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using Newtonsoft.Json;
 using System.Globalization;
-using System.Runtime.InteropServices;
 using CameraPlus.HarmonyPatches;
 
 namespace CameraPlus

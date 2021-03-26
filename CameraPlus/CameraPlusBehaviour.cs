@@ -110,7 +110,6 @@ namespace CameraPlus
         public static bool wasWithinBorder = false;
         public static bool anyInstanceBusy = false;
         private static bool _contextMenuEnabled = true;
-        private MultiplayerScoreProvider ScoreProvider = null;
         private GameObject adjustOffset;
         private GameObject adjustParent;
         private ExternalSender externalSender;
@@ -229,11 +228,13 @@ namespace CameraPlus
             SceneManager_activeSceneChanged(new Scene(), new Scene());
             Logger.Log($"Camera \"{Path.GetFileName(Config.FilePath)}\" successfully initialized! {Convert.ToString(_cam.cullingMask,16)}");
 
+            /*
             if (!Plugin.Instance.MultiplayerSessionInit)
             {
                 Plugin.Instance.MultiplayerSessionInit = true;
                 MultiplayerSession.Init();
             }
+            */
         }
 
         public void InitExternalSender()
@@ -405,14 +406,8 @@ namespace CameraPlus
         {
             StartCoroutine(GetMainCamera());
             StartCoroutine(Get360Managers());
-            var vrPointers = to.name == "GameCore" ? Resources.FindObjectsOfTypeAll<VRPointer>() : Resources.FindObjectsOfTypeAll<VRPointer>();
-            if (vrPointers.Count() == 0)
-            {
-                Logger.Log("Failed to get VRPointer!", LogLevel.Warning);
-                return;
-            }
-
-            var pointer = to.name != "GameCore" ? vrPointers.First() : vrPointers.Last();
+ 
+            var pointer = VRPointerPatch.Instance;
             if (_moverPointer) Destroy(_moverPointer);
             _moverPointer = pointer.gameObject.AddComponent<CameraMoverPointer>();
             _moverPointer.Init(this, _cameraCube);
@@ -567,8 +562,12 @@ namespace CameraPlus
 
         private void HandleThirdPerson360()
         {
-            if (!_beatLineManager || !Config.use360Camera || !_environmentSpawnRotation) return;
-            
+            if (!_beatLineManager || !Config.use360Camera || !_environmentSpawnRotation)
+            {
+                _beatLineManager = BeatLineManagerPatch.Instance;
+                _environmentSpawnRotation = EnvironmentSpawnRotationPatch.Instance;
+                return;
+            }
             float b;
             if (_beatLineManager.isMidRotationValid)
             {
@@ -600,7 +599,7 @@ namespace CameraPlus
         {
             try
             {
-                if (MultiplayerSession.LobbyContoroller == null || !MultiplayerSession.LobbyContoroller.isActiveAndEnabled || Config.MultiPlayerNumber == 0) return;
+                if (!MultiplayerLobbyAvatarPlaceManagerPatch.Instance || !MultiplayerLobbyControllerPatch.Instance.isActiveAndEnabled || Config.MultiPlayerNumber == 0) return;
                 if (MultiplayerSession.LobbyAvatarPlaceList.Count == 0) MultiplayerSession.LoadLobbyAvatarPlace();
 
                 for (int i=0; i< MultiplayerSession.LobbyAvatarPlaceList.Count;i++)
@@ -626,18 +625,11 @@ namespace CameraPlus
                 {
                     MultiplayerConnectedPlayerFacade player = null;
                     bool TryPlayerFacade;
-                    if (MultiplayerSession.playersManager == null)
-                    {
-                        MultiplayerSession.playersManager = Resources.FindObjectsOfTypeAll<MultiplayerPlayersManager>().FirstOrDefault();
-                        Logger.Log($"{this.name} Set MultiplayerPlayersManager", LogLevel.Notice);
-                    }
-                    if (Config.MultiPlayerNumber != 0 && MultiplayerSession.playersManager != null)
-                    {
-                        foreach(IConnectedPlayer connectedPlayer in MultiplayerSession.connectedPlayers)
-                        {
+                    if (MultiplayerPlayersManagerPatch.Instance && Config.MultiPlayerNumber != 0)
+                        foreach (IConnectedPlayer connectedPlayer in MultiplayerSession.connectedPlayers)
                             if (Config.MultiPlayerNumber - 1 == connectedPlayer.sortIndex)
                             {
-                                TryPlayerFacade = MultiplayerSession.playersManager.TryGetConnectedPlayerController(connectedPlayer.userId, out player);
+                                TryPlayerFacade = MultiplayerPlayersManagerPatch.Instance.TryGetConnectedPlayerController(connectedPlayer.userId, out player);
                                 if (TryPlayerFacade && player != null)
                                 {
                                     OffsetPosition = player.transform.position;
@@ -645,8 +637,6 @@ namespace CameraPlus
                                 }
                                 break;
                             }
-                        }
-                    }
                 }
             }
             catch (Exception ex)
@@ -707,25 +697,19 @@ namespace CameraPlus
         }
 
         protected IEnumerator Get360Managers() {
-            yield return new WaitForSeconds(0.5f);
+            yield return _waitForMainCamera;
 
             _beatLineManager = null;
             _environmentSpawnRotation = null;
 
-            var testList = Resources.FindObjectsOfTypeAll<BeatLineManager>();
-
-            if (testList.Length > 0)
+            if (BeatLineManagerPatch.Instance)
             {
-                _beatLineManager = testList.FirstOrDefault();
-
-                _environmentSpawnRotation = Resources.FindObjectsOfTypeAll<EnvironmentSpawnRotation>().FirstOrDefault();
+                _beatLineManager = BeatLineManagerPatch.Instance;
+                _environmentSpawnRotation = EnvironmentSpawnRotationPatch.Instance;
             }
 
             if (_beatLineManager)
-            {
                 this._yAngle = _beatLineManager.midRotation;
-            }
-
         }
 
         internal virtual void SetFOV()
@@ -1008,24 +992,22 @@ namespace CameraPlus
 
                         if (SceneManager.GetActiveScene().name == "GameCore" && MultiplayerSession.ConnectedMultiplay)
                         {
-                            if (ScoreProvider == null)
-                                ScoreProvider = Resources.FindObjectsOfTypeAll<MultiplayerScoreProvider>().FirstOrDefault();
-
-                            foreach (MultiplayerScoreProvider.RankedPlayer rankedPlayer in ScoreProvider.rankedPlayers)
-                                if (rankedPlayer.userId == connectedPlayer.userId)
-                                {
-                                    GUI.skin.label.fontSize = 30;
-                                    GUI.Label(new Rect(Config.screenPosX, Screen.height - Config.screenPosY - Config.screenHeight + size + 45, Config.screenWidth, 40), String.Format("{0:#,0}", rankedPlayer.score));
-                                    GUI.Label(new Rect(Config.screenPosX, Screen.height - Config.screenPosY - Config.screenHeight + size + 5, Config.screenWidth, 40), "Rank " + ScoreProvider.GetPositionOfPlayer(connectedPlayer.userId).ToString());
-                                    break;
-                                }
-                            break;
+                            if (MultiplayerScoreProviderPatch.Instance)
+                            {
+                                foreach (MultiplayerScoreProvider.RankedPlayer rankedPlayer in MultiplayerScoreProviderPatch.Instance.rankedPlayers)
+                                    if (rankedPlayer.userId == connectedPlayer.userId)
+                                    {
+                                        GUI.skin.label.fontSize = 30;
+                                        GUI.Label(new Rect(Config.screenPosX, Screen.height - Config.screenPosY - Config.screenHeight + size + 45, Config.screenWidth, 40), String.Format("{0:#,0}", rankedPlayer.score));
+                                        GUI.Label(new Rect(Config.screenPosX, Screen.height - Config.screenPosY - Config.screenHeight + size + 5, Config.screenWidth, 40), "Rank " + MultiplayerScoreProviderPatch.Instance.GetPositionOfPlayer(connectedPlayer.userId).ToString());
+                                        break;
+                                    }
+                                break;
+                            }
                         }
                     }
             if (SceneManager.GetActiveScene().name == "GameCore")
-            {
-
-            }
+            { }
         }
         void DisplayContextMenu()
         {

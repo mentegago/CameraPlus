@@ -306,8 +306,8 @@ namespace CameraPlus
                 config2.type = Camera2Utils.CameraType.FirstPerson.ToString();
             config2.FOV = fov;
             config2.layer = layer;
-            config2.antiAliasing = (antiAliasing > 2) ? antiAliasing : 2;
-            config2.renderScale = (renderScale > 1.2f) ? renderScale : 1.2f ;
+            config2.renderScale = (renderScale >= 0.99f) ? Math.Max(1.2f, renderScale) : renderScale;
+            config2.antiAliasing = (renderScale >= 0.99f) ? Math.Max(antiAliasing, 2) : antiAliasing;
             config2.viewRect.x = screenPosX;
             config2.viewRect.y = screenPosY;
             config2.viewRect.width = fitToCanvas ? -1 : screenWidth;

@@ -1,12 +1,17 @@
 # v4.10.0 Changes
 - VMCProtocol implementation (Sender uses OSC Jack, Receiver depends on VMCAvatar)  
-- Added some numerical restrictions to the camera2 converter  
+- Added some numerical restrictions to the camera2 converter(thanks review kinsi)  
 - Show the third-person camera when the FPFCToggle is turned back off.
+  (Known issue where using the FPFC toggle prevents you from moving to another player's position in multiplayer mode.)
+- Lighter multiplayer related processing.  
+
 # v4.9.2 Changes
 - Fixed an issue where the first-person camera would switch to the third-person camera when switching profiles.  
+
 # v4.9.1 Changes
 - In v4.9.0, we changed the timing of the display layer control for the future.  
 However, it turned out that it was not working properly in some environments, so we changed it back.  
+
 # v4.9.0 Changes
 - Trial implementation of configuration converter to Camera2.
 - Fixed a bug in NoodlePlayerTrack when changing RoomAdjust.

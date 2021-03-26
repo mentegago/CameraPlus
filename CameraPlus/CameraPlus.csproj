@@ -158,7 +158,10 @@
     <Compile Include="HarmonyPatches\DisableSmoothCamera.cs" />
     <Compile Include="HarmonyPatches\FPFCPatch.cs" />
     <Compile Include="HarmonyPatches\LevelDataPatch.cs" />
+    <Compile Include="HarmonyPatches\MultiplayerPatch.cs" />
     <Compile Include="HarmonyPatches\RoomAdjustPatch.cs" />
+    <Compile Include="HarmonyPatches\RotateMapPatch.cs" />
+    <Compile Include="HarmonyPatches\VRPointerPatch.cs" />
     <Compile Include="Logger.cs" />
     <Compile Include="MultiplayerSession.cs" />
     <Compile Include="VMCProtocol\ExternalSender.cs" />
