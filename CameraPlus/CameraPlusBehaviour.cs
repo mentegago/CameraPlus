@@ -112,12 +112,12 @@ namespace CameraPlus
         private static bool _contextMenuEnabled = true;
         private GameObject adjustOffset;
         private GameObject adjustParent;
-        private ExternalSender externalSender;
+        private ExternalSender externalSender = null;
         private bool replaceFPFC = false;
         private bool isFPFC = false;
 
 #if WithVMCAvatar
-        private VMCProtocol.VMCAvatarMarionette marionette;
+        private VMCProtocol.VMCAvatarMarionette marionette=null;
 #endif
         public virtual void Init(Config config)
         {
@@ -235,15 +235,24 @@ namespace CameraPlus
                 MultiplayerSession.Init();
             }
             */
+            if (Config.VMCProtocolMode == "sender")
+                InitExternalSender();
         }
 
         public void InitExternalSender()
         {
-            if (Config.VMCProtocolMode == "sender")
+            if (Config.VMCProtocolMode == "sender" && Config.fitToCanvas)
             {
+                if (CameraUtilities.vmcPortList == null) CameraUtilities.vmcPortList = new List<int>();
+                if (CameraUtilities.vmcPortList.Find(p=>p==Config.VMCProtocolPort)== Config.VMCProtocolPort)
+                {
+                    Logger.Log($"Camera \"{Path.GetFileName(Config.FilePath)}\" already use port {Config.VMCProtocolPort}");
+                    return;
+                }
                 externalSender = new GameObject("VMCProtocolCamera").AddComponent<ExternalSender>();
                 externalSender.SendCameraData(Config.VMCProtocolAddress, Config.VMCProtocolPort);
                 externalSender.camera = _cam;
+                CameraUtilities.vmcPortList.Add(Config.VMCProtocolPort);
             }
         }
         public void InitExternalReceiver()
@@ -262,11 +271,15 @@ namespace CameraPlus
             if (marionette)
                 Destroy(marionette);
 #endif
+            if (CameraUtilities.vmcPortList != null)
+                if (CameraUtilities.vmcPortList.Find(p => p == Config.VMCProtocolPort) == Config.VMCProtocolPort)
+                    CameraUtilities.vmcPortList.Remove(Config.VMCProtocolPort);
             if (externalSender)
                 Destroy(externalSender);
             if (Config.movementScriptPath != String.Empty || Config.songSpecificScript)
                 AddMovementScript();
         }
+
 
         protected virtual void OnDestroy()
         {
@@ -284,8 +297,12 @@ namespace CameraPlus
             if (marionette)
                 Destroy(marionette);
 #endif
+            if(CameraUtilities.vmcPortList!=null)
+                if (CameraUtilities.vmcPortList.Find(p => p == Config.VMCProtocolPort) == Config.VMCProtocolPort)
+                    CameraUtilities.vmcPortList.Remove(Config.VMCProtocolPort);
             if (externalSender)
                 Destroy(externalSender);
+
             if (_screenCamera)
                 Destroy(_screenCamera.gameObject);
             if (_cameraCubeGO)
@@ -406,12 +423,25 @@ namespace CameraPlus
         {
             StartCoroutine(GetMainCamera());
             StartCoroutine(Get360Managers());
- 
+
             var pointer = VRPointerPatch.Instance;
             if (_moverPointer) Destroy(_moverPointer);
             _moverPointer = pointer.gameObject.AddComponent<CameraMoverPointer>();
             _moverPointer.Init(this, _cameraCube);
 
+            /*
+            var vrPointers = to.name == "GameCore" ? Resources.FindObjectsOfTypeAll<VRPointer>() : Resources.FindObjectsOfTypeAll<VRPointer>();
+            if (vrPointers.Count() == 0)
+            {
+                Logger.Log("Failed to get VRPointer!", LogLevel.Warning);
+                return;
+            }
+            
+            var pointer = to.name != "GameCore" ? vrPointers.First() : vrPointers.Last();
+            if (_moverPointer) Destroy(_moverPointer);
+            _moverPointer = pointer.gameObject.AddComponent<CameraMoverPointer>();
+            _moverPointer.Init(this, _cameraCube);
+            */
             if (to.name == "GameCore")
                 SharedCoroutineStarter.instance.StartCoroutine(Delayed_activeSceneChanged(from, to));
             else
@@ -602,9 +632,9 @@ namespace CameraPlus
                 if (!MultiplayerLobbyAvatarPlaceManagerPatch.Instance || !MultiplayerLobbyControllerPatch.Instance.isActiveAndEnabled || Config.MultiPlayerNumber == 0) return;
                 if (MultiplayerSession.LobbyAvatarPlaceList.Count == 0) MultiplayerSession.LoadLobbyAvatarPlace();
 
-                for (int i=0; i< MultiplayerSession.LobbyAvatarPlaceList.Count;i++)
+                for (int i = 0; i < MultiplayerSession.LobbyAvatarPlaceList.Count; i++)
                 {
-                    if (i==Config.MultiPlayerNumber - 1)
+                    if (i == Config.MultiPlayerNumber - 1)
                     {
                         OffsetPosition = MultiplayerSession.LobbyAvatarPlaceList[i].position;
                         OffsetAngle = MultiplayerSession.LobbyAvatarPlaceList[i].eulerAngles;
@@ -644,6 +674,7 @@ namespace CameraPlus
                 Logger.Log($"{this.name} HandleMultiPlayerGame Error {ex.Message}", LogLevel.Error);
             }
         }
+
         public string AddMovementScript()
         {
             string songScriptPath = Config.movementScriptPath;

@@ -222,7 +222,7 @@ namespace CameraPlus
                         MenuMode = 6;
                         Camera2ConfigExporter.Init();
                     }
-                    if (GUI.Button(new Rect(menuPos.x + 150, menuPos.y + 385, 145, 40), new GUIContent("VMCProtocol")))
+                    if (GUI.Button(new Rect(menuPos.x + 150, menuPos.y + 385, 145, 40), new GUIContent("External linkage")))
                     {
                         MenuMode = 7;
                     }
@@ -961,39 +961,51 @@ namespace CameraPlus
                 }
                 else if (MenuMode == 7)
                 {
-                    GUI.Box(new Rect(menuPos.x, menuPos.y + 25, 300, 55), "VMCProtocol");
-                    if (GUI.Button(new Rect(menuPos.x , menuPos.y + 45, 100, 30), new GUIContent("Sender"), parentBehaviour.Config.VMCProtocolMode=="sender" ? CustomEnableStyle : CustomDisableStyle))
+                    GUI.Box(new Rect(menuPos.x, menuPos.y + 25, 300, 65), "VMCProtocol");
+                    if (parentBehaviour.Config.fitToCanvas)
                     {
-                        parentBehaviour.Config.VMCProtocolMode ="sender";
-                        parentBehaviour.Config.Save();
-                        parentBehaviour.DestoryVMCProtocolObject();
-                        parentBehaviour.InitExternalSender();
+                        if (GUI.Button(new Rect(menuPos.x, menuPos.y + 45, 100, 40), new GUIContent("Sender"), parentBehaviour.Config.VMCProtocolMode == "sender" ? CustomEnableStyle : CustomDisableStyle))
+                        {
+                            parentBehaviour.Config.VMCProtocolMode = "sender";
+                            parentBehaviour.Config.Save();
+                            parentBehaviour.DestoryVMCProtocolObject();
+                            parentBehaviour.InitExternalSender();
+                        }
+
                     }
+                    else
+                        GUI.Box(new Rect(menuPos.x, menuPos.y + 45, 100, 40), new GUIContent("Require\nFitToCanvas"));
                     if (Plugin.Instance.ExistsVMCAvatar)
-                        if (GUI.Button(new Rect(menuPos.x + 100, menuPos.y + 45, 100, 30), new GUIContent("Receiver"), parentBehaviour.Config.VMCProtocolMode == "receiver" ? CustomEnableStyle : CustomDisableStyle))
+                    {
+                        if (GUI.Button(new Rect(menuPos.x + 100, menuPos.y + 45, 100, 40), new GUIContent("Receiver"), parentBehaviour.Config.VMCProtocolMode == "receiver" ? CustomEnableStyle : CustomDisableStyle))
                         {
                             parentBehaviour.Config.VMCProtocolMode = "receiver";
                             parentBehaviour.Config.Save();
                             parentBehaviour.DestoryVMCProtocolObject();
                             parentBehaviour.InitExternalReceiver();
                         }
-                    if (GUI.Button(new Rect(menuPos.x + 200, menuPos.y + 45, 100, 30), new GUIContent("Disable"), parentBehaviour.Config.VMCProtocolMode == "disable" ? CustomEnableStyle : CustomDisableStyle))
+                    }
+                    else
+                        GUI.Box(new Rect(menuPos.x + 100, menuPos.y + 45, 100, 40), new GUIContent("Require\nVMCAvatar Mod"));
+
+                    if (GUI.Button(new Rect(menuPos.x + 200, menuPos.y + 45, 100, 40), new GUIContent("Disable"), parentBehaviour.Config.VMCProtocolMode == "disable" ? CustomEnableStyle : CustomDisableStyle))
                     {
                         parentBehaviour.Config.VMCProtocolMode = "disable";
                         parentBehaviour.Config.Save();
                         parentBehaviour.DestoryVMCProtocolObject();
                     }
+
                     if (parentBehaviour.Config.VMCProtocolMode == "sender")
                     {
-                        GUI.Box(new Rect(menuPos.x, menuPos.y+80, 150, 45), new GUIContent("Address"));
-                        var addr = GUI.TextField(new Rect(menuPos.x, menuPos.y + 100, 150, 25), parentBehaviour.Config.VMCProtocolAddress);
+                        GUI.Box(new Rect(menuPos.x, menuPos.y+90, 150, 45), new GUIContent("Address"));
+                        var addr = GUI.TextField(new Rect(menuPos.x, menuPos.y + 110, 150, 25), parentBehaviour.Config.VMCProtocolAddress);
                         if (Regex.IsMatch(addr, ("^" + ipNum + "\\." + ipNum +"\\."+ipNum +"\\."+ipNum +"$")))
                         {
                             parentBehaviour.Config.VMCProtocolAddress = addr;
                             parentBehaviour.Config.Save();
                         }
-                        GUI.Box(new Rect(menuPos.x+150, menuPos.y+80, 150, 45), new GUIContent("Port"));
-                        var port = GUI.TextField(new Rect(menuPos.x+150, menuPos.y + 100, 150, 25), parentBehaviour.Config.VMCProtocolPort.ToString());
+                        GUI.Box(new Rect(menuPos.x+150, menuPos.y+90, 150, 45), new GUIContent("Port"));
+                        var port = GUI.TextField(new Rect(menuPos.x+150, menuPos.y + 110, 150, 25), parentBehaviour.Config.VMCProtocolPort.ToString());
                         if (int.TryParse(port, out int result))
                         {
                             parentBehaviour.Config.VMCProtocolPort = result;
@@ -1001,7 +1013,7 @@ namespace CameraPlus
                         }
                     }
 
-                    if (GUI.Button(new Rect(menuPos.x, menuPos.y + 430, 300, 30), new GUIContent("Close VMCProtocol Menu")))
+                    if (GUI.Button(new Rect(menuPos.x, menuPos.y + 430, 300, 30), new GUIContent("Close External linkage Menu")))
                         MenuMode = 0;
                 }
                 GUI.matrix = originalMatrix;

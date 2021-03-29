@@ -12,9 +12,7 @@ namespace CameraPlus.HarmonyPatches
         {
             Instance = __instance;
             MultiplayerSession.Init(Instance);
-#if DEBUG
-            Logger.Log("Got MultiplayerSessionManager", LogLevel.Notice);
-#endif
+            Logger.Log($"Success Find SessionManager", LogLevel.Info);
         }
     }
 

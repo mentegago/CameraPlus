@@ -31,7 +31,7 @@ namespace CameraPlus
         public ProfileChanger _profileChanger;
         public string _currentProfile;
 
-        //public bool MultiplayerSessionInit;
+        public bool MultiplayerSessionInit;
 
         public Transform _origin;
         private bool isRestartingSong = false;
@@ -70,7 +70,7 @@ namespace CameraPlus
             CameraProfiles.CreateMainDirectory();
 
             _profileChanger = new ProfileChanger();
-            //MultiplayerSessionInit = false;
+            MultiplayerSessionInit = false;
             Logger.Log($"{Plugin.Name} has started", LogLevel.Notice);
 
             if (Utils.IsModInstalled("VMCAvatar"))

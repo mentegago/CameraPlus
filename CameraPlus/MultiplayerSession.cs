@@ -20,17 +20,11 @@ namespace CameraPlus
             LobbyAvatarPlaceList = new List<Transform>();
             ConnectedMultiplay = false;
             SessionManager = sessionManager;
-            if (SessionManager == null)
-                Logger.Log($"Unable to get MultiplayerSessionManager", LogLevel.Error);
-            else
-            {
-                Logger.Log($"Success Find SessionManager", LogLevel.Info);
 
-                SessionManager.connectedEvent += OnSessionConnected;
-                SessionManager.disconnectedEvent += OnSessionDisconnected;
-                SessionManager.playerConnectedEvent += OnSessionPlayerConnected;
-                SessionManager.playerDisconnectedEvent += OnSessionPlayerDisconnected;
-            }
+            SessionManager.connectedEvent += OnSessionConnected;
+            SessionManager.disconnectedEvent += OnSessionDisconnected;
+            SessionManager.playerConnectedEvent += OnSessionPlayerConnected;
+            SessionManager.playerDisconnectedEvent += OnSessionPlayerDisconnected;
         }
 
         public static void Close()
@@ -110,10 +104,8 @@ namespace CameraPlus
                     LobbyAvatarPlaceList = Tr;
                 else
                     Logger.Log($"LobbyAvatarPlace SortError", LogLevel.Info);
-#if DEBUG
                 for (int i = 0; i < LobbyAvatarPlaceList.Count; i++)
                     Logger.Log($"Find Sorted LobbyAvatarPlace {i}: {LobbyAvatarPlaceList[i].position.x},{LobbyAvatarPlaceList[i].position.y},{LobbyAvatarPlaceList[i].position.z}", LogLevel.Notice);
-#endif
             }
             catch {
                 Logger.Log($"Unable to LoadLobbyAvatarPlace", LogLevel.Error);

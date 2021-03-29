@@ -2,6 +2,7 @@
 using System.IO;
 using System.Linq;
 using System.Collections;
+using System.Collections.Generic;
 using IPA.Utilities;
 using LogLevel = IPA.Logging.Logger.Level;
 using UnityEngine;
@@ -11,6 +12,7 @@ namespace CameraPlus
 {
     public class CameraUtilities
     {
+        public static List<int> vmcPortList =null;
         public static bool CameraExists(string cameraName)
         {
             return Plugin.Instance.Cameras.Keys.Where(c => c == $"{cameraName}.cfg").Count() > 0;

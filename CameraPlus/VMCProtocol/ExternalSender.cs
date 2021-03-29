@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Threading;
+using System.Threading.Tasks;
 using UnityEngine;
 using LogLevel = IPA.Logging.Logger.Level;
 
@@ -7,13 +7,12 @@ namespace CameraPlus.VMCProtocol
 {
     public class ExternalSender : MonoBehaviour
     {
-        public static ExternalSender Instance { get; private set; }
-        private System.Threading.Thread thread;
+        public static ExternalSender Instance = null;
+        private Task task;
         public Camera camera = null;
         public bool update = false;
         private OscClient Client;
         private bool stopThread = false;
-        public  void Awake(){}
 
         public void SendCameraData(string address="127.0.0.1", int port = 39540)
         {
@@ -28,47 +27,36 @@ namespace CameraPlus.VMCProtocol
             stopThread = false;
             this.Client = new OscClient(address, port);
             Logger.Log($"Instance of {GetType().Name} Starting.", LogLevel.Notice);
-            this.thread = new System.Threading.Thread(new ThreadStart(() =>
+            this.task = Task.Run(() => SendData());
+        }
+
+        private void SendData()
+        {
+            while (true)
             {
-                while (true)
+                try
                 {
-                    try
+                    if (camera && update)
                     {
-                        if (camera && update)
-                        {
-                            Client.Send("/VMC/Ext/Cam", "Camera", new float[] {
+                        Client.Send("/VMC/Ext/Cam", "Camera", new float[] {
                              camera.transform.position.x, camera.transform.position.y, camera.transform.position.z,
                              camera.transform.rotation.x, camera.transform.rotation.y, camera.transform.rotation.z, camera.transform.rotation.w,
                              camera.fieldOfView});
-                            update = false;
-                        }
-                        if (stopThread)
-                            return;
+                        update = false;
                     }
-                    catch (Exception e)
-                    {
-                        Logger.Log($"{camera.name} ExternalSender Thread : {e}", LogLevel.Error);
-                    }
+                    if (stopThread)
+                        break;
                 }
-            }));
-            this.thread.Start();
+                catch (Exception e)
+                {
+                    Logger.Log($"{camera.name} ExternalSender Thread : {e}", LogLevel.Error);
+                }
+            }
         }
         private void OnDestroy()
         {
-            if (Instance == this)
-                Instance = null;
-            try
-            {
-                stopThread = true;
-                while (thread.IsAlive) { }
-                Logger.Log($"{camera.name} ExternalSender Close", LogLevel.Notice);
-            }
-            catch (Exception e)
-            {
-                Logger.Log($"{camera.name} ExternalSender Destroy : {e}", LogLevel.Error);
-            }
-            this.Client.Dispose();
-
+            stopThread = true;
+            Task.WaitAll(task);
         }
     }
 }
