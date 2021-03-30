@@ -81,6 +81,9 @@ namespace CameraPlus
         {
             if (isRestartingSong && to.name != "GameCore") return;
             SharedCoroutineStarter.instance.StartCoroutine(DelayedActiveSceneChanged(from, to));
+#if DEBUG
+            Logger.Log($"Scene Change {from.name} to {to.name}", LogLevel.Info);
+#endif
         }
 
         [HarmonyPatch(typeof(StandardLevelRestartController))]
@@ -141,6 +144,8 @@ namespace CameraPlus
                     }
                 }
             }
+            else if (_rootConfig.ProfileSceneChange && to.name == "HealthWarning" && _rootConfig.MenuProfile != "")
+                _profileChanger.ProfileChange(_rootConfig.MenuProfile);
 
             yield return waitForcam();
 

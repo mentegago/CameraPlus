@@ -19,6 +19,7 @@ namespace CameraPlus
         public static float mouseRotateSpeedX = -0.05f;
         public static float mouseRotateSpeedY = 0.05f;
         public static float mouseRotateSpeedZ = 1f;
+        public static bool movementScriptEditMode = false;
 
         public static bool CameraExists(string cameraName)
         {
@@ -204,6 +205,12 @@ namespace CameraPlus
         public static string CurrentMovementScript(string scriptPath)
         {
             return Path.GetFileName(scriptPath);
+        }
+
+        public static void MovementScriptEditMode()
+        {
+            Plugin.Instance._profileChanger.ClearCameras();
+
         }
 
         public static IEnumerator Spawn38Cameras()

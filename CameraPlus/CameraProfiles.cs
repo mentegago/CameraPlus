@@ -174,6 +174,16 @@ namespace CameraPlus
             DirectoryInfo dir = new DirectoryInfo(Path.Combine(pPath, "Profiles", ProfileName));
             if (!dir.Exists)
                 return;
+            ClearCameras();
+            Plugin.Instance._currentProfile = ProfileName;
+
+            if (Plugin.Instance._rootConfig.ProfileLoadCopyMethod && ProfileName !=null)
+                CameraProfiles.SetProfile(ProfileName);
+            CameraUtilities.ReloadCameras();
+        }
+
+        public void ClearCameras()
+        {
             var cs = Resources.FindObjectsOfTypeAll<CameraPlusBehaviour>();
 
             if (Plugin.Instance._rootConfig.ProfileLoadCopyMethod)
@@ -184,12 +194,6 @@ namespace CameraPlus
             foreach (var csi in Plugin.Instance.Cameras.Values)
                 Destroy(csi.Instance.gameObject);
             Plugin.Instance.Cameras.Clear();
-
-            Plugin.Instance._currentProfile = ProfileName;
-
-            if (Plugin.Instance._rootConfig.ProfileLoadCopyMethod && ProfileName !=null)
-                CameraProfiles.SetProfile(ProfileName);
-            CameraUtilities.ReloadCameras();
         }
     }
 }

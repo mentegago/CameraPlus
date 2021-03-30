@@ -921,7 +921,7 @@ namespace CameraPlus
                     {
                         if (i < scriptName.Length)
                         {
-                            if (GUI.Button(new Rect(menuPos.x, menuPos.y + (i - scriptPage * 5) * 35 + 175, 300, 30), new GUIContent(scriptName[i]), CameraUtilities.CurrentMovementScript(parentBehaviour.Config.movementScriptPath) == scriptName[i] ? CustomEnableStyle : CustomDisableStyle))
+                            if (GUI.Button(new Rect(menuPos.x, menuPos.y + (i - scriptPage * 5) * 30 + 170, 300, 30), new GUIContent(scriptName[i]), CameraUtilities.CurrentMovementScript(parentBehaviour.Config.movementScriptPath) == scriptName[i] ? CustomEnableStyle : CustomDisableStyle))
                             {
                                 parentBehaviour.Config.movementScriptPath = scriptName[i];
                                 parentBehaviour.Config.Save();
@@ -929,7 +929,7 @@ namespace CameraPlus
                             }
                         }
                     }
-                    if (GUI.Button(new Rect(menuPos.x + 50, menuPos.y + 360, 200, 40), new GUIContent("Movement Off"), CameraUtilities.CurrentMovementScript(parentBehaviour.Config.movementScriptPath)==string.Empty ? CustomEnableStyle : CustomDisableStyle))
+                    if (GUI.Button(new Rect(menuPos.x + 50, menuPos.y + 330, 200, 40), new GUIContent("Movement Off"), CameraUtilities.CurrentMovementScript(parentBehaviour.Config.movementScriptPath)==string.Empty ? CustomEnableStyle : CustomDisableStyle))
                     {
                         if (parentBehaviour.Config.movementScriptPath != string.Empty)
                         {
@@ -938,6 +938,10 @@ namespace CameraPlus
                             if (!parentBehaviour.Config.songSpecificScript)
                                 parentBehaviour.ClearMovementScript();
                         }
+                    }
+                    if (GUI.Button(new Rect(menuPos.x , menuPos.y + 390, 300, 30), new GUIContent("Movement Script Record Mode")))
+                    {
+                        CameraUtilities.MovementScriptEditMode();
                     }
                     //Close
                     if (GUI.Button(new Rect(menuPos.x, menuPos.y + 430, 300, 30), new GUIContent("Close MovementScript Menu")))

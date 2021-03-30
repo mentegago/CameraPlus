@@ -99,6 +99,11 @@ namespace CameraPlus
                     LobbyOffset = multiLobbyAvatarPlace.transform;
                     LobbyAvatarPlaceList.Add(LobbyOffset);
                 }
+                if (LobbyAvatarPlaceList.Count <= 1)
+                {
+                    LobbyAvatarPlaceList.Clear();
+                    return;
+                }
                 List<Transform> Tr= ShiftLobbyPositionList(LocalPlayerSortIndex());
                 if (Tr != null) 
                     LobbyAvatarPlaceList = Tr;

@@ -291,12 +291,12 @@ namespace CameraPlus
             Config.ConfigChangedEvent -= PluginOnConfigChangedEvent;
             Plugin.Instance.ActiveSceneChanged -= SceneManager_activeSceneChanged;
 
+            
             _cameraMovement?.Shutdown();
-
             // Close our context menu if its open, and destroy all associated controls, otherwise the game will lock up
             CloseContextMenu();
 
-            _camRenderTexture.Release();
+            _camRenderTexture?.Release();
 
 #if WithVMCAvatar
             if (marionette)
@@ -850,7 +850,8 @@ namespace CameraPlus
 
         internal void CloseContextMenu()
         {
-            _contextMenu.DisableMenu();
+            if (_contextMenu!=null)
+                _contextMenu.DisableMenu();
             Destroy(MenuObj);
             _contextMenuOpen = false;
         }
