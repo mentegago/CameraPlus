@@ -378,29 +378,29 @@ namespace CameraPlus
                     }
 
                     //Layer
-                    GUI.Box(new Rect(menuPos.x, menuPos.y + 55, 100, 50), "Layer: " + parentBehaviour.Config.layer);
-                    if (GUI.Button(new Rect(menuPos.x + 5, menuPos.y + 75, 45, 30), new GUIContent("-")))
+                    GUI.Box(new Rect(menuPos.x, menuPos.y + 55, 90, 50), "Layer: " + parentBehaviour.Config.layer);
+                    if (GUI.Button(new Rect(menuPos.x + 5, menuPos.y + 75, 40, 30), new GUIContent("-")))
                     {
                         parentBehaviour.Config.layer--;
                         parentBehaviour.CreateScreenRenderTexture();
                         parentBehaviour.Config.Save();
                     }
-                    if (GUI.Button(new Rect(menuPos.x + 50, menuPos.y + 75, 45, 30), new GUIContent("+")))
+                    if (GUI.Button(new Rect(menuPos.x + 45, menuPos.y + 75, 40, 30), new GUIContent("+")))
                     {
                         parentBehaviour.Config.layer++;
                         parentBehaviour.CreateScreenRenderTexture();
                         parentBehaviour.Config.Save();
                     }
                     //FOV
-                    GUI.Box(new Rect(menuPos.x + 100, menuPos.y + 55, 100, 50), "FOV: " + parentBehaviour.Config.fov);
-                    if (GUI.Button(new Rect(menuPos.x + 105, menuPos.y + 75, 45, 30), new GUIContent("-")))
+                    GUI.Box(new Rect(menuPos.x + 90, menuPos.y + 55, 90, 50), "FOV: " + parentBehaviour.Config.fov);
+                    if (GUI.Button(new Rect(menuPos.x + 95, menuPos.y + 75, 40, 30), new GUIContent("-")))
                     {
                         parentBehaviour.Config.fov--;
                         parentBehaviour.SetFOV();
                         parentBehaviour.CreateScreenRenderTexture();
                         parentBehaviour.Config.Save();
                     }
-                    if (GUI.Button(new Rect(menuPos.x + 150, menuPos.y + 75, 45, 30), new GUIContent("+")))
+                    if (GUI.Button(new Rect(menuPos.x + 135, menuPos.y + 75, 40, 30), new GUIContent("+")))
                     {
                         parentBehaviour.Config.fov++;
                         parentBehaviour.SetFOV();
@@ -408,14 +408,14 @@ namespace CameraPlus
                         parentBehaviour.Config.Save();
                     }
                     //Fit Canvas
-                    GUI.Box(new Rect(menuPos.x + 200, menuPos.y + 55, 100, 50), "Fit to Canvas");
-                    if (GUI.Button(new Rect(menuPos.x + 205, menuPos.y + 75, 45, 30), new GUIContent("Yes"), parentBehaviour.Config.fitToCanvas ? CustomEnableStyle : CustomDisableStyle))
+                    GUI.Box(new Rect(menuPos.x + 180, menuPos.y + 55, 120, 50), "Fit to Canvas");
+                    if (GUI.Button(new Rect(menuPos.x + 185, menuPos.y + 75, 55, 30), new GUIContent("Enable"), parentBehaviour.Config.fitToCanvas ? CustomEnableStyle : CustomDisableStyle))
                     {
                         parentBehaviour.Config.fitToCanvas = true;
                         parentBehaviour.CreateScreenRenderTexture();
                         parentBehaviour.Config.Save();
                     }
-                    if (GUI.Button(new Rect(menuPos.x + 250, menuPos.y + 75, 45, 30), new GUIContent("No"), !parentBehaviour.Config.fitToCanvas ? CustomEnableStyle : CustomDisableStyle))
+                    if (GUI.Button(new Rect(menuPos.x + 240, menuPos.y + 75, 55, 30), new GUIContent("Disable"), !parentBehaviour.Config.fitToCanvas ? CustomEnableStyle : CustomDisableStyle))
                     {
                         parentBehaviour.Config.fitToCanvas = false;
                         parentBehaviour.CreateScreenRenderTexture();
@@ -437,13 +437,13 @@ namespace CameraPlus
                         parentBehaviour.Config.Save();
                     }
                     //Mouse Drag
-                    GUI.Box(new Rect(menuPos.x + 200, menuPos.y + 105, 100, 50), "Mouse Drag");
-                    if (GUI.Button(new Rect(menuPos.x + 205, menuPos.y + 125, 45, 30), new GUIContent("Yes"), parentBehaviour.mouseMoveCamera ? CustomEnableStyle : CustomDisableStyle))
+                    GUI.Box(new Rect(menuPos.x + 180, menuPos.y + 105, 120, 50), "Mouse Drag");
+                    if (GUI.Button(new Rect(menuPos.x + 185, menuPos.y + 125, 55, 30), new GUIContent("Enable"), parentBehaviour.mouseMoveCamera ? CustomEnableStyle : CustomDisableStyle))
                     {
                         parentBehaviour.mouseMoveCamera = true;
                         parentBehaviour.mouseMoveCameraSave = true;
                     }
-                    if (GUI.Button(new Rect(menuPos.x + 250, menuPos.y + 125, 45, 30), new GUIContent("No"), !parentBehaviour.mouseMoveCamera ? CustomEnableStyle : CustomDisableStyle))
+                    if (GUI.Button(new Rect(menuPos.x + 240, menuPos.y + 125, 55, 30), new GUIContent("Disable"), !parentBehaviour.mouseMoveCamera ? CustomEnableStyle : CustomDisableStyle))
                     {
                         parentBehaviour.mouseMoveCamera = false;
                         parentBehaviour.mouseMoveCameraSave = false;
