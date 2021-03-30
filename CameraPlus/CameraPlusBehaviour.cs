@@ -116,6 +116,11 @@ namespace CameraPlus
         private bool replaceFPFC = false;
         private bool isFPFC = false;
 
+        private Vector3 prevMousePos = Vector3.zero;
+        private Vector3 mouseRightDownPos = Vector3.zero;
+        public  bool mouseMoveCamera = false;
+        public  bool mouseMoveCameraSave = false;
+
 #if WithVMCAvatar
         private VMCProtocol.VMCAvatarMarionette marionette=null;
 #endif
@@ -879,19 +884,66 @@ namespace CameraPlus
         {
             bool holdingLeftClick = Input.GetMouseButton(0);
             bool holdingRightClick = Input.GetMouseButton(1);
+            bool holdingMiddleClick = Input.GetMouseButton(2);
 
             Vector3 mousePos = Input.mousePosition;
 
-            // Close the context menu when we click anywhere within the bounds of the application
-            if (!_mouseHeld && (holdingLeftClick || holdingRightClick))
-            {
-                if (/*_menuStrip != null &&*/ mousePos.x > 0 && mousePos.x < Screen.width && mousePos.y > 0 && mousePos.y < Screen.height)
-                {
-                    //          CloseContextMenu();
-                }
-            }
-
             _isTopmostAtCursorPos = IsTopmostRenderAreaAtPos(mousePos);
+            if (_isTopmostAtCursorPos && mouseMoveCamera)
+            {
+                if (Input.GetMouseButtonDown(2))
+                    prevMousePos = mousePos;
+
+                if (holdingLeftClick)
+                {
+                    float scroll = Input.mouseScrollDelta.y;
+                    if (scroll != 0)
+                        ThirdPersonRot.z += scroll * CameraUtilities.mouseRotateSpeedZ;
+                }
+
+                if (holdingMiddleClick)
+                    if (mousePos != prevMousePos)
+                    {
+                        Vector3 up = transform.TransformDirection(Vector3.up);
+                        Vector3 right = transform.TransformDirection(Vector3.right);
+
+                        ThirdPersonPos += right * (mousePos.x - prevMousePos.x) * CameraUtilities.mouseMoveSpeedX +
+                                            up * (mousePos.y - prevMousePos.y) * CameraUtilities.mouseMoveSpeedY;
+                    }
+
+                if (holdingRightClick)
+                {
+                    float scroll = Input.mouseScrollDelta.y;
+                    if (scroll != 0)
+                        ThirdPersonPos += transform.forward * scroll * CameraUtilities.mouseScrollSpeed;
+
+                    if (mousePos != prevMousePos)
+                    {
+                        ThirdPersonRot.x += (mousePos.y - prevMousePos.y) * CameraUtilities.mouseRotateSpeedX;
+                        ThirdPersonRot.y += (mousePos.x - prevMousePos.x) * CameraUtilities.mouseRotateSpeedY;
+                    }
+                }
+
+                if (Input.GetMouseButtonDown(1))
+                {
+                    mouseRightDownPos = mousePos;
+                    holdingRightClick = false;
+                }
+                else if (Input.GetMouseButtonUp(1))
+                    holdingRightClick = (Vector3.Distance(mouseRightDownPos, mousePos) < 4);
+                else
+                    holdingRightClick = false;
+
+                if (mouseMoveCameraSave && (Input.GetMouseButtonUp(0) || Input.GetMouseButtonUp(1) || Input.GetMouseButtonUp(2)))
+                {
+                    Config.Position = ThirdPersonPos;
+                    Config.Rotation = ThirdPersonRot;
+                    Config.Save();
+                }
+
+                prevMousePos = mousePos;
+            }
+            
             // Only evaluate mouse events for the topmost render target at the mouse position
             if (!_mouseHeld && !_isTopmostAtCursorPos) return;
 

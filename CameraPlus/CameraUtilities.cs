@@ -13,6 +13,13 @@ namespace CameraPlus
     public class CameraUtilities
     {
         public static List<int> vmcPortList =null;
+        public static float mouseMoveSpeedX = -0.01f;
+        public static float mouseMoveSpeedY = -0.01f;
+        public static float mouseScrollSpeed = 0.5f;
+        public static float mouseRotateSpeedX = -0.05f;
+        public static float mouseRotateSpeedY = 0.05f;
+        public static float mouseRotateSpeedZ = 1f;
+
         public static bool CameraExists(string cameraName)
         {
             return Plugin.Instance.Cameras.Keys.Where(c => c == $"{cameraName}.cfg").Count() > 0;

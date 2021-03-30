@@ -3,7 +3,8 @@
 - Added some numerical restrictions to the camera2 converter(thanks review kinsi)  
 - Show the third-person camera when the FPFCToggle is turned back off.
   (Known issue where using the FPFC toggle prevents you from moving to another player's position in multiplayer mode.)
-- Lighter multiplayer related processing.  
+- (Not Fix)Lighter multiplayer related processing.  
+- Camera position can now be changed by mouse dragging. (Base cord were given to me by nalululuna.)
 
 # v4.9.2 Changes
 - Fixed an issue where the first-person camera would switch to the third-person camera when switching profiles.  
