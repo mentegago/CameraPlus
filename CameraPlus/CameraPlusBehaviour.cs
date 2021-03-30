@@ -718,6 +718,7 @@ namespace CameraPlus
             _cameraMovement = null;
             ThirdPersonPos = Config.Position;
             ThirdPersonRot = Config.Rotation;
+            SetFOV();
             CreateScreenRenderTexture();
         }
 
