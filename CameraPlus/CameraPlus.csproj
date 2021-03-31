@@ -18,8 +18,8 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>bin\DebugWithVMCA\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;WithVMCAvatar</DefineConstants>
+    <OutputPath>bin\DebugWithVMCA\</OutputPath>  
+    <DefineConstants>TRACE;DEBUG;WithVMCAvatar</DefineConstants>  
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
@@ -27,23 +27,23 @@
     <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>bin\ReleaseWithVMCA\</OutputPath>
-    <DefineConstants>TRACE;WithVMCAvatar</DefineConstants>
+    <OutputPath>bin\ReleaseWithVMCA\</OutputPath> 
+    <DefineConstants>TRACE;WithVMCAvatar</DefineConstants> 
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'DebugNonVMC|AnyCPU'">
     <DebugSymbols>true</DebugSymbols>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>TRACE;DEBUG</DefineConstants>
+    <OutputPath>bin\Debug\</OutputPath> 
+    <DefineConstants>TRACE;DEBUG</DefineConstants> 
     <DebugType>full</DebugType>
     <PlatformTarget>AnyCPU</PlatformTarget>
     <LangVersion>7.3</LangVersion>
     <ErrorReport>prompt</ErrorReport>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'ReleaseNonVMC|AnyCPU'">
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
+    <OutputPath>bin\Release\</OutputPath> 
+    <DefineConstants>TRACE</DefineConstants> 
     <Optimize>true</Optimize>
     <DebugType>pdbonly</DebugType>
     <PlatformTarget>AnyCPU</PlatformTarget>
