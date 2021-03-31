@@ -7,20 +7,20 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CameraPlus", "CameraPlus.cs
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
-		Debug with VMCA|Any CPU = Debug with VMCA|Any CPU
+		DebugWithVMCA|Any CPU = DebugWithVMCA|Any CPU
 		Debug|Any CPU = Debug|Any CPU
-		Release with VMCA|Any CPU = Release with VMCA|Any CPU
+		ReleaseWithVMCA|Any CPU = ReleaseWithVMCA|Any CPU
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{EB29D3F0-3BC0-4459-9269-C9DA0F3FCD1A}.Debug with VMCA|Any CPU.ActiveCfg = Debug|Any CPU
-		{EB29D3F0-3BC0-4459-9269-C9DA0F3FCD1A}.Debug with VMCA|Any CPU.Build.0 = Debug|Any CPU
-		{EB29D3F0-3BC0-4459-9269-C9DA0F3FCD1A}.Debug|Any CPU.ActiveCfg = DebugNonVMC|Any CPU
-		{EB29D3F0-3BC0-4459-9269-C9DA0F3FCD1A}.Debug|Any CPU.Build.0 = DebugNonVMC|Any CPU
-		{EB29D3F0-3BC0-4459-9269-C9DA0F3FCD1A}.Release with VMCA|Any CPU.ActiveCfg = Release|Any CPU
-		{EB29D3F0-3BC0-4459-9269-C9DA0F3FCD1A}.Release with VMCA|Any CPU.Build.0 = Release|Any CPU
-		{EB29D3F0-3BC0-4459-9269-C9DA0F3FCD1A}.Release|Any CPU.ActiveCfg = ReleaseNonVMC|Any CPU
-		{EB29D3F0-3BC0-4459-9269-C9DA0F3FCD1A}.Release|Any CPU.Build.0 = ReleaseNonVMC|Any CPU
+		{EB29D3F0-3BC0-4459-9269-C9DA0F3FCD1A}.DebugWithVMCA|Any CPU.ActiveCfg = DebugWithVMCA|Any CPU
+		{EB29D3F0-3BC0-4459-9269-C9DA0F3FCD1A}.DebugWithVMCA|Any CPU.Build.0 = DebugWithVMCA|Any CPU
+		{EB29D3F0-3BC0-4459-9269-C9DA0F3FCD1A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EB29D3F0-3BC0-4459-9269-C9DA0F3FCD1A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EB29D3F0-3BC0-4459-9269-C9DA0F3FCD1A}.ReleaseWithVMCA|Any CPU.ActiveCfg = ReleaseWithVMCA|Any CPU
+		{EB29D3F0-3BC0-4459-9269-C9DA0F3FCD1A}.ReleaseWithVMCA|Any CPU.Build.0 = ReleaseWithVMCA|Any CPU
+		{EB29D3F0-3BC0-4459-9269-C9DA0F3FCD1A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EB29D3F0-3BC0-4459-9269-C9DA0F3FCD1A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
