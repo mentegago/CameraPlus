@@ -533,33 +533,32 @@ namespace CameraPlus
 
                     HandleThirdPerson360();
 
+                    if (adjustOffset == null)
+                    {
+                        adjustParent = new GameObject("OriginParent");
+                        Plugin.Instance._origin = new GameObject("OriginParent").transform;
+                        adjustOffset = new GameObject("OriginTarget");
+                        adjustOffset.transform.SetParent(adjustParent.transform);
+                        externalSender.adjustOffset = adjustOffset;
+                    }
+
+                    adjustParent.transform.position = Plugin.Instance._origin.position - RoomAdjustPatch.position;
+                    adjustParent.transform.localRotation = Plugin.Instance._origin.localRotation * Quaternion.Inverse(RoomAdjustPatch.rotation);
                     if (Config.NoodleTrack && SceneManager.GetActiveScene().name == "GameCore")
                     {
-                        if (adjustOffset == null)
-                        {
-                            adjustOffset = new GameObject("OriginTarget");
-                            adjustParent = new GameObject("OriginParent");
-                            adjustOffset.transform.SetParent(adjustParent.transform);
-                            Plugin.Instance._origin = new GameObject("OriginParent").transform;
-                        }
-                        adjustParent.transform.position = Plugin.Instance._origin.position - RoomAdjustPatch.position;
-                        adjustParent.transform.localRotation = Plugin.Instance._origin.localRotation * Quaternion.Inverse(RoomAdjustPatch.rotation);
-                        
                         adjustOffset.transform.localPosition = ThirdPersonPos;
                         adjustOffset.transform.localEulerAngles = ThirdPersonRot;
-
-                        transform.position = adjustOffset.transform.position;
-                        transform.eulerAngles = adjustOffset.transform.eulerAngles;
-                        _cameraCube.position = adjustOffset.transform.position;
-                        _cameraCube.eulerAngles = adjustOffset.transform.eulerAngles;
                     }
                     else
                     {
-                        transform.position = ThirdPersonPos;
-                        transform.eulerAngles = ThirdPersonRot;
-                        _cameraCube.position = ThirdPersonPos;
-                        _cameraCube.eulerAngles = ThirdPersonRot;
+                        adjustOffset.transform.position = ThirdPersonPos;
+                        adjustOffset.transform.eulerAngles = ThirdPersonRot;
                     }
+
+                    transform.position = adjustOffset.transform.position;
+                    transform.eulerAngles = adjustOffset.transform.eulerAngles;
+                    _cameraCube.position = adjustOffset.transform.position;
+                    _cameraCube.eulerAngles = adjustOffset.transform.eulerAngles;
 
                     if (OffsetPosition != Vector3.zero && OffsetAngle != Vector3.zero)
                     {
