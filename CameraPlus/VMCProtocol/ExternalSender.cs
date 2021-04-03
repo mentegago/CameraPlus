@@ -9,6 +9,7 @@ namespace CameraPlus.VMCProtocol
     {
         public static ExternalSender Instance = null;
         private Task task;
+        public GameObject adjustOffset = null;
         public Camera camera = null;
         public bool update = false;
         private OscClient Client;
@@ -36,11 +37,11 @@ namespace CameraPlus.VMCProtocol
             {
                 try
                 {
-                    if (camera && update)
+                    if (camera && adjustOffset && update)
                     {
                         Client.Send("/VMC/Ext/Cam", "Camera", new float[] {
-                             camera.transform.position.x, camera.transform.position.y, camera.transform.position.z,
-                             camera.transform.rotation.x, camera.transform.rotation.y, camera.transform.rotation.z, camera.transform.rotation.w,
+                             adjustOffset.transform.localPosition.x, adjustOffset.transform.localPosition.y, adjustOffset.transform.localPosition.z,
+                             adjustOffset.transform.localRotation.x, adjustOffset.transform.localRotation.y, adjustOffset.transform.localRotation.z, adjustOffset.transform.localRotation.w,
                              camera.fieldOfView});
                         update = false;
                     }
