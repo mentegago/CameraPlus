@@ -21,6 +21,8 @@ namespace CameraPlus
         public static float mouseRotateSpeedZ = 1f;
         public static bool movementScriptEditMode = false;
 
+        public static Texture2D seekBarBackground = null;
+        public static Texture2D seekBar = null;
         public static bool CameraExists(string cameraName)
         {
             return Plugin.Instance.Cameras.Keys.Where(c => c == $"{cameraName}.cfg").Count() > 0;
@@ -207,10 +209,14 @@ namespace CameraPlus
             return Path.GetFileName(scriptPath);
         }
 
-        public static void MovementScriptEditMode()
+        public static void CreatSeekbarTexture()
         {
-            Plugin.Instance._profileChanger.ClearCameras();
-
+            seekBar = new Texture2D(1, 1,TextureFormat.ARGB32,false);
+            seekBarBackground = new Texture2D(1, 1, TextureFormat.ARGB32, false);
+            seekBar.SetPixel(0, 0, new Color(1.0f,1.0f,1.0f,1.0f));
+            seekBar.Apply();
+            seekBarBackground.SetPixel(0, 0, new Color(0.3f, 0.3f, 0.3f, 0.5f));
+            seekBarBackground.Apply();
         }
 
         public static IEnumerator Spawn38Cameras()

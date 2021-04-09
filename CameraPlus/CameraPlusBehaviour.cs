@@ -118,8 +118,11 @@ namespace CameraPlus
 
         private Vector3 prevMousePos = Vector3.zero;
         private Vector3 mouseRightDownPos = Vector3.zero;
-        public  bool mouseMoveCamera = false;
-        public  bool mouseMoveCameraSave = false;
+        public bool mouseMoveCamera = false;
+        public bool mouseMoveCameraSave = false;
+        public bool scriptEditMode =false;
+
+        private GUIStyle boxStyle;
 
 #if WithVMCAvatar
         private VMCProtocol.VMCAvatarMarionette marionette=null;
@@ -242,6 +245,9 @@ namespace CameraPlus
             */
             if (Config.VMCProtocolMode == "sender")
                 InitExternalSender();
+
+            if (CameraUtilities.seekBar == null)
+                CameraUtilities.CreatSeekbarTexture();
         }
 
         public void InitExternalSender()
@@ -426,6 +432,8 @@ namespace CameraPlus
 
         public virtual void SceneManager_activeSceneChanged(Scene from, Scene to)
         {
+            CloseContextMenu();
+
             StartCoroutine(GetMainCamera());
             StartCoroutine(Get360Managers());
 
@@ -1090,11 +1098,39 @@ namespace CameraPlus
                             }
                         }
                     }
-            if (SceneManager.GetActiveScene().name == "GameCore")
-            { }
+            if (scriptEditMode)
+            {
+                float menuLeft = Screen.width / 2 - 300;
+                float menuTop = Screen.height - 100;
+
+                boxStyle = new GUIStyle(GUI.skin.box);
+
+                GUI.Box(new Rect(menuLeft, menuTop, 600, 100), $"Script Edit Mode {_cam.name}");
+                boxStyle.normal.background = CameraUtilities.seekBarBackground;
+                GUI.Box(new Rect(menuLeft + 20, menuTop + 35, 560, 20),string.Empty,boxStyle);
+
+                boxStyle.normal.background = CameraUtilities.seekBar;
+                GUI.Box(new Rect(menuLeft + 20, menuTop + 35, 10, 20), string.Empty,boxStyle);
+
+                //GUI.Box(new Rect(menuLeft + 20, menuTop + 30, 10, 10), "");
+                /*
+                if (GUI.Button(new Rect(Screen.width / 2 + 200, Screen.height - 30, 100, 30), ""))
+                {
+
+                }
+                */
+
+                if (GUI.Button(new Rect(menuLeft + 500, menuTop, 100, 30), "Exit EditMode"))
+                {
+                    scriptEditMode = false;
+                    mouseMoveCamera = false;
+                    mouseMoveCameraSave = false;
+                }
+            }
         }
         void DisplayContextMenu()
         {
+            if (scriptEditMode) return;
             if (_contextMenu == null)
             {
                 MenuObj = new GameObject("CameraPlusMenu");

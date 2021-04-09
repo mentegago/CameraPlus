@@ -78,9 +78,9 @@ namespace CameraPlus
                 Matrix4x4 originalMatrix = GUI.matrix;
                 GUI.matrix = Matrix4x4.TRS(new Vector3(0, 0, 0), Quaternion.identity, scale);
                 //Layer boxes for Opacity
-                GUI.Box(new Rect(menuPos.x - 5, menuPos.y, 310, 470), "CameraPlus" + parentBehaviour.name);
-                GUI.Box(new Rect(menuPos.x - 5, menuPos.y, 310, 470), "CameraPlus" + parentBehaviour.name);
-                GUI.Box(new Rect(menuPos.x - 5, menuPos.y, 310, 470), "CameraPlus" + parentBehaviour.name);
+                GUI.Box(new Rect(menuPos.x - 5, menuPos.y, 310, 470), $"CameraPlus {parentBehaviour.name}");
+                GUI.Box(new Rect(menuPos.x - 5, menuPos.y, 310, 470), $"CameraPlus {parentBehaviour.name}");
+                GUI.Box(new Rect(menuPos.x - 5, menuPos.y, 310, 470), $"CameraPlus {parentBehaviour.name}");
 
                 CustomEnableStyle = new GUIStyle(GUI.skin.button);
                 CustomEnableStyle.normal.background = CustomEnableStyle.active.background;
@@ -941,7 +941,10 @@ namespace CameraPlus
                     }
                     if (GUI.Button(new Rect(menuPos.x , menuPos.y + 390, 300, 30), new GUIContent("Movement Script Record Mode")))
                     {
-                        CameraUtilities.MovementScriptEditMode();
+                        parentBehaviour.scriptEditMode = true;
+                        parentBehaviour.mouseMoveCamera = true;
+                        parentBehaviour.mouseMoveCameraSave = false;
+                        parentBehaviour.CloseContextMenu();
                     }
                     //Close
                     if (GUI.Button(new Rect(menuPos.x, menuPos.y + 430, 300, 30), new GUIContent("Close MovementScript Menu")))
