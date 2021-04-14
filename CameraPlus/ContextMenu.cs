@@ -939,6 +939,7 @@ namespace CameraPlus
                                 parentBehaviour.ClearMovementScript();
                         }
                     }
+                    /*
                     if (GUI.Button(new Rect(menuPos.x , menuPos.y + 390, 300, 30), new GUIContent("Movement Script Record Mode")))
                     {
                         parentBehaviour.scriptEditMode = true;
@@ -946,6 +947,7 @@ namespace CameraPlus
                         parentBehaviour.mouseMoveCameraSave = false;
                         parentBehaviour.CloseContextMenu();
                     }
+                    */
                     //Close
                     if (GUI.Button(new Rect(menuPos.x, menuPos.y + 430, 300, 30), new GUIContent("Close MovementScript Menu")))
                     {
