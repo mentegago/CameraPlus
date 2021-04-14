@@ -12,7 +12,7 @@ namespace CameraPlus.VMCProtocol
         public GameObject adjustOffset = null;
         public Camera camera = null;
         public bool update = false;
-        private OscClient Client;
+        private OscClient Client=null;
         private bool stopThread = false;
 
         public void SendCameraData(string address="127.0.0.1", int port = 39540)
@@ -27,7 +27,10 @@ namespace CameraPlus.VMCProtocol
             Instance = this;
             stopThread = false;
             this.Client = new OscClient(address, port);
-            Logger.Log($"Instance of {GetType().Name} Starting.", LogLevel.Notice);
+            if (this.Client!=null)
+                Logger.Log($"Instance of {GetType().Name} Starting.", LogLevel.Notice);
+            else
+                Logger.Log($"Instance of {GetType().Name} Not Starting.", LogLevel.Error);
             this.task = Task.Run(() => SendData());
         }
 

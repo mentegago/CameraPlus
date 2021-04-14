@@ -580,8 +580,12 @@ namespace CameraPlus
                         _cameraCube.position = transform.position;
                         _cameraCube.eulerAngles = transform.eulerAngles;
                     }
-                    if(externalSender!=null & Config.VMCProtocolMode=="sender")
+                    if(externalSender!=null & Config.VMCProtocolMode == "sender")
+                    {
+                        if (externalSender.camera == null)
+                            externalSender.camera = _cam;
                         externalSender.update = true;
+                    }
                     return;
                 }
                 //     Console.WriteLine(Config.FirstPersonPositionOffset.ToString());
