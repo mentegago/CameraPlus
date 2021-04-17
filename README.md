@@ -70,3 +70,5 @@ If you plan on adding any new dependencies which are located in the Beat Saber d
 </Reference>
 ...
 ```
+VMCAvatar-BS Mod is required to build with full functionality.
+[VMCAvatar-BS](https://github.com/nagatsuki/VMCAvatar-BS)
