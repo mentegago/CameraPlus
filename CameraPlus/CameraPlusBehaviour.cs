@@ -115,7 +115,7 @@ namespace CameraPlus
         private ExternalSender externalSender = null;
         private bool replaceFPFC = false;
         private bool isFPFC = false;
-
+        private GUIStyle _multiplayerGUIStyle=null;
         private Vector3 prevMousePos = Vector3.zero;
         private Vector3 mouseRightDownPos = Vector3.zero;
         public bool mouseMoveCamera = false;
@@ -1096,9 +1096,15 @@ namespace CameraPlus
                                 foreach (MultiplayerScoreProvider.RankedPlayer rankedPlayer in MultiplayerScoreProviderPatch.Instance.rankedPlayers)
                                     if (rankedPlayer.userId == connectedPlayer.userId)
                                     {
-                                        GUI.skin.label.fontSize = 30;
-                                        GUI.Label(new Rect(Config.screenPosX, Screen.height - Config.screenPosY - Config.screenHeight + size + 45, Config.screenWidth, 40), String.Format("{0:#,0}", rankedPlayer.score));
-                                        GUI.Label(new Rect(Config.screenPosX, Screen.height - Config.screenPosY - Config.screenHeight + size + 5, Config.screenWidth, 40), "Rank " + MultiplayerScoreProviderPatch.Instance.GetPositionOfPlayer(connectedPlayer.userId).ToString());
+                                        if (_multiplayerGUIStyle == null)
+                                            _multiplayerGUIStyle = new GUIStyle(GUI.skin.label);
+                                        if (rankedPlayer.isFailed)
+                                            _multiplayerGUIStyle.normal.textColor = Color.red;
+                                        else
+                                            _multiplayerGUIStyle.normal.textColor = Color.white;
+                                        _multiplayerGUIStyle.fontSize = 30;
+                                        GUI.Label(new Rect(Config.screenPosX, Screen.height - Config.screenPosY - Config.screenHeight + size + 45, Config.screenWidth, 40), String.Format("{0:#,0}", rankedPlayer.score),_multiplayerGUIStyle);
+                                        GUI.Label(new Rect(Config.screenPosX, Screen.height - Config.screenPosY - Config.screenHeight + size + 5, Config.screenWidth, 40), "Rank " + MultiplayerScoreProviderPatch.Instance.GetPositionOfPlayer(connectedPlayer.userId).ToString(), _multiplayerGUIStyle);
                                         break;
                                     }
                                 break;
