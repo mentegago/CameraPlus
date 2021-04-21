@@ -1,3 +1,7 @@
+# v4.11.0 Changes
+- Added option to follow the 3rd person camera in the direction of the HMD.
+- When failing the multiplayer score display, it is displayed in red to make it easier to understand.
+
 # v4.10.0 Changes
 - VMCProtocol implementation (Sender uses OSC Jack, Receiver depends on VMCAvatar)  
 - Added some numerical restrictions to the camera2 converter(thanks review kinsi)  

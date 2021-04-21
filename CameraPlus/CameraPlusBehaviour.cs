@@ -558,15 +558,11 @@ namespace CameraPlus
 
                         transform.position = adjustOffset.transform.position;
                         transform.eulerAngles = adjustOffset.transform.eulerAngles;
-                        _cameraCube.position = adjustOffset.transform.position;
-                        _cameraCube.eulerAngles = adjustOffset.transform.eulerAngles;
                     }
                     else
                     {
                         transform.position = ThirdPersonPos;
                         transform.eulerAngles = ThirdPersonRot;
-                        _cameraCube.position = ThirdPersonPos;
-                        _cameraCube.eulerAngles = ThirdPersonRot;
                     }
 
                     if (OffsetPosition != Vector3.zero && OffsetAngle != Vector3.zero)
@@ -578,10 +574,12 @@ namespace CameraPlus
                         transform.position = angle * transform.position;
                         transform.position += OffsetPosition;
 
-                        _cameraCube.position = transform.position;
-                        _cameraCube.eulerAngles = transform.eulerAngles;
                     }
+                    if (Config.turnToHead)
+                        transform.LookAt(Camera.main.transform);
 
+                    _cameraCube.position = transform.position;
+                    _cameraCube.eulerAngles = transform.eulerAngles;
 
                     if (externalSender!=null & Config.VMCProtocolMode == "sender")
                     {
@@ -606,7 +604,12 @@ namespace CameraPlus
                     transform.rotation = rot * Quaternion.Euler(0, 0, -(rot.eulerAngles.z));
                 }
             }
-            catch{}
+            catch(Exception e)
+            {
+#if DEBUG
+                Logger.Log($"{e}",LogLevel.Error);
+#endif
+            }
         }
 
         private void HandleThirdPerson360()
@@ -692,6 +695,22 @@ namespace CameraPlus
             {
                 Logger.Log($"{this.name} HandleMultiPlayerGame Error {ex.Message}", LogLevel.Error);
             }
+        }
+        private void HandleTurnToHead()
+        {
+            if (!Config.turnToHead)
+            {
+                transform.LookAt(null);
+                return;
+            }
+            else
+            {
+                transform.LookAt(Camera.main.transform);
+                _cameraCube.position = transform.position;
+                _cameraCube.eulerAngles = transform.eulerAngles;
+            }
+
+
         }
 
         public string AddMovementScript()

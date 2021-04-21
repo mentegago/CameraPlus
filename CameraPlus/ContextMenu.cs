@@ -448,6 +448,21 @@ namespace CameraPlus
                         parentBehaviour.mouseMoveCamera = false;
                         parentBehaviour.mouseMoveCameraSave = false;
                     }
+                    //Turn to Head
+                    GUI.Box(new Rect(menuPos.x + 180, menuPos.y + 155, 120, 50), "Turn to Head");
+                    if (GUI.Button(new Rect(menuPos.x + 185, menuPos.y + 175, 55, 30), new GUIContent("Enable"), parentBehaviour.Config.turnToHead ? CustomEnableStyle : CustomDisableStyle))
+                    {
+                        parentBehaviour.Config.turnToHead = true;
+                        parentBehaviour.CreateScreenRenderTexture();
+                        parentBehaviour.Config.Save();
+                    }
+                    if (GUI.Button(new Rect(menuPos.x + 240, menuPos.y + 175, 55, 30), new GUIContent("Disable"), !parentBehaviour.Config.turnToHead ? CustomEnableStyle : CustomDisableStyle))
+                    {
+                        parentBehaviour.Config.turnToHead = false;
+                        parentBehaviour.CreateScreenRenderTexture();
+                        parentBehaviour.Config.Save();
+                    }
+
                     //Amount of Movemnet
                     GUI.Box(new Rect(menuPos.x, menuPos.y + 155, 175, 50), "Amount movement : " + amountMove.ToString("F2"));
                     if (GUI.Button(new Rect(menuPos.x + 5, menuPos.y + 175, 55, 30), new GUIContent("0.01")))
