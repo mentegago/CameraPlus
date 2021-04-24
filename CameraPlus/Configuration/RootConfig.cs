@@ -1,8 +1,7 @@
 ﻿using System;
 using System.IO;
-using UnityEngine;
 
-namespace CameraPlus
+namespace CameraPlus.Configuration
 {
     public class RootConfig
     {
@@ -15,6 +14,7 @@ namespace CameraPlus
         public string MultiplayerProfile = "";
         public bool ProfileLoadCopyMethod = false;
         public int CameraQuadLayer = 0;
+        public bool ScreenFillBlack = false;
 
         public event Action<RootConfig> ConfigChangedEvent;
 

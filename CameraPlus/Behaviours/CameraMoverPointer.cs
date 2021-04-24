@@ -1,8 +1,10 @@
 ﻿using System.Collections;
 using UnityEngine;
 using VRUIControls;
+using CameraPlus.Behaviours;
+using CameraPlus.Configuration;
 
-namespace CameraPlus
+namespace CameraPlus.Behaviours
 {
     public class CameraMoverPointer : MonoBehaviour
     {

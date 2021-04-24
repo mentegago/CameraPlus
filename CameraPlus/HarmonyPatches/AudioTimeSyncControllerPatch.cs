@@ -9,7 +9,7 @@ namespace CameraPlus.HarmonyPatches
         static void Postfix(AudioTimeSyncController __instance)
         {
 #if DEBUG
-            Logger.Log("AudioTimeSyncController Awake");
+            Logger.log.Notice("AudioTimeSyncController Awake");
 #endif
             Instance = __instance;
         }

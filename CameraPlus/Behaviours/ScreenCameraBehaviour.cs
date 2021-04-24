@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace CameraPlus
+namespace CameraPlus.Behaviours
 {
     /// <summary>
     /// This is the monobehaviour that goes on the camera that handles
@@ -24,7 +24,7 @@ namespace CameraPlus
 
         public void Awake()
         {
-            Logger.Log("Created new screen camera behaviour component!");
+            Logger.log.Notice("Created new screen camera behaviour component!");
             DontDestroyOnLoad(gameObject);
 
             _cam = gameObject.AddComponent<Camera>();

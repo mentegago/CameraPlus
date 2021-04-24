@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.31129.286
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CameraPlus", "CameraPlus\CameraPlus.csproj", "{9227039B-DBC8-4362-AC05-6651B24E7FF5}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		DebugWithVMCA|Any CPU = DebugWithVMCA|Any CPU
+		Release|Any CPU = Release|Any CPU
+		ReleaseWithVMCA|Any CPU = ReleaseWithVMCA|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{9227039B-DBC8-4362-AC05-6651B24E7FF5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9227039B-DBC8-4362-AC05-6651B24E7FF5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9227039B-DBC8-4362-AC05-6651B24E7FF5}.DebugWithVMCA|Any CPU.ActiveCfg = DebugWithVMCA|Any CPU
+		{9227039B-DBC8-4362-AC05-6651B24E7FF5}.DebugWithVMCA|Any CPU.Build.0 = DebugWithVMCA|Any CPU
+		{9227039B-DBC8-4362-AC05-6651B24E7FF5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9227039B-DBC8-4362-AC05-6651B24E7FF5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9227039B-DBC8-4362-AC05-6651B24E7FF5}.ReleaseWithVMCA|Any CPU.ActiveCfg = ReleaseWithVMCA|Any CPU
+		{9227039B-DBC8-4362-AC05-6651B24E7FF5}.ReleaseWithVMCA|Any CPU.Build.0 = ReleaseWithVMCA|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {21FF5537-642E-484A-B275-ADD9A7AEBA17}
+	EndGlobalSection
+EndGlobal

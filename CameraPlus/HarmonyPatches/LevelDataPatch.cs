@@ -3,7 +3,6 @@ using System.Linq;
 using System.Collections.Generic;
 using System.Reflection;
 using HarmonyLib;
-using LogLevel = IPA.Logging.Logger.Level;
 
 namespace CameraPlus.HarmonyPatches
 {
@@ -20,7 +19,7 @@ namespace CameraPlus.HarmonyPatches
 		static void Prefix(IDifficultyBeatmap difficultyBeatmap)
 		{
 #if DEBUG
-			Logger.Log("Got level data!",LogLevel.Notice);
+			Logger.log.Notice("Got level data!");
 #endif
 			LevelDataPatch.difficultyBeatmap = difficultyBeatmap;
 

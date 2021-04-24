@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
 using UnityEngine;
-using LogLevel = IPA.Logging.Logger.Level;
 
 namespace CameraPlus.VMCProtocol
 {
@@ -20,7 +19,7 @@ namespace CameraPlus.VMCProtocol
         {
             if (Instance != null)
             {
-                Logger.Log($"Instance of {GetType().Name} already exists, destroying.", LogLevel.Warning);
+                Logger.log.Warn($"Instance of {GetType().Name} already exists, destroying.");
                 GameObject.DestroyImmediate(this);
                 return;
             }
@@ -29,9 +28,9 @@ namespace CameraPlus.VMCProtocol
             stopThread = false;
             this.Client = new OscClient(address, port);
             if (this.Client!=null)
-                Logger.Log($"Instance of {GetType().Name} Starting.", LogLevel.Notice);
+                Logger.log.Notice($"Instance of {GetType().Name} Starting.");
             else
-                Logger.Log($"Instance of {GetType().Name} Not Starting.", LogLevel.Error);
+                Logger.log.Error($"Instance of {GetType().Name} Not Starting.");
             this.task = Task.Run(() => SendData());
         }
 
@@ -54,7 +53,7 @@ namespace CameraPlus.VMCProtocol
                 }
                 catch (Exception e)
                 {
-                    Logger.Log($"{camera.name} ExternalSender Thread : {e}", LogLevel.Error);
+                    Logger.log.Error($"{camera.name} ExternalSender Thread : {e}");
                 }
             }
         }

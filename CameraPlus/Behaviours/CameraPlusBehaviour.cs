@@ -3,18 +3,18 @@ using System.IO;
 using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
-using System.Runtime.InteropServices;
 using IPA.Utilities;
-using LogLevel = IPA.Logging.Logger.Level;
 using UnityEngine;
 using UnityEngine.XR;
 using UnityEngine.SceneManagement;
-using VRUIControls;
 using Screen = UnityEngine.Screen;
+using CameraPlus.Configuration;
 using CameraPlus.HarmonyPatches;
 using CameraPlus.VMCProtocol;
+using CameraPlus.Utilities;
+using UniGLTF;
 
-namespace CameraPlus
+namespace CameraPlus.Behaviours
 {
     public class CameraPlusBehaviour : MonoBehaviour
     {
@@ -28,7 +28,6 @@ namespace CameraPlus
         }
 
         protected readonly WaitUntil _waitForMainCamera = new WaitUntil(() => Camera.main);
-        private readonly WaitForSecondsRealtime _waitForSecondsRealtime = new WaitForSecondsRealtime(1f);
         protected const int OnlyInThirdPerson = 3;
         protected const int UILayer = 5;
         protected const int OnlyInFirstPerson = 6; //Moved to an empty layer because layer 4 overlapped the floor
@@ -37,9 +36,11 @@ namespace CameraPlus
         protected const int NoteLayer = 8;
         protected const int CustomNoteLayer = 24;
 
-        public bool ThirdPerson {
+        public bool ThirdPerson
+        {
             get { return _thirdPerson; }
-            set {
+            set
+            {
                 _thirdPerson = value;
                 _cameraCube.gameObject.SetActive(_thirdPerson && Config.showThirdPersonCamera);
                 _cameraPreviewQuad.gameObject.SetActive(_thirdPerson && Config.showThirdPersonCamera);
@@ -105,7 +106,7 @@ namespace CameraPlus
         protected Vector2 _lastScreenPos;
         protected bool _isBottom = false, _isLeft = false;
         protected static GameObject MenuObj = null;
-        protected static ContextMenu _contextMenu = null;
+        protected static UI.ContextMenu _contextMenu = null;
         public static CursorType currentCursor = CursorType.None;
         public static bool wasWithinBorder = false;
         public static bool anyInstanceBusy = false;
@@ -115,22 +116,22 @@ namespace CameraPlus
         private ExternalSender externalSender = null;
         private bool replaceFPFC = false;
         private bool isFPFC = false;
-        private GUIStyle _multiplayerGUIStyle=null;
+        private GUIStyle _multiplayerGUIStyle = null;
         private Vector3 prevMousePos = Vector3.zero;
         private Vector3 mouseRightDownPos = Vector3.zero;
-        public bool mouseMoveCamera = false;
-        public bool mouseMoveCameraSave = false;
-        public bool scriptEditMode =false;
-
+        internal bool mouseMoveCamera = false;
+        internal bool mouseMoveCameraSave = false;
+        internal bool scriptEditMode = false;
         private GUIStyle boxStyle;
+        private Transform turnToTarget;
 
 #if WithVMCAvatar
-        private VMCProtocol.VMCAvatarMarionette marionette=null;
+        private VMCProtocol.VMCAvatarMarionette marionette = null;
 #endif
         public virtual void Init(Config config)
         {
             DontDestroyOnLoad(gameObject);
-            Logger.Log("Created new camera plus behaviour component!");
+            Logger.log.Notice("Created new camera plus behaviour component!");
 
             Config = config;
             _isMainCamera = Path.GetFileName(Config.FilePath) == $"{Plugin.MainCamera}.cfg";
@@ -148,7 +149,7 @@ namespace CameraPlus
             if (_contextMenu == null)
             {
                 MenuObj = new GameObject("CameraPlusMenu");
-                _contextMenu = MenuObj.AddComponent<ContextMenu>();
+                _contextMenu = MenuObj.AddComponent<UI.ContextMenu>();
             }
             XRSettings.showDeviceView = false;
 
@@ -159,31 +160,31 @@ namespace CameraPlus
             gameObj.SetActive(false);
             gameObj.name = "Camera Plus";
             gameObj.tag = "Untagged";
-            while (gameObj.transform.childCount > 0) DestroyImmediate(gameObj.transform.GetChild(0).gameObject);
-            //DestroyImmediate(gameObj.GetComponent(typeof(CameraRenderCallbacksManager)));
-            DestroyImmediate(gameObj.GetComponent("AudioListener"));
-            DestroyImmediate(gameObj.GetComponent("MeshCollider"));
 
             _cam = gameObj.GetComponent<Camera>();
             _cam.stereoTargetEye = StereoTargetEyeMask.None;
             _cam.enabled = true;
             _cam.name = Path.GetFileName(Config.FilePath);
 
-            var _liv = _cam.GetComponent<LIV.SDK.Unity.LIV>();
-            if (_liv)
-                Destroy(_liv);
+            foreach (var child in _cam.transform.Cast<Transform>())
+                Destroy(child.gameObject);
+            var destroyList = new string[] { "AudioListener", "LIV", "MainCamera", "MeshCollider" };
+            foreach (var component in _cam.GetComponents<Behaviour>())
+                if (destroyList.Contains(component.GetType().Name)) Destroy(component);
 
             _screenCamera = new GameObject("Screen Camera").AddComponent<ScreenCameraBehaviour>();
-
+            
+            
+            Shader shader = Resources.Load<Shader>("CustomBlitCopyWithDepth");
             if (_previewMaterial == null)
-                _previewMaterial = new Material(Shader.Find("Hidden/BlitCopyWithDepth"));
-
+                _previewMaterial = new Material(Plugin.cameraController.Shaders["BeatSaber/BlitCopyWithDepth"]);
+                //_previewMaterial = new Material(Shader.Find("Hidden/BlitCopyWithDepth"));
             gameObj.SetActive(true);
 
             var camera = _mainCamera.transform;
             transform.position = camera.position;
             transform.rotation = camera.rotation;
-            Logger.Log($"near clipplane \"{Camera.main.nearClipPlane}");
+            Logger.log.Notice($"near clipplane \"{Camera.main.nearClipPlane}");
 
             gameObj.transform.parent = transform;
             gameObj.transform.localPosition = Vector3.zero;
@@ -196,7 +197,7 @@ namespace CameraPlus
             _cameraCube = _cameraCubeGO.transform;
             _cameraCube.localScale = new Vector3(0.15f, 0.15f, 0.22f);
             _cameraCube.name = "CameraCube";
-            _cameraCubeGO.layer = Plugin.Instance._rootConfig.CameraQuadLayer;
+            _cameraCubeGO.layer = Plugin.cameraController.rootConfig.CameraQuadLayer;
 
             _quad = GameObject.CreatePrimitive(PrimitiveType.Quad);
             DontDestroyOnLoad(_quad);
@@ -207,8 +208,7 @@ namespace CameraPlus
             _quad.transform.localEulerAngles = new Vector3(0, 180, 0);
             _quad.transform.localScale = new Vector3(_cam.aspect, 1, 1);
             _cameraPreviewQuad = _quad;
-            _quad.layer = Plugin.Instance._rootConfig.CameraQuadLayer;
-
+            _quad.layer = Plugin.cameraController.rootConfig.CameraQuadLayer;
             ReadConfig();
 
             if (ThirdPerson)
@@ -228,21 +228,11 @@ namespace CameraPlus
                 AddMovementScript();
 
             SetCullingMask();
-            CameraMovement.CreateExampleScript();
 
-            Plugin.Instance.ActiveSceneChanged += SceneManager_activeSceneChanged;
-            //      FirstPersonOffset = Config.FirstPersonPositionOffset;
-            //       FirstPersonRotationOffset = Config.FirstPersonRotationOffset;
+            Plugin.cameraController.ActiveSceneChanged += SceneManager_activeSceneChanged;
             SceneManager_activeSceneChanged(new Scene(), new Scene());
-            Logger.Log($"Camera \"{Path.GetFileName(Config.FilePath)}\" successfully initialized! {Convert.ToString(_cam.cullingMask,16)}");
+            Logger.log.Notice($"Camera \"{Path.GetFileName(Config.FilePath)}\" successfully initialized! {Convert.ToString(_cam.cullingMask, 16)}");
 
-            /*
-            if (!Plugin.Instance.MultiplayerSessionInit)
-            {
-                Plugin.Instance.MultiplayerSessionInit = true;
-                MultiplayerSession.Init();
-            }
-            */
             if (Config.VMCProtocolMode == "sender")
                 InitExternalSender();
 
@@ -255,9 +245,9 @@ namespace CameraPlus
             if (Config.VMCProtocolMode == "sender" && Config.fitToCanvas)
             {
                 if (CameraUtilities.vmcPortList == null) CameraUtilities.vmcPortList = new List<int>();
-                if (CameraUtilities.vmcPortList.Find(p=>p==Config.VMCProtocolPort)== Config.VMCProtocolPort)
+                if (CameraUtilities.vmcPortList.Find(p => p == Config.VMCProtocolPort) == Config.VMCProtocolPort)
                 {
-                    Logger.Log($"Camera \"{Path.GetFileName(Config.FilePath)}\" already use port {Config.VMCProtocolPort}");
+                    Logger.log.Notice($"Camera \"{Path.GetFileName(Config.FilePath)}\" already use port {Config.VMCProtocolPort}");
                     return;
                 }
                 externalSender = new GameObject("VMCProtocolCamera").AddComponent<ExternalSender>();
@@ -269,7 +259,7 @@ namespace CameraPlus
         public void InitExternalReceiver()
         {
 #if WithVMCAvatar
-            if (Config.VMCProtocolMode == "receiver" && Plugin.Instance.ExistsVMCAvatar)
+            if (Config.VMCProtocolMode == "receiver" && Plugin.cameraController.existsVMCAvatar)
             {
                 marionette = this.gameObject.AddComponent<VMCProtocol.VMCAvatarMarionette>();
                 ClearMovementScript();
@@ -295,9 +285,8 @@ namespace CameraPlus
         protected virtual void OnDestroy()
         {
             Config.ConfigChangedEvent -= PluginOnConfigChangedEvent;
-            Plugin.Instance.ActiveSceneChanged -= SceneManager_activeSceneChanged;
+            Plugin.cameraController.ActiveSceneChanged -= SceneManager_activeSceneChanged;
 
-            
             _cameraMovement?.Shutdown();
             // Close our context menu if its open, and destroy all associated controls, otherwise the game will lock up
             CloseContextMenu();
@@ -308,7 +297,7 @@ namespace CameraPlus
             if (marionette)
                 Destroy(marionette);
 #endif
-            if(CameraUtilities.vmcPortList!=null)
+            if (CameraUtilities.vmcPortList != null)
                 if (CameraUtilities.vmcPortList.Find(p => p == Config.VMCProtocolPort) == Config.VMCProtocolPort)
                     CameraUtilities.vmcPortList.Remove(Config.VMCProtocolPort);
             if (externalSender)
@@ -340,8 +329,6 @@ namespace CameraPlus
             {
                 ThirdPersonPos = Config.Position;
                 ThirdPersonRot = Config.Rotation;
-                //      FirstPersonOffset = Config.FirstPersonPositionOffset;
-                //      FirstPersonRotationOffset = Config.FirstPersonRotationOffset;
             }
 
             SetCullingMask();
@@ -392,23 +379,13 @@ namespace CameraPlus
                     Config.screenWidth = Screen.width;
                     Config.screenHeight = Screen.height;
                 }
-                /*
-                _cam.orthographic = Config.Orthographics;
-                if (Config.Orthographics)
-                {
-                    _cam.orthographicSize = Config.fov / 10;
-                    _cam.farClipPlane = 10;
-                    _cam.nearClipPlane = 2;
-                }
-                */
                 _lastRenderUpdate = DateTime.Now;
-                //GetScaledScreenResolution(Config.renderScale, out var scaledWidth, out var scaledHeight);
                 _camRenderTexture.width = Mathf.Clamp(Mathf.RoundToInt(Config.screenWidth * Config.renderScale), 1, int.MaxValue);
                 _camRenderTexture.height = Mathf.Clamp(Mathf.RoundToInt(Config.screenHeight * Config.renderScale), 1, int.MaxValue);
 
                 _camRenderTexture.useDynamicScale = false;
                 _camRenderTexture.antiAliasing = Config.antiAliasing;
-                _camRenderTexture.Create();
+                //_camRenderTexture.Create();
 
                 _cam.targetTexture = _camRenderTexture;
                 _previewMaterial.SetTexture("_MainTex", _camRenderTexture);
@@ -442,41 +419,18 @@ namespace CameraPlus
             _moverPointer = pointer.gameObject.AddComponent<CameraMoverPointer>();
             _moverPointer.Init(this, _cameraCube);
 
-            /*
-            var vrPointers = to.name == "GameCore" ? Resources.FindObjectsOfTypeAll<VRPointer>() : Resources.FindObjectsOfTypeAll<VRPointer>();
-            if (vrPointers.Count() == 0)
-            {
-                Logger.Log("Failed to get VRPointer!", LogLevel.Warning);
-                return;
-            }
-            
-            var pointer = to.name != "GameCore" ? vrPointers.First() : vrPointers.Last();
-            if (_moverPointer) Destroy(_moverPointer);
-            _moverPointer = pointer.gameObject.AddComponent<CameraMoverPointer>();
-            _moverPointer.Init(this, _cameraCube);
-            */
             if (to.name == "GameCore")
                 SharedCoroutineStarter.instance.StartCoroutine(Delayed_activeSceneChanged(from, to));
             else
-                if (Config.movementAudioSync || (!Config.movementAudioSync && Config.movementScriptPath==string.Empty))
-                    ClearMovementScript();
+                if (Config.movementAudioSync || (!Config.movementAudioSync && Config.movementScriptPath == string.Empty))
+                ClearMovementScript();
         }
 
         private IEnumerator Delayed_activeSceneChanged(Scene from, Scene to)
         {
             yield return new WaitForSeconds(0.05f);
             string scriptpath = AddMovementScript();
-            Logger.Log($"{this.name} Add MoveScript \"{Path.GetFileName(scriptpath)}\" successfully initialized! {Convert.ToString(_cam.cullingMask, 16)}");
-            //SetCullingMask();
-        }
-
-        [DllImport("user32.dll")]
-        static extern System.IntPtr GetActiveWindow();
-
-        protected void OnApplicationFocus(bool hasFocus)
-        {
-            //      if(!hasFocus && GetActiveWindow() == IntPtr.Zero)
-            //         CloseContextMenu();
+            Logger.log.Notice($"{this.name} Add MoveScript \"{Path.GetFileName(scriptpath)}\" successfully initialized! {Convert.ToString(_cam.cullingMask, 16)}");
         }
 
         protected virtual void Update()
@@ -491,8 +445,6 @@ namespace CameraPlus
                     {
                         transform.position = _mainCamera.transform.position;
                         transform.rotation = _mainCamera.transform.rotation;
-                        //          FirstPersonOffset = Config.FirstPersonPositionOffset;
-                        //            FirstPersonRotationOffset = Config.FirstPersonRotationOffset;
                     }
                     else
                     {
@@ -526,14 +478,14 @@ namespace CameraPlus
                             CreateScreenRenderTexture();
                         }
 #if WithVMCAvatar
-                    if (Plugin.Instance.ExistsVMCAvatar)
+                    if (Plugin.cameraController.existsVMCAvatar)
                         if (Config.VMCProtocolMode == "receiver" && marionette)
                             if (marionette.receivedData)
                             {
                                 transform.position = marionette.position;
                                 transform.rotation = marionette.rotate;
                                 _cam.fieldOfView = marionette.fov > 0 ? marionette.fov : Config.fov;
-                                Logger.Log($"Receive Marionette");
+                                Logger.log.Notice($"Receive Marionette");
                                 return;
                             }
 #endif
@@ -548,10 +500,10 @@ namespace CameraPlus
                             adjustOffset = new GameObject("OriginTarget");
                             adjustParent = new GameObject("OriginParent");
                             adjustOffset.transform.SetParent(adjustParent.transform);
-                            Plugin.Instance._origin = new GameObject("OriginParent").transform;
+                            Plugin.cameraController.origin = new GameObject("OriginParent").transform;
                         }
-                        adjustParent.transform.position = Plugin.Instance._origin.position - RoomAdjustPatch.position;
-                        adjustParent.transform.localRotation = Plugin.Instance._origin.localRotation * Quaternion.Inverse(RoomAdjustPatch.rotation);
+                        adjustParent.transform.position = Plugin.cameraController.origin.position - RoomAdjustPatch.position;
+                        adjustParent.transform.localRotation = Plugin.cameraController.origin.localRotation * Quaternion.Inverse(RoomAdjustPatch.rotation);
 
                         adjustOffset.transform.localPosition = ThirdPersonPos;
                         adjustOffset.transform.localEulerAngles = ThirdPersonRot;
@@ -576,12 +528,16 @@ namespace CameraPlus
 
                     }
                     if (Config.turnToHead)
-                        transform.LookAt(Camera.main.transform);
+                    {
+                        turnToTarget = Camera.main.transform;
+                        turnToTarget.transform.position += Config.TurnToHeadOffset;
+                        transform.LookAt(turnToTarget);
+                    }
 
                     _cameraCube.position = transform.position;
                     _cameraCube.eulerAngles = transform.eulerAngles;
 
-                    if (externalSender!=null & Config.VMCProtocolMode == "sender")
+                    if (externalSender != null & Config.VMCProtocolMode == "sender")
                     {
                         externalSender.position = ThirdPersonPos;
                         externalSender.rotation = Quaternion.Euler(ThirdPersonRot);
@@ -589,7 +545,6 @@ namespace CameraPlus
                     }
                     return;
                 }
-                //     Console.WriteLine(Config.FirstPersonPositionOffset.ToString());
                 transform.position = Vector3.Lerp(transform.position, camera.position + Config.FirstPersonPositionOffset,
                     Config.positionSmooth * Time.unscaledDeltaTime);
 
@@ -604,12 +559,7 @@ namespace CameraPlus
                     transform.rotation = rot * Quaternion.Euler(0, 0, -(rot.eulerAngles.z));
                 }
             }
-            catch(Exception e)
-            {
-#if DEBUG
-                Logger.Log($"{e}",LogLevel.Error);
-#endif
-            }
+            catch { }
         }
 
         private void HandleThirdPerson360()
@@ -641,10 +591,10 @@ namespace CameraPlus
             else
                 _yAngle = Mathf.Lerp(_yAngle, b, Mathf.Clamp(Time.deltaTime * Config.cam360Smoothness, 0f, 1f));
 
-            ThirdPersonRot = new Vector3(Config.cam360XTilt, _yAngle + Config.cam360YTilt, Config.cam360ZTilt);
+            ThirdPersonRot = new Vector3(Config.angx, _yAngle + Config.angy, Config.angz);
 
-            ThirdPersonPos = (transform.forward * Config.cam360ForwardOffset) + (transform.right * Config.cam360RightOffset);
-            ThirdPersonPos = new Vector3(ThirdPersonPos.x, Config.cam360UpOffset, ThirdPersonPos.z);
+            ThirdPersonPos = (transform.forward * Config.posz) + (transform.right * Config.posx);
+            ThirdPersonPos = new Vector3(ThirdPersonPos.x, Config.posy, ThirdPersonPos.z);
         }
 
         private void HandleMultiPlayerLobby()
@@ -666,7 +616,7 @@ namespace CameraPlus
             }
             catch (Exception ex)
             {
-                Logger.Log($"HandleMultiPlayerLobby Error {ex.Message}", LogLevel.Error);
+                Logger.log.Error($"HandleMultiPlayerLobby Error {ex.Message}");
             }
         }
         private void HandleMultiPlayerGame()
@@ -693,49 +643,30 @@ namespace CameraPlus
             }
             catch (Exception ex)
             {
-                Logger.Log($"{this.name} HandleMultiPlayerGame Error {ex.Message}", LogLevel.Error);
+                Logger.log.Error($"{this.name} HandleMultiPlayerGame Error {ex.Message}");
             }
-        }
-        private void HandleTurnToHead()
-        {
-            if (!Config.turnToHead)
-            {
-                transform.LookAt(null);
-                return;
-            }
-            else
-            {
-                transform.LookAt(Camera.main.transform);
-                _cameraCube.position = transform.position;
-                _cameraCube.eulerAngles = transform.eulerAngles;
-            }
-
-
         }
 
         public string AddMovementScript()
         {
-            string songScriptPath = Config.movementScriptPath;
+            string songScriptPath = String.Empty;
             if (Config.VMCProtocolMode == "receiver") return "ExternalReceiver Enabled";
+
             if (Config.movementScriptPath != String.Empty || Config.songSpecificScript)
             {
                 if (_cameraMovement)
                     _cameraMovement.Shutdown();
 
-                if (CustomPreviewBeatmapLevelPatch.customLevelPath != String.Empty)
-                    songScriptPath = Path.Combine(CustomPreviewBeatmapLevelPatch.customLevelPath, "SongScript.json");
-                else
-                    songScriptPath = "SongScript";
-
-                if (Config.songSpecificScript && File.Exists(songScriptPath))
-                    _cameraMovement = _cam.gameObject.AddComponent<CameraMovement>();
-                else if (File.Exists(Config.movementScriptPath) || 
-                        File.Exists(Path.Combine(UnityGame.UserDataPath, Plugin.Name, "Scripts", Config.movementScriptPath)) || 
-                        File.Exists(Path.Combine(UnityGame.UserDataPath, Plugin.Name, "Scripts", Path.GetFileName(Config.movementScriptPath))))
-                    _cameraMovement = _cam.gameObject.AddComponent<CameraMovement>();
+                if (CustomPreviewBeatmapLevelPatch.customLevelPath != String.Empty && Config.songSpecificScript)
+                    songScriptPath = CustomPreviewBeatmapLevelPatch.customLevelPath;
+                else if (File.Exists(Path.Combine(CameraUtilities.scriptPath, Path.GetFileName(Config.movementScriptPath))))
+                    songScriptPath = Path.Combine(CameraUtilities.scriptPath, Path.GetFileName(Config.movementScriptPath));
                 else
                     return "Not Find Script";
-                if (_cameraMovement.Init(this, Config.songSpecificScript))
+
+                _cameraMovement = _cam.gameObject.AddComponent<CameraMovement>();
+
+                if (_cameraMovement.Init(this, songScriptPath))
                 {
                     ThirdPersonPos = Config.Position;
                     ThirdPersonRot = Config.Rotation;
@@ -766,7 +697,8 @@ namespace CameraPlus
             _mainCamera = Camera.main;
         }
 
-        protected IEnumerator Get360Managers() {
+        protected IEnumerator Get360Managers()
+        {
             yield return _waitForMainCamera;
 
             _beatLineManager = null;
@@ -848,7 +780,7 @@ namespace CameraPlus
         public bool IsTopmostRenderAreaAtPos(Vector2 mousePos)
         {
             if (!IsWithinRenderArea(mousePos, Config)) return false;
-            foreach (CameraPlusInstance c in Plugin.Instance.Cameras.Values.ToArray())
+            foreach (CameraPlusInstance c in Plugin.cameraController.Cameras.Values.ToArray())
             {
                 if (c.Instance == this) continue;
                 if (!IsWithinRenderArea(mousePos, c.Config) && !c.Instance._mouseHeld) continue;
@@ -874,7 +806,7 @@ namespace CameraPlus
 
         public static CameraPlusBehaviour GetTopmostInstanceAtCursorPos()
         {
-            foreach (CameraPlusInstance c in Plugin.Instance.Cameras.Values.ToArray())
+            foreach (CameraPlusInstance c in Plugin.cameraController.Cameras.Values.ToArray())
             {
                 if (c.Instance._isTopmostAtCursorPos)
                     return c.Instance;
@@ -884,7 +816,7 @@ namespace CameraPlus
 
         internal void CloseContextMenu()
         {
-            if (_contextMenu!=null)
+            if (_contextMenu != null)
                 _contextMenu.DisableMenu();
             Destroy(MenuObj);
             _contextMenuOpen = false;
@@ -898,16 +830,16 @@ namespace CameraPlus
                 switch (type)
                 {
                     case CursorType.Horizontal:
-                        texture = Utils.LoadTextureFromResources("CameraPlus.Resources.Resize_Horiz.png");
+                        texture = CustomUtils.LoadTextureFromResources("CameraPlus.Resources.Resize_Horiz.png");
                         break;
                     case CursorType.Vertical:
-                        texture = Utils.LoadTextureFromResources("CameraPlus.Resources.Resize_Vert.png");
+                        texture = CustomUtils.LoadTextureFromResources("CameraPlus.Resources.Resize_Vert.png");
                         break;
                     case CursorType.DiagonalRight:
-                        texture = Utils.LoadTextureFromResources("CameraPlus.Resources.Resize_DiagRight.png");
+                        texture = CustomUtils.LoadTextureFromResources("CameraPlus.Resources.Resize_DiagRight.png");
                         break;
                     case CursorType.DiagonalLeft:
-                        texture = Utils.LoadTextureFromResources("CameraPlus.Resources.Resize_DiagLeft.png");
+                        texture = CustomUtils.LoadTextureFromResources("CameraPlus.Resources.Resize_DiagLeft.png");
                         break;
                 }
                 UnityEngine.Cursor.SetCursor(texture, texture ? new Vector2(texture.width / 2, texture.height / 2) : new Vector2(0, 0), CursorMode.Auto);
@@ -933,7 +865,7 @@ namespace CameraPlus
                 {
                     float scroll = Input.mouseScrollDelta.y;
                     if (scroll != 0)
-                        ThirdPersonRot.z += scroll * CameraUtilities.mouseRotateSpeedZ;
+                        ThirdPersonRot.z += scroll * CameraUtilities.mouseRotateSpeed[2];
                 }
 
                 if (holdingMiddleClick)
@@ -942,8 +874,8 @@ namespace CameraPlus
                         Vector3 up = transform.TransformDirection(Vector3.up);
                         Vector3 right = transform.TransformDirection(Vector3.right);
 
-                        ThirdPersonPos += right * (mousePos.x - prevMousePos.x) * CameraUtilities.mouseMoveSpeedX +
-                                            up * (mousePos.y - prevMousePos.y) * CameraUtilities.mouseMoveSpeedY;
+                        ThirdPersonPos += right * (mousePos.x - prevMousePos.x) * CameraUtilities.mouseMoveSpeed[0] +
+                                            up * (mousePos.y - prevMousePos.y) * CameraUtilities.mouseMoveSpeed[1];
                     }
 
                 if (holdingRightClick)
@@ -954,8 +886,8 @@ namespace CameraPlus
 
                     if (mousePos != prevMousePos)
                     {
-                        ThirdPersonRot.x += (mousePos.y - prevMousePos.y) * CameraUtilities.mouseRotateSpeedX;
-                        ThirdPersonRot.y += (mousePos.x - prevMousePos.x) * CameraUtilities.mouseRotateSpeedY;
+                        ThirdPersonRot.x += (mousePos.y - prevMousePos.y) * CameraUtilities.mouseRotateSpeed[0];
+                        ThirdPersonRot.y += (mousePos.x - prevMousePos.x) * CameraUtilities.mouseRotateSpeed[1];
                     }
                 }
 
@@ -978,16 +910,16 @@ namespace CameraPlus
 
                 prevMousePos = mousePos;
             }
-            
+
             // Only evaluate mouse events for the topmost render target at the mouse position
             if (!_mouseHeld && !_isTopmostAtCursorPos) return;
 
             int tolerance = 5;
-            bool cursorWithinBorder = Utils.WithinRange((int)mousePos.x, -tolerance, tolerance) || Utils.WithinRange((int)mousePos.y, -tolerance, tolerance) ||
-                Utils.WithinRange((int)mousePos.x, Config.screenPosX + Config.screenWidth - tolerance, Config.screenPosX + Config.screenWidth + tolerance) ||
-                Utils.WithinRange((int)mousePos.x, Config.screenPosX - tolerance, Config.screenPosX + tolerance) ||
-                Utils.WithinRange((int)mousePos.y, Config.screenPosY + Config.screenHeight - tolerance, Config.screenPosY + Config.screenHeight + tolerance) ||
-                Utils.WithinRange((int)mousePos.y, Config.screenPosY - tolerance, Config.screenPosY + tolerance);
+            bool cursorWithinBorder = CustomUtils.WithinRange((int)mousePos.x, -tolerance, tolerance) || CustomUtils.WithinRange((int)mousePos.y, -tolerance, tolerance) ||
+                CustomUtils.WithinRange((int)mousePos.x, Config.screenPosX + Config.screenWidth - tolerance, Config.screenPosX + Config.screenWidth + tolerance) ||
+                CustomUtils.WithinRange((int)mousePos.x, Config.screenPosX - tolerance, Config.screenPosX + tolerance) ||
+                CustomUtils.WithinRange((int)mousePos.y, Config.screenPosY + Config.screenHeight - tolerance, Config.screenPosY + Config.screenHeight + tolerance) ||
+                CustomUtils.WithinRange((int)mousePos.y, Config.screenPosY - tolerance, Config.screenPosY + tolerance);
 
             float currentMouseOffsetX = mousePos.x - Config.screenPosX;
             float currentMouseOffsetY = mousePos.y - Config.screenPosY;
@@ -1001,8 +933,8 @@ namespace CameraPlus
                     var centerY = Config.screenPosY + (Config.screenHeight / 2);
                     var offsetX = Config.screenWidth / 2 - tolerance;
                     var offsetY = Config.screenHeight / 2 - tolerance;
-                    _xAxisLocked = Utils.WithinRange((int)mousePos.x, centerX - offsetX + 1, centerX + offsetX - 1);
-                    _yAxisLocked = Utils.WithinRange((int)mousePos.y, centerY - offsetY + 1, centerY + offsetY - 1);
+                    _xAxisLocked = CustomUtils.WithinRange((int)mousePos.x, centerX - offsetX + 1, centerX + offsetX - 1);
+                    _yAxisLocked = CustomUtils.WithinRange((int)mousePos.y, centerY - offsetY + 1, centerY + offsetY - 1);
 
                     if (!Config.fitToCanvas)
                     {
@@ -1106,7 +1038,7 @@ namespace CameraPlus
                         GUI.skin.label.fontSize = Config.screenWidth / 8;
                         size = GUI.skin.label.fontSize + 15;
 
-                        GUI.Label(new Rect(Config.screenPosX, Screen.height-Config.screenPosY - Config.screenHeight, Config.screenWidth, GUI.skin.label.fontSize + 15), connectedPlayer.userName);
+                        GUI.Label(new Rect(Config.screenPosX, Screen.height - Config.screenPosY - Config.screenHeight, Config.screenWidth, GUI.skin.label.fontSize + 15), connectedPlayer.userName);
 
                         if (SceneManager.GetActiveScene().name == "GameCore" && MultiplayerSession.ConnectedMultiplay)
                         {
@@ -1122,7 +1054,7 @@ namespace CameraPlus
                                         else
                                             _multiplayerGUIStyle.normal.textColor = Color.white;
                                         _multiplayerGUIStyle.fontSize = 30;
-                                        GUI.Label(new Rect(Config.screenPosX, Screen.height - Config.screenPosY - Config.screenHeight + size + 45, Config.screenWidth, 40), String.Format("{0:#,0}", rankedPlayer.score),_multiplayerGUIStyle);
+                                        GUI.Label(new Rect(Config.screenPosX, Screen.height - Config.screenPosY - Config.screenHeight + size + 45, Config.screenWidth, 40), String.Format("{0:#,0}", rankedPlayer.score), _multiplayerGUIStyle);
                                         GUI.Label(new Rect(Config.screenPosX, Screen.height - Config.screenPosY - Config.screenHeight + size + 5, Config.screenWidth, 40), "Rank " + MultiplayerScoreProviderPatch.Instance.GetPositionOfPlayer(connectedPlayer.userId).ToString(), _multiplayerGUIStyle);
                                         break;
                                     }
@@ -1139,10 +1071,10 @@ namespace CameraPlus
 
                 GUI.Box(new Rect(menuLeft, menuTop, 600, 100), $"Script Edit Mode {_cam.name}");
                 boxStyle.normal.background = CameraUtilities.seekBarBackground;
-                GUI.Box(new Rect(menuLeft + 20, menuTop + 35, 560, 20),string.Empty,boxStyle);
+                GUI.Box(new Rect(menuLeft + 20, menuTop + 35, 560, 20), string.Empty, boxStyle);
 
                 boxStyle.normal.background = CameraUtilities.seekBar;
-                GUI.Box(new Rect(menuLeft + 20, menuTop + 35, 10, 20), string.Empty,boxStyle);
+                GUI.Box(new Rect(menuLeft + 20, menuTop + 35, 10, 20), string.Empty, boxStyle);
 
                 //GUI.Box(new Rect(menuLeft + 20, menuTop + 30, 10, 10), "");
                 /*
@@ -1166,7 +1098,7 @@ namespace CameraPlus
             if (_contextMenu == null)
             {
                 MenuObj = new GameObject("CameraPlusMenu");
-                _contextMenu = MenuObj.AddComponent<ContextMenu>();
+                _contextMenu = MenuObj.AddComponent<UI.ContextMenu>();
             }
             _contextMenu.EnableMenu(Input.mousePosition, this);
         }

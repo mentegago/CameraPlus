@@ -1,3 +1,9 @@
+# v5.0.0 Changes
+- Rebuilt to IPA 4.x specifications.  
+- Fixed camera Quad ignoring Depth.
+- Added offset to the option to point the camera at the HMD.
+- The 360-degree setting value is shared with the third person.
+
 # v4.11.0 Changes
 - Added option to follow the 3rd person camera in the direction of the HMD.
 - When failing the multiplayer score display, it is displayed in red to make it easier to understand.

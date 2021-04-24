@@ -2,8 +2,8 @@
 using System.IO;
 using UnityEngine;
 using CameraPlus.Camera2Utils;
-using LogLevel = IPA.Logging.Logger.Level;
-namespace CameraPlus
+
+namespace CameraPlus.Configuration
 {
     public class Config
     {
@@ -28,7 +28,6 @@ namespace CameraPlus
         public float posx;
         public float posy = 2;
         public float posz = -3.0f;
-
         public float angx = 15;
         public float angy;
         public float angz;
@@ -36,17 +35,13 @@ namespace CameraPlus
         public float firstPersonPosOffsetX;
         public float firstPersonPosOffsetY;
         public float firstPersonPosOffsetZ;
-
         public float firstPersonRotOffsetX;
         public float firstPersonRotOffsetY;
         public float firstPersonRotOffsetZ;
 
-        public float cam360ForwardOffset = -2f;
-        public float cam360XTilt = 10f;
-        public float cam360ZTilt = 0f;
-        public float cam360YTilt = 0f;
-        public float cam360UpOffset = 2.2f;
-        public float cam360RightOffset = 0f;
+        public float turnToHeadOffsetX;
+        public float turnToHeadOffsetY;
+        public float turnToHeadOffsetZ;
 
         public bool NoodleTrack = false;
 
@@ -55,7 +50,6 @@ namespace CameraPlus
         public int screenPosX;
         public int screenPosY;
 
-        //public bool Orthographics = false;
         public int MultiPlayerNumber = 0;
         public bool DisplayMultiPlayerNameInfo = false;
 
@@ -158,6 +152,20 @@ namespace CameraPlus
             }
         }
 
+        public Vector3 TurnToHeadOffset
+        {
+            get
+            {
+                return new Vector3(turnToHeadOffsetX, turnToHeadOffsetY, turnToHeadOffsetZ);
+            }
+            set
+            {
+                turnToHeadOffsetX = value.x;
+                turnToHeadOffsetY = value.y;
+                turnToHeadOffsetZ = value.z;
+            }
+        }
+
         public Config(string filePath)
         {
             FilePath = filePath;
@@ -253,12 +261,12 @@ namespace CameraPlus
             else
                 showThirdPersonCamera = false;
             use360Camera = config2.follow360.enabled;
-            posx = firstPersonPosOffsetX = cam360RightOffset = config2.targetPos.x;
-            posy = firstPersonPosOffsetY = cam360UpOffset = config2.targetPos.y;
-            posz = firstPersonPosOffsetZ = cam360ForwardOffset = config2.targetPos.z;
-            angx = firstPersonRotOffsetX = cam360XTilt = config2.targetRot.x;
-            angy = firstPersonRotOffsetY = cam360YTilt = config2.targetRot.y;
-            angz = firstPersonRotOffsetZ = cam360ZTilt = config2.targetRot.z;
+            posx = firstPersonPosOffsetX = config2.targetPos.x;
+            posy = firstPersonPosOffsetY = config2.targetPos.y;
+            posz = firstPersonPosOffsetZ = config2.targetPos.z;
+            angx = firstPersonRotOffsetX = config2.targetRot.x;
+            angy = firstPersonRotOffsetY = config2.targetRot.y;
+            angz = firstPersonRotOffsetZ = config2.targetRot.z;
             NoodleTrack = config2.modmapExtensions.moveWithMap;
             screenWidth = (int)config2.viewRect.width;
             if (screenWidth <= 0) screenWidth = Screen.width;
@@ -319,12 +327,12 @@ namespace CameraPlus
             config2.follow360.enabled = use360Camera;
             config2.follow360.smoothing = cam360Smoothness;
             config2.modmapExtensions.moveWithMap = NoodleTrack;
-            config2.targetPos.x = use360Camera ? cam360RightOffset : thirdPerson ? posx : firstPersonPosOffsetX;
-            config2.targetPos.y = use360Camera ? cam360UpOffset : thirdPerson ? posy : firstPersonPosOffsetY;
-            config2.targetPos.z = use360Camera ? cam360ForwardOffset : thirdPerson ? posz : firstPersonPosOffsetZ;
-            config2.targetRot.x = use360Camera ? cam360XTilt : thirdPerson ? angx : firstPersonRotOffsetX;
-            config2.targetRot.y = use360Camera ? cam360YTilt : thirdPerson ? angy : firstPersonRotOffsetY;
-            config2.targetRot.z = use360Camera ? cam360ZTilt : thirdPerson ? angz : firstPersonRotOffsetZ;
+            config2.targetPos.x = thirdPerson ? posx : firstPersonPosOffsetX;
+            config2.targetPos.y = thirdPerson ? posy : firstPersonPosOffsetY;
+            config2.targetPos.z = thirdPerson ? posz : firstPersonPosOffsetZ;
+            config2.targetRot.x = thirdPerson ? angx : firstPersonRotOffsetX;
+            config2.targetRot.y = thirdPerson ? angy : firstPersonRotOffsetY;
+            config2.targetRot.z = thirdPerson ? angz : firstPersonRotOffsetZ;
             return config2;
         }
     }

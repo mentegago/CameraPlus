@@ -1,52 +1,34 @@
 ﻿using Newtonsoft.Json;
 
-namespace CameraPlus
+namespace CameraPlus.Configuration
 {
-    [JsonObject("StartPos")]
     public class StartPos
     {
-        [JsonProperty("x")]
         public string x { get; set; }
-        [JsonProperty("y")]
         public string y { get; set; }
-        [JsonProperty("z")]
         public string z { get; set; }
-        [JsonProperty("FOV")]
         public string FOV { get; set; }
     }
 
-    [JsonObject("StartRot")]
     public class StartRot
     {
-        [JsonProperty("x")]
         public string x { get; set; }
-        [JsonProperty("y")]
         public string y { get; set; }
-        [JsonProperty("z")]
         public string z { get; set; }
     }
 
-    [JsonObject("EndPos")]
     public class EndPos
     {
-        [JsonProperty("x")]
         public string x { get; set; }
-        [JsonProperty("y")]
         public string y { get; set; }
-        [JsonProperty("z")]
         public string z { get; set; }
-        [JsonProperty("FOV")]
         public string FOV { get; set; }
     }
 
-    [JsonObject("EndRot")]
     public class EndRot
     {
-        [JsonProperty("x")]
         public string x { get; set; }
-        [JsonProperty("y")]
         public string y { get; set; }
-        [JsonProperty("z")]
         public string z { get; set; }
     }
 
@@ -62,18 +44,13 @@ namespace CameraPlus
         [JsonProperty("EndRot")]
         public EndRot endRot { get; set; }
 
-        [JsonProperty("Duration")]
         public string Duration { get; set; }
-        [JsonProperty("Delay")]
         public string Delay { get; set; }
-        [JsonProperty("EaseTransition")]
         public string EaseTransition { get; set; }
     }
 
-    [JsonObject("MovementScriptJson")]
     public class MovementScriptJson
     {
-        [JsonProperty("ActiveInPauseMenu")]
         public string ActiveInPauseMenu { get; set; }
         [JsonProperty("Movements")]
         public JSONMovement[] Jsonmovement { get; set; }

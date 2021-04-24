@@ -131,40 +131,23 @@ namespace CameraPlus.Camera2Utils
     [JsonObject("Camera2Config")]
     public class Camera2Config
     {
-        //[JsonProperty("type")]
         public string type { get; set; }
-        //[JsonProperty("worldCamVisibility")]
         public string worldCamVisibility { get; set; }
-        //[JsonProperty("FOV")]
         public float FOV { get; set; }
-        //[JsonProperty("previewScreenSize")]
         public float previewScreenSize { get; set; }
-        //[JsonProperty("layer")]
         public int layer { get; set; }
-        //[JsonProperty("antiAliasing")]
         public int antiAliasing { get; set; }
-        //[JsonProperty("renderScale")]
         public float renderScale { get; set; }
-
-        //[JsonProperty("visibleObjects")]
         public visibleObjectsElement visibleObject { get; set; }
-        //[JsonProperty("viewRect")]
         public viewRectElement viewRect { get; set; }
 
-        //[JsonProperty("FPSLimiter")]
         public FPSLimiterElement fpsLimitter { get; set; }
-        //[JsonProperty("Smoothfollow")]
         public SmoothfollowElement Smoothfollow { get; set; }
-        //[JsonProperty("Follow360")]
         public Follow360Element follow360 { get; set; }
-        //[JsonProperty("ModmapExtensions")]
         public ModmapExtensionsElement modmapExtensions { get; set; }
 
-        //[JsonProperty("targetPos")]
         public targetPosElement targetPos { get; set; }
-        //[JsonProperty("targetRot")]
         public targetRotElement targetRot { get; set; }
-        //[JsonProperty("MovementScript")]
         public MovementScriptElement movementScript { get; set; }
     }
 }

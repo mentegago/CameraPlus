@@ -9,7 +9,7 @@ namespace CameraPlus.HarmonyPatches
         static void Postfix(BeatLineManager __instance)
         {
 #if DEBUG
-            Logger.Log("BeatLineManager Start");
+            Logger.log.Notice("BeatLineManager Start");
 #endif
             Instance = __instance;
         }
@@ -21,7 +21,7 @@ namespace CameraPlus.HarmonyPatches
         static void Postfix(EnvironmentSpawnRotation __instance)
         {
 #if DEBUG
-            Logger.Log("EnvironmentSpawnRotation Start");
+            Logger.log.Notice("EnvironmentSpawnRotation Start");
 #endif
             Instance = __instance;
         }

@@ -1,14 +1,12 @@
 ﻿using System.Linq;
 using System.Reflection;
 using System.Collections.Generic;
-using IPA;
 using IPA.Loader;
 using UnityEngine;
-using LogLevel = IPA.Logging.Logger.Level;
 
-namespace CameraPlus
+namespace CameraPlus.Utilities
 {
-    class Utils
+    internal class CustomUtils
     {
         public static Texture2D LoadTextureRaw(byte[] file)
         {
@@ -57,15 +55,15 @@ namespace CameraPlus
                 PluginMetadata meta = PluginManager.GetPlugin(modName);
                 if (meta != null)
                 {
-                    Logger.Log($"Found {modName}.", LogLevel.Debug);
+                    Logger.log.Debug($"Found {modName}.");
                     return true;
                 }
-                Logger.Log($"{modName} was not found.", LogLevel.Debug);
+                Logger.log.Debug($"{modName} was not found.");
                 return false;
             }
             catch
             {
-                Logger.Log($"{modName} serach error.", LogLevel.Debug);
+                Logger.log.Debug($"{modName} serach error.");
                 return false;
             }
         }

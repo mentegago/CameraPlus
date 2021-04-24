@@ -1,20 +1,18 @@
-﻿
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using LogLevel = IPA.Logging.Logger.Level;
 using CameraPlus.HarmonyPatches;
 
-namespace CameraPlus
+namespace CameraPlus.Utilities
 {
-    public static class MultiplayerSession
+    internal static class MultiplayerSession
     {
-        public static MultiplayerSessionManager SessionManager { get; private set; }
-        public static List<IConnectedPlayer> connectedPlayers;
-        public static bool ConnectedMultiplay;
-        public static MultiplayerPlayersManager playersManager = null;
-        public static List<Transform> LobbyAvatarPlaceList;
-        public static void Init(MultiplayerSessionManager sessionManager)
+        internal static MultiplayerSessionManager SessionManager { get; private set; }
+        internal static List<IConnectedPlayer> connectedPlayers;
+        internal static bool ConnectedMultiplay;
+        internal static MultiplayerPlayersManager playersManager = null;
+        internal static List<Transform> LobbyAvatarPlaceList;
+        internal static void Init(MultiplayerSessionManager sessionManager)
         {
             connectedPlayers = new List<IConnectedPlayer>();
             LobbyAvatarPlaceList = new List<Transform>();
@@ -27,7 +25,7 @@ namespace CameraPlus
             SessionManager.playerDisconnectedEvent += OnSessionPlayerDisconnected;
         }
 
-        public static void Close()
+        internal static void Close()
         {
             ConnectedMultiplay = false;
             if (SessionManager != null)
@@ -45,12 +43,12 @@ namespace CameraPlus
             connectedPlayers.Clear();
             connectedPlayers.Add(SessionManager.localPlayer);
 #if DEBUG
-            Logger.Log($"ConnectedPlayer---------------", LogLevel.Info);
+            Logger.log.Info($"ConnectedPlayer---------------");
             for (int i = 0; i < connectedPlayers.Count; i++)
-                Logger.Log($"ConnectedPlayer {connectedPlayers[i].userName},{connectedPlayers[i].sortIndex}", LogLevel.Info);
+                Logger.log.Info($"ConnectedPlayer {connectedPlayers[i].userName},{connectedPlayers[i].sortIndex}");
 #endif
-            if (Plugin.Instance._rootConfig.MultiplayerProfile != "" && Plugin.Instance._rootConfig.ProfileSceneChange)
-                Plugin.Instance._profileChanger.ProfileChange(Plugin.Instance._rootConfig.MultiplayerProfile);
+            if (Plugin.cameraController.rootConfig.MultiplayerProfile != "" && Plugin.cameraController.rootConfig.ProfileSceneChange)
+                CameraUtilities.ProfileChange(Plugin.cameraController.rootConfig.MultiplayerProfile);
             LoadLobbyAvatarPlace();
         }
         private static void OnSessionDisconnected(DisconnectedReason reason)
@@ -58,9 +56,9 @@ namespace CameraPlus
             ConnectedMultiplay = false;
             connectedPlayers.Clear();
             LobbyAvatarPlaceList.Clear();
-            Logger.Log($"SessionManager Disconnected {reason}", LogLevel.Info);
-            if (Plugin.Instance._rootConfig.MenuProfile != "" && Plugin.Instance._rootConfig.ProfileSceneChange)
-                Plugin.Instance._profileChanger.ProfileChange(Plugin.Instance._rootConfig.MenuProfile);
+            Logger.log.Info($"SessionManager Disconnected {reason}");
+            if (Plugin.cameraController.rootConfig.MenuProfile != "" && Plugin.cameraController.rootConfig.ProfileSceneChange)
+                CameraUtilities.ProfileChange(Plugin.cameraController.rootConfig.MenuProfile);
         }
         private static void OnSessionPlayerConnected(IConnectedPlayer player)
         {
@@ -68,9 +66,9 @@ namespace CameraPlus
             connectedPlayers = connectedPlayers.OrderBy(pl => pl.sortIndex)
                     .ToList();
 #if DEBUG
-            Logger.Log($"ConnectedPlayer---------------", LogLevel.Info);
+            Logger.log.Info($"ConnectedPlayer---------------");
             for (int i = 0; i < connectedPlayers.Count; i++)
-                Logger.Log($"ConnectedPlayer {connectedPlayers[i].userName},{connectedPlayers[i].sortIndex}", LogLevel.Info);
+                Logger.log.Info($"ConnectedPlayer {connectedPlayers[i].userName},{connectedPlayers[i].sortIndex}");
 #endif
         }
         private static void OnSessionPlayerDisconnected(IConnectedPlayer player)
@@ -83,10 +81,10 @@ namespace CameraPlus
                     break;
                 }
             }
-            Logger.Log($"SessionManager PlayerDisconnected {player.userName},{player.sortIndex}", LogLevel.Info);
+            Logger.log.Info($"SessionManager PlayerDisconnected {player.userName},{player.sortIndex}");
         }
 
-        public static void LoadLobbyAvatarPlace()
+        internal static void LoadLobbyAvatarPlace()
         {
             try
             {
@@ -104,19 +102,20 @@ namespace CameraPlus
                     LobbyAvatarPlaceList.Clear();
                     return;
                 }
-                List<Transform> Tr= ShiftLobbyPositionList(LocalPlayerSortIndex());
-                if (Tr != null) 
+                List<Transform> Tr = ShiftLobbyPositionList(LocalPlayerSortIndex());
+                if (Tr != null)
                     LobbyAvatarPlaceList = Tr;
                 else
-                    Logger.Log($"LobbyAvatarPlace SortError", LogLevel.Info);
+                    Logger.log.Info($"LobbyAvatarPlace SortError");
                 for (int i = 0; i < LobbyAvatarPlaceList.Count; i++)
-                    Logger.Log($"Find Sorted LobbyAvatarPlace {i}: {LobbyAvatarPlaceList[i].position.x},{LobbyAvatarPlaceList[i].position.y},{LobbyAvatarPlaceList[i].position.z}", LogLevel.Notice);
+                    Logger.log.Notice($"Find Sorted LobbyAvatarPlace {i}: {LobbyAvatarPlaceList[i].position.x},{LobbyAvatarPlaceList[i].position.y},{LobbyAvatarPlaceList[i].position.z}");
             }
-            catch {
-                Logger.Log($"Unable to LoadLobbyAvatarPlace", LogLevel.Error);
+            catch
+            {
+                Logger.log.Error($"Unable to LoadLobbyAvatarPlace");
             }
         }
-        public static int LocalPlayerSortIndex()
+        private static int LocalPlayerSortIndex()
         {
             int result = 0;
             foreach (IConnectedPlayer player in connectedPlayers)
@@ -129,15 +128,15 @@ namespace CameraPlus
             }
             return result;
         }
-        public static List<Transform> ShiftLobbyPositionList(int shiftValue)
+        private static List<Transform> ShiftLobbyPositionList(int shiftValue)
         {
             if (shiftValue < 0 || shiftValue >= LobbyAvatarPlaceList.Count) return null;
 
             List<Transform> result = LobbyAvatarPlaceList;
-            for (int i=0; i < shiftValue ; i++)
+            for (int i = 0; i < shiftValue; i++)
             {
-                result.Insert(0,result[result.Count-1]);
-                result.RemoveAt(result.Count-1);
+                result.Insert(0, result[result.Count - 1]);
+                result.RemoveAt(result.Count - 1);
             }
             return result;
         }

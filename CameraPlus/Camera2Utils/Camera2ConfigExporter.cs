@@ -4,7 +4,8 @@ using IPA.Utilities;
 using System.Collections.Generic;
 using System.Linq;
 using Newtonsoft.Json;
-using LogLevel = IPA.Logging.Logger.Level;
+using CameraPlus.Utilities;
+using CameraPlus.Configuration;
 
 namespace CameraPlus.Camera2Utils
 {
@@ -25,7 +26,7 @@ namespace CameraPlus.Camera2Utils
         {
             Camera2Scenes camera2Scenes = JsonConvert.DeserializeObject<Camera2Scenes>(File.ReadAllText(Path.Combine(cam2Path, "Scenes.json")));
 
-            var cameraList = Camera2CameraExporter(CameraProfiles.currentlySelected);
+            var cameraList = Camera2CameraExporter(CameraUtilities.currentlySelected);
             SceneTypes selectedSceneType = enumScenes.Find(x => x.ToString() == currentlyScenesSelected);
             camera2Scenes.scenes[selectedSceneType] = cameraList;
 
@@ -40,18 +41,18 @@ namespace CameraPlus.Camera2Utils
             List<string> cameraList = camera2Scenes.scenes[s];
             if (cameraList.Count > 0)
             {
-                string ProfileName = CameraProfiles.GetNextProfileName(s.ToString());
+                string ProfileName = CameraUtilities.GetNextProfileName(s.ToString());
                 if (ProfileName == string.Empty)
                 {
-                    Logger.Log("No ProfileName in LoadCamera2Scene", LogLevel.Error);
+                    Logger.log.Error("No ProfileName in LoadCamera2Scene");
                     return;
                 }
-                CameraProfiles.DirectoryCreate(Path.Combine(pPath, ProfileName));
+                CameraUtilities.DirectoryCreate(Path.Combine(pPath, ProfileName));
                 for (int i = 0; i < cameraList.Count; i++)
                     Camera2ConfigLoader(Path.Combine(cam2Path,"Cameras", $"{cameraList[i]}.json"), ProfileName);
             }
             else
-                Logger.Log("No Camera Data from Camera2 Scene",LogLevel.Error);
+                Logger.log.Error("No Camera Data from Camera2 Scene");
         }
         public static void SetSceneNext(string now = null)
         {
@@ -100,7 +101,7 @@ namespace CameraPlus.Camera2Utils
             FileInfo[] files = dir.GetFiles();
             if (files.Length <= 0)
             {
-                Logger.Log("Return MainCameraName in GetNextCamera2Name", LogLevel.Notice);
+                Logger.log.Notice("Return MainCameraName in GetNextCamera2Name");
                 return $"{Plugin.MainCamera}";
             }
             int index = 1;
@@ -126,13 +127,13 @@ namespace CameraPlus.Camera2Utils
             else
             {
                 cameraName = CameraUtilities.GetNextCameraName();
-                Logger.Log($"Adding new config with name {cameraName}.cfg", LogLevel.Notice);
+                Logger.log.Notice($"Adding new config with name {cameraName}.cfg");
 
                 path = Path.Combine(UnityGame.UserDataPath, Plugin.Name, $"{cameraName}.cfg");
-                if (!Plugin.Instance._rootConfig.ProfileLoadCopyMethod && Plugin.Instance._currentProfile != null)
-                    path = Path.Combine(UnityGame.UserDataPath, "." + Plugin.Name.ToLower(), "Profiles", Plugin.Instance._currentProfile, $"{cameraName}.cfg");
+                if (!Plugin.cameraController.rootConfig.ProfileLoadCopyMethod && Plugin.cameraController.currentProfile != null)
+                    path = Path.Combine(UnityGame.UserDataPath, "." + Plugin.Name.ToLower(), "Profiles", Plugin.cameraController.currentProfile, $"{cameraName}.cfg");
             }
-            Logger.Log($"Try Adding {path}", LogLevel.Notice);
+            Logger.log.Notice($"Try Adding {path}");
 
             Config config = new Config(path);
             Camera2Config config2 = null;
@@ -143,11 +144,11 @@ namespace CameraPlus.Camera2Utils
             }
             catch(Exception ex)
             {
-                Logger.Log($"DeserializeObjectError {ex.Message}", LogLevel.Notice);
+                Logger.log.Notice($"DeserializeObjectError {ex.Message}");
             }
             config.ConvertFromCamera2(config2);
 
-            foreach (CameraPlusInstance c in Plugin.Instance.Cameras.Values.OrderBy(i => i.Config.layer))
+            foreach (CameraPlusInstance c in Plugin.cameraController.Cameras.Values.OrderBy(i => i.Config.layer))
             {
                 if (c.Config.layer > config.layer)
                     config.layer += (c.Config.layer - config.layer);

@@ -1,16 +1,16 @@
 ﻿using System.IO;
 using UnityEngine;
+using CameraPlus.Behaviours;
+using CameraPlus.Configuration;
 
 namespace CameraPlus
 {
-    public class CameraPlusInstance
+    internal class CameraPlusInstance
     {
-        private readonly WaitForSecondsRealtime _waitForSecondsRealtime = new WaitForSecondsRealtime(0.1f);
+        internal Config Config;
+        internal CameraPlusBehaviour Instance;
 
-        public Config Config;
-        public CameraPlusBehaviour Instance;
-
-        public CameraPlusInstance(string configPath)
+        internal CameraPlusInstance(string configPath)
         {
             Config = new Config(configPath);
 

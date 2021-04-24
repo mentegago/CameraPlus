@@ -1,17 +1,16 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 using System.Collections.Generic;
 using IPA.Utilities;
-using LogLevel = IPA.Logging.Logger.Level;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using Newtonsoft.Json;
 using System.Globalization;
 using CameraPlus.HarmonyPatches;
+using CameraPlus.Configuration;
 
-namespace CameraPlus
+namespace CameraPlus.Behaviours
 {
     public class CameraMovement : MonoBehaviour
     {
@@ -61,7 +60,7 @@ namespace CameraPlus
                 }
                 catch (Exception ex)
                 {
-                    Logger.Log($"JSON file syntax error. {ex.Message}", LogLevel.Error);
+                    Logger.log.Error($"JSON file syntax error. {ex.Message}");
                 }
                 if (movementScriptJson != null && movementScriptJson.Jsonmovement !=null)
                 {
@@ -163,23 +162,17 @@ namespace CameraPlus
             return new Vector3(Mathf.LerpAngle(from.x, to.x, percent), Mathf.LerpAngle(from.y, to.y, percent), Mathf.LerpAngle(from.z, to.z, percent));
         }
 
-        public virtual bool Init(CameraPlusBehaviour cameraPlus, bool useSongSpecificScript)
+        public virtual bool Init(CameraPlusBehaviour cameraPlus, string scriptPath)
         {
             _cameraPlus = cameraPlus;
-            Plugin.Instance.ActiveSceneChanged += OnActiveSceneChanged;
 
-            if (useSongSpecificScript && File.Exists(Path.Combine(CustomPreviewBeatmapLevelPatch.customLevelPath, "SongScript.json")))
-            {
-                Logger.Log($"{Path.Combine(CustomPreviewBeatmapLevelPatch.customLevelPath, "SongScript.json")}", LogLevel.Notice);
-                return LoadCameraData(Path.Combine(CustomPreviewBeatmapLevelPatch.customLevelPath, "SongScript.json"));
-            }
-            else
-                return LoadCameraData(cameraPlus.Config.movementScriptPath);
+            Plugin.cameraController.ActiveSceneChanged += OnActiveSceneChanged;
+            return LoadCameraData(scriptPath);
         }
 
         public virtual void Shutdown()
         {
-            Plugin.Instance.ActiveSceneChanged -= OnActiveSceneChanged;
+            Plugin.cameraController.ActiveSceneChanged -= OnActiveSceneChanged;
             Destroy(this);
         }
 
@@ -200,31 +193,25 @@ namespace CameraPlus
 
         protected bool LoadCameraData(string pathFile)
         {
-            string path="";
-            if (File.Exists(pathFile))
-                path = pathFile;
-            else if (File.Exists(Path.Combine(UnityGame.UserDataPath, Plugin.Name, "Scripts", pathFile)))
-                path = Path.Combine(UnityGame.UserDataPath, Plugin.Name, "Scripts", pathFile);
-            else if (File.Exists(Path.Combine(UnityGame.UserDataPath, Plugin.Name, "Scripts", Path.GetFileName(pathFile))))
-                path = Path.Combine(UnityGame.UserDataPath, Plugin.Name, "Scripts", Path.GetFileName(pathFile));
+            string path= pathFile;
 
             if (File.Exists(path))
             {
                 string jsonText = File.ReadAllText(path);
                 if (data.LoadFromJson(jsonText))
                 {
-                    Logger.Log("Populated CameraData");
+                    Logger.log.Notice("Populated CameraData");
 
                     if (data.Movements.Count == 0)
                     {
-                        Logger.Log("No movement data!");
+                        Logger.log.Notice("No movement data!");
                         return false;
                     }
                     eventID = 0;
                     UpdatePosAndRot();
                     dataLoaded = true;
 
-                    Logger.Log($"Found {data.Movements.Count} entries in: {path}");
+                    Logger.log.Notice($"Found {data.Movements.Count} entries in: {path}");
                     return true;
                 }
             }
@@ -295,16 +282,6 @@ namespace CameraPlus
                 float f = ((2 * p) - 2);
                 return 0.5f * f * f * f + 1;
             }
-        }
-
-        public static void CreateExampleScript()
-        {
-            string path = Path.Combine(UnityGame.UserDataPath, Plugin.Name, "Scripts");
-            if (!Directory.Exists(path))
-                Directory.CreateDirectory(path);
-            string defaultScript = Path.Combine(path, "ExampleMovementScript.json");
-            if (!File.Exists(defaultScript))
-                File.WriteAllBytes(defaultScript, Utils.GetResource(Assembly.GetExecutingAssembly(), "CameraPlus.Resources.ExampleMovementScript.json"));
         }
     }
 }

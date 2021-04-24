@@ -1,6 +1,5 @@
-﻿using HarmonyLib;
-using IPALogger = IPA.Logging.Logger;
-using LogLevel = IPA.Logging.Logger.Level;
+﻿using System.IO;
+using HarmonyLib;
 
 namespace CameraPlus.HarmonyPatches
 {
@@ -11,9 +10,12 @@ namespace CameraPlus.HarmonyPatches
         static void Postfix(CustomPreviewBeatmapLevel __instance)
         {
 #if DEBUG
-            //Logger.Log($"Selected CustomLevel Path :\n {__instance.customLevelPath}", LogLevel.Notice);
+            Logger.log.Notice($"Selected CustomLevel Path :\n {__instance.customLevelPath}");
 #endif
-            customLevelPath = __instance.customLevelPath;
+            if (File.Exists(Path.Combine(__instance.customLevelPath, "SongScript.json")))
+                customLevelPath = Path.Combine(__instance.customLevelPath, "SongScript.json");
+            else
+                customLevelPath = string.Empty;
         }
     }
 }

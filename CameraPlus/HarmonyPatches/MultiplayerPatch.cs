@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using HarmonyLib;
-using LogLevel = IPA.Logging.Logger.Level;
+using CameraPlus.Utilities;
 
 namespace CameraPlus.HarmonyPatches
 {
@@ -12,7 +12,7 @@ namespace CameraPlus.HarmonyPatches
         {
             Instance = __instance;
             MultiplayerSession.Init(Instance);
-            Logger.Log($"Success Find SessionManager", LogLevel.Info);
+            Logger.log.Info($"Success Find SessionManager");
         }
     }
 
@@ -26,7 +26,7 @@ namespace CameraPlus.HarmonyPatches
             Instance = __instance;
             LobbyAvatarPlaces = ____allPlaces;
 #if DEBUG
-            Logger.Log("Got MultiplayerLobbyAvatarPlaceManager", LogLevel.Notice);
+            Logger.log.Notice("Got MultiplayerLobbyAvatarPlaceManager");
 #endif
         }
     }
@@ -39,7 +39,7 @@ namespace CameraPlus.HarmonyPatches
         {
             Instance = __instance;
 #if DEBUG
-            Logger.Log("Got MultiplayerLobbyController", LogLevel.Notice);
+            Logger.log.Notice("Got MultiplayerLobbyController");
 #endif
         }
     }
@@ -51,7 +51,7 @@ namespace CameraPlus.HarmonyPatches
         {
             Instance = __instance;
 #if DEBUG
-            Logger.Log("Got MultiplayerPlayersManager", LogLevel.Notice);
+            Logger.log.Notice("Got MultiplayerPlayersManager");
 #endif
         }
     }
@@ -64,7 +64,7 @@ namespace CameraPlus.HarmonyPatches
             if (Instance == null)
             {
 #if DEBUG
-                Logger.Log("Got MultiplayerScoreProvider", LogLevel.Notice);
+                Logger.log.Notice("Got MultiplayerScoreProvider");
 #endif
                 Instance = __instance;
             }

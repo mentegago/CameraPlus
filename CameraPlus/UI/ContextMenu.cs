@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Text.RegularExpressions;
 using UnityEngine;
-using LogLevel = IPA.Logging.Logger.Level;
 using CameraPlus.Camera2Utils;
+using CameraPlus.Behaviours;
+using CameraPlus.Utilities;
 
-
-namespace CameraPlus
+namespace CameraPlus.UI
 {
     public class ContextMenu : MonoBehaviour
     {
@@ -35,9 +35,6 @@ namespace CameraPlus
 
         private string ipNum =@"(25[0-5]|2[0-4]\d|[0-1]\d{2}|[1-9]?\d)";
 
-        public void Awake()
-        {
-        }
         public void EnableMenu(Vector2 mousePos, CameraPlusBehaviour parentBehaviour)
         {
             this.enabled = true;
@@ -49,13 +46,13 @@ namespace CameraPlus
             scriptPage = 0;
 
             if (this.parentBehaviour.Config.LockScreen)
-                texture = Utils.LoadTextureFromResources("CameraPlus.Resources.Lock.png");
+                texture = CustomUtils.LoadTextureFromResources("CameraPlus.Resources.Lock.png");
             else
-                texture = Utils.LoadTextureFromResources("CameraPlus.Resources.UnLock.png");
+                texture = CustomUtils.LoadTextureFromResources("CameraPlus.Resources.UnLock.png");
             if (this.parentBehaviour.Config.LockCamera || this.parentBehaviour.Config.LockCameraDrag)
-                Cameratexture = Utils.LoadTextureFromResources("CameraPlus.Resources.CameraLock.png");
+                Cameratexture = CustomUtils.LoadTextureFromResources("CameraPlus.Resources.CameraLock.png");
             else
-                Cameratexture = Utils.LoadTextureFromResources("CameraPlus.Resources.CameraUnlock.png");
+                Cameratexture = CustomUtils.LoadTextureFromResources("CameraPlus.Resources.CameraUnlock.png");
         }
         public void DisableMenu()
         {
@@ -96,9 +93,9 @@ namespace CameraPlus
                         parentBehaviour.Config.LockScreen = !parentBehaviour.Config.LockScreen;
                         parentBehaviour.Config.Save();
                         if (this.parentBehaviour.Config.LockScreen)
-                            texture = Utils.LoadTextureFromResources("CameraPlus.Resources.Lock.png");
+                            texture = CustomUtils.LoadTextureFromResources("CameraPlus.Resources.Lock.png");
                         else
-                            texture = Utils.LoadTextureFromResources("CameraPlus.Resources.UnLock.png");
+                            texture = CustomUtils.LoadTextureFromResources("CameraPlus.Resources.UnLock.png");
                     }
                     GUI.Box(new Rect(menuPos.x + 35, menuPos.y + 25, 115, 30), new GUIContent(parentBehaviour.Config.LockScreen ? "Locked Screen" : "Unlocked Screen"), ProfileStyle);
 
@@ -108,19 +105,19 @@ namespace CameraPlus
                         {
                             parentBehaviour.Config.LockCamera = true;
                             parentBehaviour.Config.LockCameraDrag = false;
-                            Cameratexture = Utils.LoadTextureFromResources("CameraPlus.Resources.CameraLock.png");
+                            Cameratexture = CustomUtils.LoadTextureFromResources("CameraPlus.Resources.CameraLock.png");
                         }
                         else if(parentBehaviour.Config.LockCamera && !parentBehaviour.Config.LockCameraDrag)
                         {
                             parentBehaviour.Config.LockCamera = false;
                             parentBehaviour.Config.LockCameraDrag = true;
-                            Cameratexture = Utils.LoadTextureFromResources("CameraPlus.Resources.CameraLock.png");
+                            Cameratexture = CustomUtils.LoadTextureFromResources("CameraPlus.Resources.CameraLock.png");
                         }
                         else
                         {
                             parentBehaviour.Config.LockCamera = false;
                             parentBehaviour.Config.LockCameraDrag = false;
-                            Cameratexture = Utils.LoadTextureFromResources("CameraPlus.Resources.CameraUnlock.png");
+                            Cameratexture = CustomUtils.LoadTextureFromResources("CameraPlus.Resources.CameraUnlock.png");
                         }
                         parentBehaviour.Config.Save();
                     }
@@ -128,10 +125,10 @@ namespace CameraPlus
 
                     if (GUI.Button(new Rect(menuPos.x + 5, menuPos.y + 60, 145, 60), new GUIContent("Add New Camera")))
                     {
-                        lock (Plugin.Instance.Cameras)
+                        lock (Plugin.cameraController.Cameras)
                         {
                             string cameraName = CameraUtilities.GetNextCameraName();
-                            Logger.Log($"Adding new config with name {cameraName}.cfg");
+                            Logger.log.Notice($"Adding new config with name {cameraName}.cfg");
                             CameraUtilities.AddNewCamera(cameraName);
                             CameraUtilities.ReloadCameras();
                             parentBehaviour.CloseContextMenu();
@@ -139,10 +136,10 @@ namespace CameraPlus
                     }
                     if (GUI.Button(new Rect(menuPos.x + 150, menuPos.y + 60, 145, 60), new GUIContent("Duplicate\nSelected Camera")))
                     {
-                        lock (Plugin.Instance.Cameras)
+                        lock (Plugin.cameraController.Cameras)
                         {
                             string cameraName = CameraUtilities.GetNextCameraName();
-                            Logger.Log($"Adding {cameraName}", LogLevel.Notice);
+                            Logger.log.Notice($"Adding {cameraName}");
                             CameraUtilities.AddNewCamera(cameraName, parentBehaviour.Config);
                             CameraUtilities.ReloadCameras();
                             parentBehaviour.CloseContextMenu();
@@ -150,14 +147,14 @@ namespace CameraPlus
                     }
                     if (GUI.Button(new Rect(menuPos.x + 150, menuPos.y + 130, 145, 50), new GUIContent("Remove\nSelected Camera")))
                     {
-                        lock (Plugin.Instance.Cameras)
+                        lock (Plugin.cameraController.Cameras)
                         {
                             if (CameraUtilities.RemoveCamera(parentBehaviour))
                             {
                                 parentBehaviour._isCameraDestroyed = true;
                                 parentBehaviour.CreateScreenRenderTexture();
                                 parentBehaviour.CloseContextMenu();
-                                Logger.Log("Camera removed!", LogLevel.Notice);
+                                Logger.log.Notice("Camera removed!");
                             }
                         }
                     }
@@ -462,7 +459,6 @@ namespace CameraPlus
                         parentBehaviour.CreateScreenRenderTexture();
                         parentBehaviour.Config.Save();
                     }
-
                     //Amount of Movemnet
                     GUI.Box(new Rect(menuPos.x, menuPos.y + 155, 175, 50), "Amount movement : " + amountMove.ToString("F2"));
                     if (GUI.Button(new Rect(menuPos.x + 5, menuPos.y + 175, 55, 30), new GUIContent("0.01")))
@@ -482,12 +478,10 @@ namespace CameraPlus
                     }
                     //X Position
                     GUI.Box(new Rect(menuPos.x, menuPos.y + 205, 100, 50), "X Pos :" +
-                        (parentBehaviour.Config.use360Camera ? parentBehaviour.Config.cam360RightOffset.ToString("F2") : (parentBehaviour.Config.thirdPerson ? parentBehaviour.Config.posx.ToString("F2") : parentBehaviour.Config.firstPersonPosOffsetX.ToString("F2"))));
+                        (parentBehaviour.Config.thirdPerson ? parentBehaviour.Config.posx.ToString("F2") : parentBehaviour.Config.firstPersonPosOffsetX.ToString("F2")));
                     if (GUI.Button(new Rect(menuPos.x + 5, menuPos.y + 225, 45, 30), new GUIContent("-")))
                     {
-                        if (parentBehaviour.Config.use360Camera)
-                            parentBehaviour.Config.cam360RightOffset -= amountMove;
-                        else if (parentBehaviour.Config.thirdPerson)
+                        if (parentBehaviour.Config.thirdPerson)
                             parentBehaviour.Config.posx -= amountMove;
                         else
                             parentBehaviour.Config.firstPersonPosOffsetX -= amountMove;
@@ -496,9 +490,7 @@ namespace CameraPlus
                     }
                     if (GUI.Button(new Rect(menuPos.x + 50, menuPos.y + 225, 45, 30), new GUIContent("+")))
                     {
-                        if (parentBehaviour.Config.use360Camera)
-                            parentBehaviour.Config.cam360RightOffset += amountMove;
-                        else if (parentBehaviour.Config.thirdPerson)
+                        if (parentBehaviour.Config.thirdPerson)
                             parentBehaviour.Config.posx += amountMove;
                         else
                             parentBehaviour.Config.firstPersonPosOffsetX += amountMove;
@@ -507,12 +499,10 @@ namespace CameraPlus
                     }
                     //Y Position
                     GUI.Box(new Rect(menuPos.x + 100, menuPos.y + 205, 100, 50), "Y Pos :" +
-                        (parentBehaviour.Config.use360Camera ? parentBehaviour.Config.cam360UpOffset.ToString("F2") : (parentBehaviour.Config.thirdPerson ? parentBehaviour.Config.posy.ToString("F2") : parentBehaviour.Config.firstPersonPosOffsetY.ToString("F2"))));
+                        (parentBehaviour.Config.thirdPerson ? parentBehaviour.Config.posy.ToString("F2") : parentBehaviour.Config.firstPersonPosOffsetY.ToString("F2")));
                     if (GUI.Button(new Rect(menuPos.x + 105, menuPos.y + 225, 45, 30), new GUIContent("-")))
                     {
-                        if (parentBehaviour.Config.use360Camera)
-                            parentBehaviour.Config.cam360UpOffset -= amountMove;
-                        else if (parentBehaviour.Config.thirdPerson)
+                        if (parentBehaviour.Config.thirdPerson)
                             parentBehaviour.Config.posy -= amountMove;
                         else
                             parentBehaviour.Config.firstPersonPosOffsetY -= amountMove;
@@ -521,9 +511,7 @@ namespace CameraPlus
                     }
                     if (GUI.Button(new Rect(menuPos.x + 150, menuPos.y + 225, 45, 30), new GUIContent("+")))
                     {
-                        if (parentBehaviour.Config.use360Camera)
-                            parentBehaviour.Config.cam360UpOffset += amountMove;
-                        else if (parentBehaviour.Config.thirdPerson)
+                        if (parentBehaviour.Config.thirdPerson)
                             parentBehaviour.Config.posy += amountMove;
                         else
                             parentBehaviour.Config.firstPersonPosOffsetY += amountMove;
@@ -532,12 +520,10 @@ namespace CameraPlus
                     }
                     //Z Position
                     GUI.Box(new Rect(menuPos.x + 200, menuPos.y + 205, 100, 50), "Z Pos :" +
-                        (parentBehaviour.Config.use360Camera ? parentBehaviour.Config.cam360ForwardOffset.ToString("F2") : (parentBehaviour.Config.thirdPerson ? parentBehaviour.Config.posz.ToString("F2") : parentBehaviour.Config.firstPersonPosOffsetZ.ToString("F2"))));
+                        (parentBehaviour.Config.thirdPerson ? parentBehaviour.Config.posz.ToString("F2") : parentBehaviour.Config.firstPersonPosOffsetZ.ToString("F2")));
                     if (GUI.Button(new Rect(menuPos.x + 205, menuPos.y + 225, 45, 30), new GUIContent("-")))
                     {
-                        if (parentBehaviour.Config.use360Camera)
-                            parentBehaviour.Config.cam360ForwardOffset -= amountMove;
-                        else if (parentBehaviour.Config.thirdPerson)
+                        if (parentBehaviour.Config.thirdPerson)
                             parentBehaviour.Config.posz -= amountMove;
                         else
                             parentBehaviour.Config.firstPersonPosOffsetZ -= amountMove;
@@ -546,120 +532,156 @@ namespace CameraPlus
                     }
                     if (GUI.Button(new Rect(menuPos.x + 250, menuPos.y + 225, 45, 30), new GUIContent("+")))
                     {
-                        if (parentBehaviour.Config.use360Camera)
-                            parentBehaviour.Config.cam360ForwardOffset += amountMove;
-                        else if (parentBehaviour.Config.thirdPerson)
+                        if (parentBehaviour.Config.thirdPerson)
                             parentBehaviour.Config.posz += amountMove;
                         else
                             parentBehaviour.Config.firstPersonPosOffsetZ += amountMove;
                         parentBehaviour.CreateScreenRenderTexture();
                         parentBehaviour.Config.Save();
                     }
-                    //Amount of Rotation
-                    GUI.Box(new Rect(menuPos.x, menuPos.y + 255, 290, 50), "Amount rotation : " + amountRot.ToString("F2"));
-                    if (GUI.Button(new Rect(menuPos.x + 5, menuPos.y + 275, 50, 30), new GUIContent("0.01")))
+                    if (!parentBehaviour.Config.turnToHead)
                     {
-                        amountRot = 0.01f;
-                        parentBehaviour.CreateScreenRenderTexture();
+                        //Amount of Rotation
+                        GUI.Box(new Rect(menuPos.x, menuPos.y + 255, 290, 50), "Amount rotation : " + amountRot.ToString("F2"));
+                        if (GUI.Button(new Rect(menuPos.x + 5, menuPos.y + 275, 50, 30), new GUIContent("0.01")))
+                        {
+                            amountRot = 0.01f;
+                            parentBehaviour.CreateScreenRenderTexture();
+                        }
+                        if (GUI.Button(new Rect(menuPos.x + 60, menuPos.y + 275, 50, 30), new GUIContent("0.10")))
+                        {
+                            amountRot = 0.1f;
+                            parentBehaviour.CreateScreenRenderTexture();
+                        }
+                        if (GUI.Button(new Rect(menuPos.x + 115, menuPos.y + 275, 50, 30), new GUIContent("1.00")))
+                        {
+                            amountRot = 1.0f;
+                            parentBehaviour.CreateScreenRenderTexture();
+                        }
+                        if (GUI.Button(new Rect(menuPos.x + 170, menuPos.y + 275, 50, 30), new GUIContent("10")))
+                        {
+                            amountRot = 10.0f;
+                            parentBehaviour.CreateScreenRenderTexture();
+                        }
+                        if (GUI.Button(new Rect(menuPos.x + 225, menuPos.y + 275, 50, 30), new GUIContent("45")))
+                        {
+                            amountRot = 45.0f;
+                            parentBehaviour.CreateScreenRenderTexture();
+                        }
+                        //X Rotation
+                        GUI.Box(new Rect(menuPos.x, menuPos.y + 305, 100, 50), "X Rot :" +
+                            (parentBehaviour.Config.thirdPerson ? parentBehaviour.Config.angx.ToString("F2") : parentBehaviour.Config.firstPersonRotOffsetX.ToString("F2")));
+                        if (GUI.Button(new Rect(menuPos.x + 5, menuPos.y + 325, 45, 30), new GUIContent("-")))
+                        {
+                            if (parentBehaviour.Config.thirdPerson)
+                                parentBehaviour.Config.angx -= amountRot;
+                            else
+                                parentBehaviour.Config.firstPersonRotOffsetX -= amountRot;
+                            parentBehaviour.CreateScreenRenderTexture();
+                            parentBehaviour.Config.Save();
+                        }
+                        if (GUI.Button(new Rect(menuPos.x + 50, menuPos.y + 325, 45, 30), new GUIContent("+")))
+                        {
+                            if (parentBehaviour.Config.thirdPerson)
+                                parentBehaviour.Config.angx += amountRot;
+                            else
+                                parentBehaviour.Config.firstPersonRotOffsetX += amountRot;
+                            parentBehaviour.CreateScreenRenderTexture();
+                            parentBehaviour.Config.Save();
+                        }
+                        //Y Rotation
+                        GUI.Box(new Rect(menuPos.x + 100, menuPos.y + 305, 100, 50), "Y Rot :" +
+                            (parentBehaviour.Config.thirdPerson ? parentBehaviour.Config.angy.ToString("F2") : parentBehaviour.Config.firstPersonRotOffsetY.ToString("F2")));
+                        if (GUI.Button(new Rect(menuPos.x + 105, menuPos.y + 325, 45, 30), new GUIContent("-")))
+                        {
+                            if (parentBehaviour.Config.thirdPerson)
+                                parentBehaviour.Config.angy -= amountRot;
+                            else
+                                parentBehaviour.Config.firstPersonRotOffsetY -= amountRot;
+                            parentBehaviour.CreateScreenRenderTexture();
+                            parentBehaviour.Config.Save();
+                        }
+                        if (GUI.Button(new Rect(menuPos.x + 150, menuPos.y + 325, 45, 30), new GUIContent("+")))
+                        {
+                            if (parentBehaviour.Config.thirdPerson)
+                                parentBehaviour.Config.angy += amountRot;
+                            else
+                                parentBehaviour.Config.firstPersonRotOffsetY += amountRot;
+                            parentBehaviour.CreateScreenRenderTexture();
+                            parentBehaviour.Config.Save();
+                        }
+                        //Z Rotation
+                        GUI.Box(new Rect(menuPos.x + 200, menuPos.y + 305, 100, 50), "Z Rot :" +
+                            (parentBehaviour.Config.thirdPerson ? parentBehaviour.Config.angz.ToString("F2") : parentBehaviour.Config.firstPersonRotOffsetZ.ToString("F2")));
+                        if (GUI.Button(new Rect(menuPos.x + 205, menuPos.y + 325, 45, 30), new GUIContent("-")))
+                        {
+                            if (parentBehaviour.Config.thirdPerson)
+                                parentBehaviour.Config.angz -= amountRot;
+                            else
+                                parentBehaviour.Config.firstPersonRotOffsetZ -= amountRot;
+                            parentBehaviour.CreateScreenRenderTexture();
+                            parentBehaviour.Config.Save();
+                        }
+                        if (GUI.Button(new Rect(menuPos.x + 250, menuPos.y + 325, 45, 30), new GUIContent("+")))
+                        {
+                            if (parentBehaviour.Config.thirdPerson)
+                                parentBehaviour.Config.angz += amountRot;
+                            else
+                                parentBehaviour.Config.firstPersonRotOffsetZ += amountRot;
+                            parentBehaviour.CreateScreenRenderTexture();
+                            parentBehaviour.Config.Save();
+                        }
                     }
-                    if (GUI.Button(new Rect(menuPos.x + 60, menuPos.y + 275, 50, 30), new GUIContent("0.10")))
+                    else
                     {
-                        amountRot = 0.1f;
-                        parentBehaviour.CreateScreenRenderTexture();
-                    }
-                    if (GUI.Button(new Rect(menuPos.x + 115, menuPos.y + 275, 50, 30), new GUIContent("1.00")))
-                    {
-                        amountRot = 1.0f;
-                        parentBehaviour.CreateScreenRenderTexture();
-                    }
-                    if (GUI.Button(new Rect(menuPos.x + 170, menuPos.y + 275, 50, 30), new GUIContent("10")))
-                    {
-                        amountRot = 10.0f;
-                        parentBehaviour.CreateScreenRenderTexture();
-                    }
-                    if (GUI.Button(new Rect(menuPos.x + 225, menuPos.y + 275, 50, 30), new GUIContent("45")))
-                    {
-                        amountRot = 45.0f;
-                        parentBehaviour.CreateScreenRenderTexture();
-                    }
-                    //X Rotation
-                    GUI.Box(new Rect(menuPos.x, menuPos.y + 305, 100, 50), "X Rot :" +
-                        (parentBehaviour.Config.use360Camera ? parentBehaviour.Config.cam360XTilt.ToString("F2") : (parentBehaviour.Config.thirdPerson ? parentBehaviour.Config.angx.ToString("F2") : parentBehaviour.Config.firstPersonRotOffsetX.ToString("F2"))));
-                    if (GUI.Button(new Rect(menuPos.x + 5, menuPos.y + 325, 45, 30), new GUIContent("-")))
-                    {
-                        if (parentBehaviour.Config.use360Camera)
-                            parentBehaviour.Config.cam360XTilt -= amountRot;
-                        else if (parentBehaviour.Config.thirdPerson)
-                            parentBehaviour.Config.angx -= amountRot;
-                        else
-                            parentBehaviour.Config.firstPersonRotOffsetX -= amountRot;
-                        parentBehaviour.CreateScreenRenderTexture();
-                        parentBehaviour.Config.Save();
-                    }
-                    if (GUI.Button(new Rect(menuPos.x + 50, menuPos.y + 325, 45, 30), new GUIContent("+")))
-                    {
-                        if (parentBehaviour.Config.use360Camera)
-                            parentBehaviour.Config.cam360XTilt += amountRot;
-                        else if (parentBehaviour.Config.thirdPerson)
-                            parentBehaviour.Config.angx += amountRot;
-                        else
-                            parentBehaviour.Config.firstPersonRotOffsetX += amountRot;
-                        parentBehaviour.CreateScreenRenderTexture();
-                        parentBehaviour.Config.Save();
-                    }
-                    //Y Rotation
-                    GUI.Box(new Rect(menuPos.x + 100, menuPos.y + 305, 100, 50), "Y Rot :" +
-                        (parentBehaviour.Config.use360Camera ? parentBehaviour.Config.cam360YTilt.ToString("F2") : (parentBehaviour.Config.thirdPerson ? parentBehaviour.Config.angy.ToString("F2") : parentBehaviour.Config.firstPersonRotOffsetY.ToString("F2"))));
-                    if (GUI.Button(new Rect(menuPos.x + 105, menuPos.y + 325, 45, 30), new GUIContent("-")))
-                    {
-                        if (parentBehaviour.Config.use360Camera)
-                            parentBehaviour.Config.cam360YTilt -= amountRot;
-                        else if (parentBehaviour.Config.thirdPerson)
-                            parentBehaviour.Config.angy -= amountRot;
-                        else
-                            parentBehaviour.Config.firstPersonRotOffsetY -= amountRot;
-                        parentBehaviour.CreateScreenRenderTexture();
-                        parentBehaviour.Config.Save();
-                    }
-                    if (GUI.Button(new Rect(menuPos.x + 150, menuPos.y + 325, 45, 30), new GUIContent("+")))
-                    {
-                        if (parentBehaviour.Config.use360Camera)
-                            parentBehaviour.Config.cam360YTilt += amountRot;
-                        else if (parentBehaviour.Config.thirdPerson)
-                            parentBehaviour.Config.angy += amountRot;
-                        else
-                            parentBehaviour.Config.firstPersonRotOffsetY += amountRot;
-                        parentBehaviour.CreateScreenRenderTexture();
-                        parentBehaviour.Config.Save();
-                    }
-                    //Z Rotation
-                    GUI.Box(new Rect(menuPos.x + 200, menuPos.y + 305, 100, 50), "Z Rot :" +
-                        (parentBehaviour.Config.use360Camera ? parentBehaviour.Config.cam360ZTilt.ToString("F2") : (parentBehaviour.Config.thirdPerson ? parentBehaviour.Config.angz.ToString("F2") : parentBehaviour.Config.firstPersonRotOffsetZ.ToString("F2"))));
-                    if (GUI.Button(new Rect(menuPos.x + 205, menuPos.y + 325, 45, 30), new GUIContent("-")))
-                    {
-                        if (parentBehaviour.Config.use360Camera)
-                            parentBehaviour.Config.cam360ZTilt -= amountRot;
-                        else if (parentBehaviour.Config.thirdPerson)
-                            parentBehaviour.Config.angz -= amountRot;
-                        else
-                            parentBehaviour.Config.firstPersonRotOffsetZ -= amountRot;
-                        parentBehaviour.CreateScreenRenderTexture();
-                        parentBehaviour.Config.Save();
-                    }
-                    if (GUI.Button(new Rect(menuPos.x + 250, menuPos.y + 325, 45, 30), new GUIContent("+")))
-                    {
-                        if (parentBehaviour.Config.use360Camera)
-                            parentBehaviour.Config.cam360ZTilt += amountRot;
-                        else if (parentBehaviour.Config.thirdPerson)
-                            parentBehaviour.Config.angz += amountRot;
-                        else
-                            parentBehaviour.Config.firstPersonRotOffsetZ += amountRot;
-                        parentBehaviour.CreateScreenRenderTexture();
-                        parentBehaviour.Config.Save();
+                        //Turn to Head Offset
+                        GUI.Box(new Rect(menuPos.x, menuPos.y + 255, 300, 70), "Turn to Head Offset");
+                        //X Position
+                        GUI.Box(new Rect(menuPos.x, menuPos.y + 275, 100, 50), $"X Pos:{parentBehaviour.Config.turnToHeadOffsetX.ToString("F2")}");
+                        if (GUI.Button(new Rect(menuPos.x + 5, menuPos.y + 295, 45, 30), new GUIContent("-")))
+                        {
+                            parentBehaviour.Config.turnToHeadOffsetX -= amountMove;
+                            parentBehaviour.CreateScreenRenderTexture();
+                            parentBehaviour.Config.Save();
+                        }
+                        if (GUI.Button(new Rect(menuPos.x + 50, menuPos.y + 295, 45, 30), new GUIContent("+")))
+                        {
+                            parentBehaviour.Config.turnToHeadOffsetX += amountMove;
+                            parentBehaviour.CreateScreenRenderTexture();
+                            parentBehaviour.Config.Save();
+                        }
+                        //Y Position
+                        GUI.Box(new Rect(menuPos.x + 100, menuPos.y + 275, 100, 50), $"Y Pos :{parentBehaviour.Config.turnToHeadOffsetY.ToString("F2")}");
+                        if (GUI.Button(new Rect(menuPos.x + 105, menuPos.y + 295, 45, 30), new GUIContent("-")))
+                        {
+                            parentBehaviour.Config.turnToHeadOffsetY -= amountMove;
+                            parentBehaviour.CreateScreenRenderTexture();
+                            parentBehaviour.Config.Save();
+                        }
+                        if (GUI.Button(new Rect(menuPos.x + 150, menuPos.y + 295, 45, 30), new GUIContent("+")))
+                        {
+                            parentBehaviour.Config.turnToHeadOffsetY += amountMove;
+                            parentBehaviour.CreateScreenRenderTexture();
+                            parentBehaviour.Config.Save();
+                        }
+                        //Z Position
+                        GUI.Box(new Rect(menuPos.x + 200, menuPos.y + 275, 100, 50), $"Z Pos :{parentBehaviour.Config.turnToHeadOffsetZ.ToString("F2")}");
+                        if (GUI.Button(new Rect(menuPos.x + 205, menuPos.y + 295, 45, 30), new GUIContent("-")))
+                        {
+                            parentBehaviour.Config.turnToHeadOffsetZ -= amountMove;
+                            parentBehaviour.CreateScreenRenderTexture();
+                            parentBehaviour.Config.Save();
+                        }
+                        if (GUI.Button(new Rect(menuPos.x + 250, menuPos.y + 295, 45, 30), new GUIContent("+")))
+                        {
+                            parentBehaviour.Config.turnToHeadOffsetZ += amountMove;
+                            parentBehaviour.CreateScreenRenderTexture();
+                            parentBehaviour.Config.Save();
+                        }
                     }
                     if (!parentBehaviour.Config.fitToCanvas)
                     {
-                        if (GUI.Button(new Rect(menuPos.x, menuPos.y + 360, 75, 65), Utils.LoadTextureFromResources("CameraPlus.Resources.ScreenLeftDock.png")))
+                        if (GUI.Button(new Rect(menuPos.x, menuPos.y + 360, 75, 65), CustomUtils.LoadTextureFromResources("CameraPlus.Resources.ScreenLeftDock.png")))
                         {
                             parentBehaviour.Config.screenPosX = 0;
                             parentBehaviour.Config.screenPosY = 0;
@@ -668,7 +690,7 @@ namespace CameraPlus
                             parentBehaviour.CreateScreenRenderTexture();
                             parentBehaviour.Config.Save();
                         }
-                        if (GUI.Button(new Rect(menuPos.x + 75, menuPos.y + 360, 75, 30), Utils.LoadTextureFromResources("CameraPlus.Resources.ScreenTopLeftDock.png")))
+                        if (GUI.Button(new Rect(menuPos.x + 75, menuPos.y + 360, 75, 30), CustomUtils.LoadTextureFromResources("CameraPlus.Resources.ScreenTopLeftDock.png")))
                         {
                             parentBehaviour.Config.screenPosX = 0;
                             parentBehaviour.Config.screenPosY = Screen.height - (Screen.height / 2);
@@ -677,7 +699,7 @@ namespace CameraPlus
                             parentBehaviour.CreateScreenRenderTexture();
                             parentBehaviour.Config.Save();
                         }
-                        if (GUI.Button(new Rect(menuPos.x + 75, menuPos.y + 395, 75, 30), Utils.LoadTextureFromResources("CameraPlus.Resources.ScreenBottomLeftDock.png")))
+                        if (GUI.Button(new Rect(menuPos.x + 75, menuPos.y + 395, 75, 30), CustomUtils.LoadTextureFromResources("CameraPlus.Resources.ScreenBottomLeftDock.png")))
                         {
                             parentBehaviour.Config.screenPosX = 0;
                             parentBehaviour.Config.screenPosY = 0;
@@ -686,7 +708,7 @@ namespace CameraPlus
                             parentBehaviour.CreateScreenRenderTexture();
                             parentBehaviour.Config.Save();
                         }
-                        if (GUI.Button(new Rect(menuPos.x + 150, menuPos.y + 360, 75, 30), Utils.LoadTextureFromResources("CameraPlus.Resources.ScreenTopRightDock.png")))
+                        if (GUI.Button(new Rect(menuPos.x + 150, menuPos.y + 360, 75, 30), CustomUtils.LoadTextureFromResources("CameraPlus.Resources.ScreenTopRightDock.png")))
                         {
                             parentBehaviour.Config.screenPosX = Screen.width - (Screen.width / 3);
                             parentBehaviour.Config.screenPosY = Screen.height - (Screen.height / 2);
@@ -695,7 +717,7 @@ namespace CameraPlus
                             parentBehaviour.CreateScreenRenderTexture();
                             parentBehaviour.Config.Save();
                         }
-                        if (GUI.Button(new Rect(menuPos.x + 150, menuPos.y + 395, 75, 30), Utils.LoadTextureFromResources("CameraPlus.Resources.ScreenBottomRightDock.png")))
+                        if (GUI.Button(new Rect(menuPos.x + 150, menuPos.y + 395, 75, 30), CustomUtils.LoadTextureFromResources("CameraPlus.Resources.ScreenBottomRightDock.png")))
                         {
                             parentBehaviour.Config.screenPosX = Screen.width - (Screen.width / 3);
                             parentBehaviour.Config.screenPosY = 0;
@@ -704,7 +726,7 @@ namespace CameraPlus
                             parentBehaviour.CreateScreenRenderTexture();
                             parentBehaviour.Config.Save();
                         }
-                        if (GUI.Button(new Rect(menuPos.x + 225, menuPos.y + 360, 75, 65), Utils.LoadTextureFromResources("CameraPlus.Resources.ScreenRightDock.png")))
+                        if (GUI.Button(new Rect(menuPos.x + 225, menuPos.y + 360, 75, 65), CustomUtils.LoadTextureFromResources("CameraPlus.Resources.ScreenRightDock.png")))
                         {
                             parentBehaviour.Config.screenPosX = Screen.width - (Screen.width / 3);
                             parentBehaviour.Config.screenPosY = 0;
@@ -799,82 +821,82 @@ namespace CameraPlus
                 else if (MenuMode == 4)
                 {
                     if (GUI.Button(new Rect(menuPos.x, menuPos.y + 25, 140, 30), new GUIContent("<")))
-                        CameraProfiles.TrySetLast(CameraProfiles.currentlySelected);
+                        CameraUtilities.TrySetLast(CameraUtilities.currentlySelected);
                     if (GUI.Button(new Rect(menuPos.x + 155, menuPos.y + 25, 140, 30), new GUIContent(">")))
-                        CameraProfiles.SetNext(CameraProfiles.currentlySelected);
-                    if (GUI.Button(new Rect(menuPos.x + 30, menuPos.y + 60, 230, 60), new GUIContent("Currently Selected:\n" + CameraProfiles.currentlySelected)))
-                        CameraProfiles.SetNext(CameraProfiles.currentlySelected);
+                        CameraUtilities.SetNext(CameraUtilities.currentlySelected);
+                    if (GUI.Button(new Rect(menuPos.x + 30, menuPos.y + 60, 230, 60), new GUIContent("Currently Selected:\n" + CameraUtilities.currentlySelected)))
+                        CameraUtilities.SetNext(CameraUtilities.currentlySelected);
                     if (GUI.Button(new Rect(menuPos.x, menuPos.y + 125, 140, 30), new GUIContent("Save")))
-                        CameraProfiles.SaveCurrent();
+                        CameraUtilities.SaveCurrent();
                     if (GUI.Button(new Rect(menuPos.x + 150, menuPos.y + 125, 140, 30), new GUIContent("Delete")))
                     {
-                        if (!Plugin.Instance._rootConfig.ProfileLoadCopyMethod)
-                            Plugin.Instance._profileChanger.ProfileChange(null);
-                        CameraProfiles.DeleteProfile(CameraProfiles.currentlySelected);
-                        CameraProfiles.TrySetLast();
+                        if (!Plugin.cameraController.rootConfig.ProfileLoadCopyMethod)
+                            CameraUtilities.ProfileChange(null);
+                        CameraUtilities.DeleteProfile(CameraUtilities.currentlySelected);
+                        CameraUtilities.TrySetLast();
                     }
                     if (GUI.Button(new Rect(menuPos.x, menuPos.y + 165, 300, 30), new GUIContent("Load Selected")))
-                        Plugin.Instance._profileChanger.ProfileChange(CameraProfiles.currentlySelected);
-                    if (GUI.Button(new Rect(menuPos.x, menuPos.y + 200, 145, 30), new GUIContent("SceneProfile On"), Plugin.Instance._rootConfig.ProfileSceneChange ? CustomEnableStyle : CustomDisableStyle))
+                        CameraUtilities.ProfileChange(CameraUtilities.currentlySelected);
+                    if (GUI.Button(new Rect(menuPos.x, menuPos.y + 200, 145, 30), new GUIContent("SceneProfile On"), Plugin.cameraController.rootConfig.ProfileSceneChange ? CustomEnableStyle : CustomDisableStyle))
                     {
-                        Plugin.Instance._rootConfig.ProfileSceneChange = true;
-                        Plugin.Instance._rootConfig.Save();
+                        Plugin.cameraController.rootConfig.ProfileSceneChange = true;
+                        Plugin.cameraController.rootConfig.Save();
                     }
-                    if (GUI.Button(new Rect(menuPos.x+150, menuPos.y + 200, 145, 30), new GUIContent("SceneProfile Off"), !Plugin.Instance._rootConfig.ProfileSceneChange ? CustomEnableStyle : CustomDisableStyle))
+                    if (GUI.Button(new Rect(menuPos.x+150, menuPos.y + 200, 145, 30), new GUIContent("SceneProfile Off"), !Plugin.cameraController.rootConfig.ProfileSceneChange ? CustomEnableStyle : CustomDisableStyle))
                     {
-                        Plugin.Instance._rootConfig.ProfileSceneChange = false;
-                        Plugin.Instance._rootConfig.Save();
+                        Plugin.cameraController.rootConfig.ProfileSceneChange = false;
+                        Plugin.cameraController.rootConfig.Save();
                     }
 
-                    if (Plugin.Instance._rootConfig.ProfileSceneChange)
+                    if (Plugin.cameraController.rootConfig.ProfileSceneChange)
                     {
-                        GUI.Box(new Rect(menuPos.x + 30, menuPos.y + 230, 270, 30), "Menu Scene  : " + (Plugin.Instance._rootConfig.MenuProfile), ProfileStyle);
-                        GUI.Box(new Rect(menuPos.x + 30, menuPos.y + 260, 270, 30), "Game Scene  : " + (Plugin.Instance._rootConfig.GameProfile), ProfileStyle);
-                        GUI.Box(new Rect(menuPos.x + 30, menuPos.y + 290, 270, 30), "Game 90/360 : " + (Plugin.Instance._rootConfig.RotateProfile), ProfileStyle);
-                        GUI.Box(new Rect(menuPos.x + 30, menuPos.y + 320, 270, 30), "Multiplayer : " + (Plugin.Instance._rootConfig.MultiplayerProfile), ProfileStyle);
+                        GUI.Box(new Rect(menuPos.x + 30, menuPos.y + 230, 270, 30), "Menu Scene  : " + (Plugin.cameraController.rootConfig.MenuProfile), ProfileStyle);
+                        GUI.Box(new Rect(menuPos.x + 30, menuPos.y + 260, 270, 30), "Game Scene  : " + (Plugin.cameraController.rootConfig.GameProfile), ProfileStyle);
+                        GUI.Box(new Rect(menuPos.x + 30, menuPos.y + 290, 270, 30), "Game 90/360 : " + (Plugin.cameraController.rootConfig.RotateProfile), ProfileStyle);
+                        GUI.Box(new Rect(menuPos.x + 30, menuPos.y + 320, 270, 30), "Multiplayer : " + (Plugin.cameraController.rootConfig.MultiplayerProfile), ProfileStyle);
                         if (GUI.Button(new Rect(menuPos.x, menuPos.y + 230, 30, 30), "X"))
                         {
-                            if (Plugin.Instance._rootConfig.MenuProfile!=string.Empty)
-                                Plugin.Instance._rootConfig.MenuProfile = string.Empty;
-                            Plugin.Instance._rootConfig.Save();
+                            if (Plugin.cameraController.rootConfig.MenuProfile!=string.Empty)
+                                Plugin.cameraController.rootConfig.MenuProfile = string.Empty;
+                            Plugin.cameraController.rootConfig.Save();
                         }
                         if (GUI.Button(new Rect(menuPos.x, menuPos.y + 260, 30, 30), "X"))
                         {
-                            if (Plugin.Instance._rootConfig.GameProfile != string.Empty)
-                                Plugin.Instance._rootConfig.GameProfile = string.Empty;
-                            Plugin.Instance._rootConfig.Save();
+                            if (Plugin.cameraController.rootConfig.GameProfile != string.Empty)
+                                Plugin.cameraController.rootConfig.GameProfile = string.Empty;
+                            Plugin.cameraController.rootConfig.Save();
                         }
                         if (GUI.Button(new Rect(menuPos.x, menuPos.y + 290, 30, 30), "X"))
                         {
-                            if (Plugin.Instance._rootConfig.RotateProfile != string.Empty)
-                                Plugin.Instance._rootConfig.RotateProfile = string.Empty;
-                            Plugin.Instance._rootConfig.Save();
+                            if (Plugin.cameraController.rootConfig.RotateProfile != string.Empty)
+                                Plugin.cameraController.rootConfig.RotateProfile = string.Empty;
+                            Plugin.cameraController.rootConfig.Save();
                         }
                         if (GUI.Button(new Rect(menuPos.x, menuPos.y + 320, 30, 30), "X"))
                         {
-                            if (Plugin.Instance._rootConfig.MultiplayerProfile != string.Empty)
-                                Plugin.Instance._rootConfig.MultiplayerProfile = string.Empty;
-                            Plugin.Instance._rootConfig.Save();
+                            if (Plugin.cameraController.rootConfig.MultiplayerProfile != string.Empty)
+                                Plugin.cameraController.rootConfig.MultiplayerProfile = string.Empty;
+                            Plugin.cameraController.rootConfig.Save();
                         }
                         if (GUI.Button(new Rect(menuPos.x, menuPos.y + 350, 145, 25), new GUIContent("Menu Selected")))
                         {
-                            Plugin.Instance._rootConfig.MenuProfile = CameraProfiles.currentlySelected;
-                            Plugin.Instance._rootConfig.Save();
+                            Plugin.cameraController.rootConfig.MenuProfile = CameraUtilities.currentlySelected;
+                            Plugin.cameraController.rootConfig.Save();
                         }
                         if (GUI.Button(new Rect(menuPos.x, menuPos.y + 375, 145, 25), new GUIContent("Game Selected")))
                         {
-                            Plugin.Instance._rootConfig.GameProfile = CameraProfiles.currentlySelected;
-                            Plugin.Instance._rootConfig.Save();
+                            Plugin.cameraController.rootConfig.GameProfile = CameraUtilities.currentlySelected;
+                            Plugin.cameraController.rootConfig.Save();
                         }
                         if (GUI.Button(new Rect(menuPos.x + 150, menuPos.y + 375, 145, 25), new GUIContent("90/360 Selected")))
                         {
-                            Plugin.Instance._rootConfig.RotateProfile = CameraProfiles.currentlySelected;
-                            Plugin.Instance._rootConfig.Save();
+                            Plugin.cameraController.rootConfig.RotateProfile = CameraUtilities.currentlySelected;
+                            Plugin.cameraController.rootConfig.Save();
                         }
                         if (GUI.Button(new Rect(menuPos.x , menuPos.y + 400, 145, 25), new GUIContent("Multiplay Selected")))
                         {
-                            Plugin.Instance._rootConfig.MultiplayerProfile = CameraProfiles.currentlySelected;
-                            Plugin.Instance._rootConfig.Save();
+                            Plugin.cameraController.rootConfig.MultiplayerProfile = CameraUtilities.currentlySelected;
+                            Plugin.cameraController.rootConfig.Save();
                         }
                     }
                     /*
@@ -950,8 +972,7 @@ namespace CameraPlus
                         {
                             parentBehaviour.Config.movementScriptPath = String.Empty;
                             parentBehaviour.Config.Save();
-                            if (!parentBehaviour.Config.songSpecificScript)
-                                parentBehaviour.ClearMovementScript();
+                            parentBehaviour.ClearMovementScript();
                         }
                     }
                     /*
@@ -981,11 +1002,11 @@ namespace CameraPlus
 
                     GUI.Box(new Rect(menuPos.x, menuPos.y + 160, 300, 120), "Select profile Export to Scene in Camera2");
                     if (GUI.Button(new Rect(menuPos.x + 5, menuPos.y + 185, 140, 25), new GUIContent("<")))
-                        CameraProfiles.TrySetLast(CameraProfiles.currentlySelected);
+                        CameraUtilities.TrySetLast(CameraUtilities.currentlySelected);
                     if (GUI.Button(new Rect(menuPos.x + 155, menuPos.y + 185, 140, 25), new GUIContent(">")))
-                        CameraProfiles.SetNext(CameraProfiles.currentlySelected);
-                    if (GUI.Button(new Rect(menuPos.x + 30, menuPos.y + 215, 230, 60), new GUIContent("Currently Selected:\n" + CameraProfiles.currentlySelected)))
-                        CameraProfiles.SetNext(CameraProfiles.currentlySelected);
+                        CameraUtilities.SetNext(CameraUtilities.currentlySelected);
+                    if (GUI.Button(new Rect(menuPos.x + 30, menuPos.y + 215, 230, 60), new GUIContent("Currently Selected:\n" + CameraUtilities.currentlySelected)))
+                        CameraUtilities.SetNext(CameraUtilities.currentlySelected);
 
                     if (GUI.Button(new Rect(menuPos.x + 5, menuPos.y + 290, 295, 25), new GUIContent("Export to Selected Scene")))
                         Camera2ConfigExporter.ExportCamera2Scene();
@@ -1013,7 +1034,7 @@ namespace CameraPlus
                     }
                     else
                         GUI.Box(new Rect(menuPos.x, menuPos.y + 45, 100, 40), new GUIContent("Require\nFitToCanvas"));
-                    if (Plugin.Instance.ExistsVMCAvatar)
+                    if (Plugin.cameraController.existsVMCAvatar)
                     {
                         if (GUI.Button(new Rect(menuPos.x + 100, menuPos.y + 45, 100, 40), new GUIContent("Receiver"), parentBehaviour.Config.VMCProtocolMode == "receiver" ? CustomEnableStyle : CustomDisableStyle))
                         {

@@ -10,7 +10,7 @@ namespace CameraPlus.HarmonyPatches
         static void Postfix(VRPointer __instance)
         {
 #if DEBUG
-            Logger.Log("VRPointer Start");
+            Logger.log.Notice("VRPointer Start");
 #endif
             Instance = __instance;
         }
