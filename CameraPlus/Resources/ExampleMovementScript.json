@@ -1,5 +1,6 @@
 {
   "ActiveInPauseMenu": true,
+  "TurnToHeadUseCameraSetting": false,
   "Movements": [
     {
       "StartPos": {
@@ -22,6 +23,7 @@
         "y": -40,
         "z": 0
       },
+      "TurnToHead": false,
       "Duration": 4,
       "Delay": 0,
       "EaseTransition": true
@@ -47,6 +49,7 @@
         "y": -15,
         "z": 0
       },
+      "TurnToHead": false,
       "Duration": 4,
       "Delay": 0,
       "EaseTransition": true
@@ -72,6 +75,7 @@
         "y": 15,
         "z": 0
       },
+      "TurnToHead": false,
       "Duration": 4,
       "Delay": 0,
       "EaseTransition": true
@@ -97,6 +101,7 @@
         "y": 40,
         "z": 0
       },
+      "TurnToHead": false,
       "Duration": 4,
       "Delay": 0,
       "EaseTransition": true
@@ -122,6 +127,7 @@
         "y": 15,
         "z": 0
       },
+      "TurnToHead": false,
       "Duration": 4,
       "Delay": 0,
       "EaseTransition": true
@@ -147,6 +153,7 @@
         "y": -15,
         "z": 0
       },
+      "TurnToHead": false,
       "Duration": 4,
       "Delay": 0,
       "EaseTransition": true

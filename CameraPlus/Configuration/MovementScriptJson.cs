@@ -44,6 +44,7 @@ namespace CameraPlus.Configuration
         [JsonProperty("EndRot")]
         public EndRot endRot { get; set; }
 
+        public string TurnToHead { get; set; }
         public string Duration { get; set; }
         public string Delay { get; set; }
         public string EaseTransition { get; set; }
@@ -52,6 +53,7 @@ namespace CameraPlus.Configuration
     public class MovementScriptJson
     {
         public string ActiveInPauseMenu { get; set; }
+        public string TurnToHeadUseCameraSetting { get; set; }
         [JsonProperty("Movements")]
         public JSONMovement[] Jsonmovement { get; set; }
     }

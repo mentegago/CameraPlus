@@ -12,7 +12,6 @@ using CameraPlus.Configuration;
 using CameraPlus.HarmonyPatches;
 using CameraPlus.VMCProtocol;
 using CameraPlus.Utilities;
-using UniGLTF;
 
 namespace CameraPlus.Behaviours
 {
@@ -124,6 +123,7 @@ namespace CameraPlus.Behaviours
         internal bool scriptEditMode = false;
         private GUIStyle boxStyle;
         private Transform turnToTarget;
+        internal bool turnToHead = false;
 
 #if WithVMCAvatar
         private VMCProtocol.VMCAvatarMarionette marionette = null;
@@ -184,7 +184,7 @@ namespace CameraPlus.Behaviours
             var camera = _mainCamera.transform;
             transform.position = camera.position;
             transform.rotation = camera.rotation;
-            Logger.log.Notice($"near clipplane \"{Camera.main.nearClipPlane}");
+            //Logger.log.Notice($"near clipplane \"{Camera.main.nearClipPlane}");
 
             gameObj.transform.parent = transform;
             gameObj.transform.localPosition = Vector3.zero;
@@ -330,6 +330,7 @@ namespace CameraPlus.Behaviours
                 ThirdPersonPos = Config.Position;
                 ThirdPersonRot = Config.Rotation;
             }
+            turnToHead = Config.turnToHead;
 
             SetCullingMask();
             CreateScreenRenderTexture();
@@ -527,7 +528,7 @@ namespace CameraPlus.Behaviours
                         transform.position += OffsetPosition;
 
                     }
-                    if (Config.turnToHead)
+                    if (turnToHead)
                     {
                         turnToTarget = Camera.main.transform;
                         turnToTarget.transform.position += Config.TurnToHeadOffset;
