@@ -209,6 +209,7 @@ namespace CameraPlus.Behaviours
             _quad.transform.localScale = new Vector3(_cam.aspect, 1, 1);
             _cameraPreviewQuad = _quad;
             _quad.layer = Plugin.cameraController.rootConfig.CameraQuadLayer;
+
             ReadConfig();
 
             if (ThirdPerson)

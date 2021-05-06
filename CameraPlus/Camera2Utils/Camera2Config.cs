@@ -2,25 +2,25 @@
 
 namespace CameraPlus.Camera2Utils
 {
-    public enum CameraType
+    internal enum CameraType
     {
         FirstPerson,
         Attached, //Unused for now, but mostly implemented - For parenting to arbitrary things like possibly to a saber, etc.
         Positionable
     }
-    public enum WallVisiblity
+    internal enum WallVisiblity
     {
         Visible,
         Transparent,
         Hidden
     }
-    enum WorldCamVisibility
+    internal enum WorldCamVisibility
     {
         Visible = 0,
         HiddenWhilePlaying,
         Hidden = 2,
     }
-    public enum NoteVisibility
+    internal enum NoteVisibility
     {
         Hidden,
         Visible,
