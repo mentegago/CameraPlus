@@ -167,9 +167,13 @@
     <Compile Include="Behaviours\CameraPlusBehaviour.cs" />
     <Compile Include="CameraPlusInstance.cs" />
     <Compile Include="Behaviours\ScreenCameraBehaviour.cs" />
+    <Compile Include="UI\MenuCamera2.cs" />
     <Compile Include="UI\MenuDisplayObject.cs" />
+    <Compile Include="UI\MenuExternalLink.cs" />
     <Compile Include="UI\MenuLayout.cs" />
+    <Compile Include="UI\MenuMovementScript.cs" />
     <Compile Include="UI\MenuMultiplayer.cs" />
+    <Compile Include="UI\MenuProfile.cs" />
     <Compile Include="Utilities\CameraUtilities.cs" />
     <Compile Include="Configuration\Config.cs" />
     <Compile Include="Configuration\RootConfig.cs" />

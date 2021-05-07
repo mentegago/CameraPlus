@@ -45,8 +45,10 @@ namespace CameraPlus.UI
         private MenuDisplayObject menuDisplayObject;
         private MenuLayout menuLayout;
         private MenuMultiplayer menuMultiplayer;
-
-        private string ipNum =@"(25[0-5]|2[0-4]\d|[0-1]\d{2}|[1-9]?\d)";
+        private MenuProfile menuProfile;
+        private MenuMovementScript menuMovementScript;
+        private MenuCamera2 menuCamera2Converter;
+        private MenuExternalLink menuExternalLink;
 
         public void EnableMenu(Vector2 mousePos, CameraPlusBehaviour parentBehaviour)
         {
@@ -61,6 +63,10 @@ namespace CameraPlus.UI
             menuDisplayObject = new MenuDisplayObject();
             menuLayout = new MenuLayout();
             menuMultiplayer = new MenuMultiplayer();
+            menuProfile = new MenuProfile();
+            menuMovementScript = new MenuMovementScript();
+            menuCamera2Converter = new MenuCamera2();
+            menuExternalLink = new MenuExternalLink();
 
             if (this.parentBehaviour.Config.LockScreen)
                 texture = CustomUtils.LoadTextureFromResources("CameraPlus.Resources.Lock.png");
@@ -255,262 +261,13 @@ namespace CameraPlus.UI
                 else if (MenuMode == MenuState.Multiplayer)
                     menuMultiplayer.DiplayMenu(parentBehaviour, this, menuPos);
                 else if (MenuMode == MenuState.Profile)
-                {
-                    if (GUI.Button(new Rect(menuPos.x, menuPos.y + 25, 140, 30), new GUIContent("<")))
-                        CameraUtilities.TrySetLast(CameraUtilities.currentlySelected);
-                    if (GUI.Button(new Rect(menuPos.x + 155, menuPos.y + 25, 140, 30), new GUIContent(">")))
-                        CameraUtilities.SetNext(CameraUtilities.currentlySelected);
-                    if (GUI.Button(new Rect(menuPos.x + 30, menuPos.y + 60, 230, 60), new GUIContent("Currently Selected:\n" + CameraUtilities.currentlySelected)))
-                        CameraUtilities.SetNext(CameraUtilities.currentlySelected);
-                    if (GUI.Button(new Rect(menuPos.x, menuPos.y + 125, 140, 30), new GUIContent("Save")))
-                        CameraUtilities.SaveCurrent();
-                    if (GUI.Button(new Rect(menuPos.x + 150, menuPos.y + 125, 140, 30), new GUIContent("Delete")))
-                    {
-                        if (!Plugin.cameraController.rootConfig.ProfileLoadCopyMethod)
-                            CameraUtilities.ProfileChange(null);
-                        CameraUtilities.DeleteProfile(CameraUtilities.currentlySelected);
-                        CameraUtilities.TrySetLast();
-                    }
-                    if (GUI.Button(new Rect(menuPos.x, menuPos.y + 165, 300, 30), new GUIContent("Load Selected")))
-                        CameraUtilities.ProfileChange(CameraUtilities.currentlySelected);
-                    if (GUI.Button(new Rect(menuPos.x, menuPos.y + 200, 145, 30), new GUIContent("SceneProfile On"), Plugin.cameraController.rootConfig.ProfileSceneChange ? CustomEnableStyle : CustomDisableStyle))
-                    {
-                        Plugin.cameraController.rootConfig.ProfileSceneChange = true;
-                        Plugin.cameraController.rootConfig.Save();
-                    }
-                    if (GUI.Button(new Rect(menuPos.x + 150, menuPos.y + 200, 145, 30), new GUIContent("SceneProfile Off"), !Plugin.cameraController.rootConfig.ProfileSceneChange ? CustomEnableStyle : CustomDisableStyle))
-                    {
-                        Plugin.cameraController.rootConfig.ProfileSceneChange = false;
-                        Plugin.cameraController.rootConfig.Save();
-                    }
-
-                    if (Plugin.cameraController.rootConfig.ProfileSceneChange)
-                    {
-                        GUI.Box(new Rect(menuPos.x + 30, menuPos.y + 230, 270, 30), "Menu Scene  : " + (Plugin.cameraController.rootConfig.MenuProfile), ProfileStyle);
-                        GUI.Box(new Rect(menuPos.x + 30, menuPos.y + 260, 270, 30), "Game Scene  : " + (Plugin.cameraController.rootConfig.GameProfile), ProfileStyle);
-                        GUI.Box(new Rect(menuPos.x + 30, menuPos.y + 290, 270, 30), "Game 90/360 : " + (Plugin.cameraController.rootConfig.RotateProfile), ProfileStyle);
-                        GUI.Box(new Rect(menuPos.x + 30, menuPos.y + 320, 270, 30), "Multiplayer : " + (Plugin.cameraController.rootConfig.MultiplayerProfile), ProfileStyle);
-                        if (GUI.Button(new Rect(menuPos.x, menuPos.y + 230, 30, 30), "X"))
-                        {
-                            if (Plugin.cameraController.rootConfig.MenuProfile != string.Empty)
-                                Plugin.cameraController.rootConfig.MenuProfile = string.Empty;
-                            Plugin.cameraController.rootConfig.Save();
-                        }
-                        if (GUI.Button(new Rect(menuPos.x, menuPos.y + 260, 30, 30), "X"))
-                        {
-                            if (Plugin.cameraController.rootConfig.GameProfile != string.Empty)
-                                Plugin.cameraController.rootConfig.GameProfile = string.Empty;
-                            Plugin.cameraController.rootConfig.Save();
-                        }
-                        if (GUI.Button(new Rect(menuPos.x, menuPos.y + 290, 30, 30), "X"))
-                        {
-                            if (Plugin.cameraController.rootConfig.RotateProfile != string.Empty)
-                                Plugin.cameraController.rootConfig.RotateProfile = string.Empty;
-                            Plugin.cameraController.rootConfig.Save();
-                        }
-                        if (GUI.Button(new Rect(menuPos.x, menuPos.y + 320, 30, 30), "X"))
-                        {
-                            if (Plugin.cameraController.rootConfig.MultiplayerProfile != string.Empty)
-                                Plugin.cameraController.rootConfig.MultiplayerProfile = string.Empty;
-                            Plugin.cameraController.rootConfig.Save();
-                        }
-                        if (GUI.Button(new Rect(menuPos.x, menuPos.y + 350, 145, 25), new GUIContent("Menu Selected")))
-                        {
-                            Plugin.cameraController.rootConfig.MenuProfile = CameraUtilities.currentlySelected;
-                            Plugin.cameraController.rootConfig.Save();
-                        }
-                        if (GUI.Button(new Rect(menuPos.x, menuPos.y + 375, 145, 25), new GUIContent("Game Selected")))
-                        {
-                            Plugin.cameraController.rootConfig.GameProfile = CameraUtilities.currentlySelected;
-                            Plugin.cameraController.rootConfig.Save();
-                        }
-                        if (GUI.Button(new Rect(menuPos.x + 150, menuPos.y + 375, 145, 25), new GUIContent("90/360 Selected")))
-                        {
-                            Plugin.cameraController.rootConfig.RotateProfile = CameraUtilities.currentlySelected;
-                            Plugin.cameraController.rootConfig.Save();
-                        }
-                        if (GUI.Button(new Rect(menuPos.x, menuPos.y + 400, 145, 25), new GUIContent("Multiplay Selected")))
-                        {
-                            Plugin.cameraController.rootConfig.MultiplayerProfile = CameraUtilities.currentlySelected;
-                            Plugin.cameraController.rootConfig.Save();
-                        }
-                    }
-                    /*
-                    if (GUI.Button(new Rect(menuPos.x, menuPos.y + 390, 290, 30), new GUIContent(Plugin.Instance._rootConfig.ProfileLoadCopyMethod ? "To Folder Reference Method" : "To File Copy Method")))
-                    {
-                        Plugin.Instance._rootConfig.ProfileLoadCopyMethod = !Plugin.Instance._rootConfig.ProfileLoadCopyMethod;
-                        Plugin.Instance._rootConfig.Save();
-                        Plugin.Instance._profileChanger.ProfileChange(null);
-                    }
-                    */
-                    if (GUI.Button(new Rect(menuPos.x, menuPos.y + 430, 300, 30), new GUIContent("Close Profile Menu")))
-                        MenuMode = 0;
-                }
+                    menuProfile.DiplayMenu(parentBehaviour, this, menuPos);
                 else if (MenuMode == MenuState.MovementScript)
-                {
-                    GUI.Box(new Rect(menuPos.x, menuPos.y + 25, 300, 55), new GUIContent("MovementScript Method"));
-                    if (GUI.Button(new Rect(menuPos.x + 5, menuPos.y + 45, 145, 30), new GUIContent("Tick UnityTimer"), !parentBehaviour.Config.movementAudioSync ? CustomEnableStyle : CustomDisableStyle))
-                    {
-                        parentBehaviour.Config.movementAudioSync = false;
-                        parentBehaviour.SetCullingMask();
-                        parentBehaviour.Config.Save();
-                    }
-                    if (GUI.Button(new Rect(menuPos.x + 150, menuPos.y + 45, 145, 30), new GUIContent("Tick AudioTimer"), parentBehaviour.Config.movementAudioSync ? CustomEnableStyle : CustomDisableStyle))
-                    {
-                        parentBehaviour.Config.movementAudioSync = true;
-                        parentBehaviour.SetCullingMask();
-                        parentBehaviour.Config.Save();
-                    }
-
-                    GUI.Box(new Rect(menuPos.x, menuPos.y + 80, 300, 55), new GUIContent("Song-specific script"));
-                    if (GUI.Button(new Rect(menuPos.x + 5, menuPos.y + 100, 145, 30), new GUIContent("Enable"), parentBehaviour.Config.songSpecificScript ? CustomEnableStyle : CustomDisableStyle))
-                    {
-                        parentBehaviour.Config.songSpecificScript = true;
-                        parentBehaviour.SetCullingMask();
-                        parentBehaviour.Config.Save();
-                        parentBehaviour.AddMovementScript();
-                    }
-                    if (GUI.Button(new Rect(menuPos.x + 150, menuPos.y + 100, 145, 30), new GUIContent("Disable"), !parentBehaviour.Config.songSpecificScript ? CustomEnableStyle : CustomDisableStyle))
-                    {
-                        parentBehaviour.Config.songSpecificScript = false;
-                        parentBehaviour.SetCullingMask();
-                        parentBehaviour.Config.Save();
-                        if (parentBehaviour.Config.movementScriptPath == string.Empty)
-                            parentBehaviour.ClearMovementScript();
-                        else
-                            parentBehaviour.AddMovementScript();
-                    }
-
-                    if (GUI.Button(new Rect(menuPos.x, menuPos.y + 140, 80, 30), new GUIContent("<")))
-                    {
-                        if (scriptPage > 0) scriptPage--;
-                    }
-                    GUI.Box(new Rect(menuPos.x + 80, menuPos.y + 140, 140, 30), new GUIContent($"{scriptPage + 1} / {Math.Ceiling(Decimal.Parse(scriptName.Length.ToString()) / 5)}"));
-                    if (GUI.Button(new Rect(menuPos.x + 220, menuPos.y + 140, 80, 30), new GUIContent(">")))
-                    {
-                        if (scriptPage < Math.Ceiling(Decimal.Parse(scriptName.Length.ToString()) / 5) - 1) scriptPage++;
-                    }
-                    for (int i = scriptPage * 5; i < scriptPage * 5 + 5; i++)
-                    {
-                        if (i < scriptName.Length)
-                        {
-                            if (GUI.Button(new Rect(menuPos.x, menuPos.y + (i - scriptPage * 5) * 30 + 170, 300, 30), new GUIContent(scriptName[i]), CameraUtilities.CurrentMovementScript(parentBehaviour.Config.movementScriptPath) == scriptName[i] ? CustomEnableStyle : CustomDisableStyle))
-                            {
-                                parentBehaviour.Config.movementScriptPath = scriptName[i];
-                                parentBehaviour.Config.Save();
-                                parentBehaviour.AddMovementScript();
-                            }
-                        }
-                    }
-                    if (GUI.Button(new Rect(menuPos.x + 50, menuPos.y + 330, 200, 40), new GUIContent("Movement Off"), CameraUtilities.CurrentMovementScript(parentBehaviour.Config.movementScriptPath) == string.Empty ? CustomEnableStyle : CustomDisableStyle))
-                    {
-                        if (parentBehaviour.Config.movementScriptPath != string.Empty)
-                        {
-                            parentBehaviour.Config.movementScriptPath = String.Empty;
-                            parentBehaviour.Config.Save();
-                            parentBehaviour.ClearMovementScript();
-                        }
-                    }
-                    /*
-                    if (GUI.Button(new Rect(menuPos.x , menuPos.y + 390, 300, 30), new GUIContent("Movement Script Record Mode")))
-                    {
-                        parentBehaviour.scriptEditMode = true;
-                        parentBehaviour.mouseMoveCamera = true;
-                        parentBehaviour.mouseMoveCameraSave = false;
-                        parentBehaviour.CloseContextMenu();
-                    }
-                    */
-                    //Close
-                    if (GUI.Button(new Rect(menuPos.x, menuPos.y + 430, 300, 30), new GUIContent("Close MovementScript Menu")))
-                    {
-                        MenuMode = 0;
-                    }
-                }
+                    menuMovementScript.DiplayMenu(parentBehaviour, this, menuPos);
                 else if (MenuMode == MenuState.Camera2Converter)
-                {
-                    GUI.Box(new Rect(menuPos.x, menuPos.y + 25, 300, 120), "Select scene to import from Camera2");
-                    if (GUI.Button(new Rect(menuPos.x + 5, menuPos.y + 50, 140, 25), new GUIContent("<")))
-                        Camera2ConfigExporter.TrySceneSetLast(Camera2ConfigExporter.currentlyScenesSelected);
-                    if (GUI.Button(new Rect(menuPos.x + 155, menuPos.y + 50, 140, 25), new GUIContent(">")))
-                        Camera2ConfigExporter.SetSceneNext(Camera2ConfigExporter.currentlyScenesSelected);
-                    if (GUI.Button(new Rect(menuPos.x + 30, menuPos.y + 80, 230, 60), new GUIContent("Currently Selected:\n" + Camera2ConfigExporter.currentlyScenesSelected)))
-                        Camera2ConfigExporter.SetSceneNext(Camera2ConfigExporter.currentlyScenesSelected);
-
-                    GUI.Box(new Rect(menuPos.x, menuPos.y + 160, 300, 120), "Select profile Export to Scene in Camera2");
-                    if (GUI.Button(new Rect(menuPos.x + 5, menuPos.y + 185, 140, 25), new GUIContent("<")))
-                        CameraUtilities.TrySetLast(CameraUtilities.currentlySelected);
-                    if (GUI.Button(new Rect(menuPos.x + 155, menuPos.y + 185, 140, 25), new GUIContent(">")))
-                        CameraUtilities.SetNext(CameraUtilities.currentlySelected);
-                    if (GUI.Button(new Rect(menuPos.x + 30, menuPos.y + 215, 230, 60), new GUIContent("Currently Selected:\n" + CameraUtilities.currentlySelected)))
-                        CameraUtilities.SetNext(CameraUtilities.currentlySelected);
-
-                    if (GUI.Button(new Rect(menuPos.x + 5, menuPos.y + 290, 295, 25), new GUIContent("Export to Selected Scene")))
-                        Camera2ConfigExporter.ExportCamera2Scene();
-
-                    if (GUI.Button(new Rect(menuPos.x + 5, menuPos.y + 320, 295, 25), new GUIContent("Import to New Profile")))
-                        Camera2ConfigExporter.LoadCamera2Scene();
-
-
-                    if (GUI.Button(new Rect(menuPos.x, menuPos.y + 430, 300, 30), new GUIContent("Close Camera2 Convert Menu")))
-                        MenuMode = 0;
-                }
+                    menuCamera2Converter.DiplayMenu(parentBehaviour, this, menuPos);
                 else if (MenuMode == MenuState.ExternalLink)
-                {
-                    GUI.Box(new Rect(menuPos.x, menuPos.y + 25, 300, 65), "VMCProtocol");
-                    if (parentBehaviour.Config.fitToCanvas)
-                    {
-                        if (GUI.Button(new Rect(menuPos.x, menuPos.y + 45, 100, 40), new GUIContent("Sender"), parentBehaviour.Config.VMCProtocolMode == "sender" ? CustomEnableStyle : CustomDisableStyle))
-                        {
-                            parentBehaviour.Config.VMCProtocolMode = "sender";
-                            parentBehaviour.Config.Save();
-                            parentBehaviour.DestoryVMCProtocolObject();
-                            parentBehaviour.InitExternalSender();
-                        }
-
-                    }
-                    else
-                        GUI.Box(new Rect(menuPos.x, menuPos.y + 45, 100, 40), new GUIContent("Require\nFitToCanvas"));
-                    if (Plugin.cameraController.existsVMCAvatar)
-                    {
-                        if (GUI.Button(new Rect(menuPos.x + 100, menuPos.y + 45, 100, 40), new GUIContent("Receiver"), parentBehaviour.Config.VMCProtocolMode == "receiver" ? CustomEnableStyle : CustomDisableStyle))
-                        {
-                            parentBehaviour.Config.VMCProtocolMode = "receiver";
-                            parentBehaviour.Config.Save();
-                            parentBehaviour.DestoryVMCProtocolObject();
-                            parentBehaviour.InitExternalReceiver();
-                        }
-                    }
-                    else
-                        GUI.Box(new Rect(menuPos.x + 100, menuPos.y + 45, 100, 40), new GUIContent("Require\nVMCAvatar Mod"));
-
-                    if (GUI.Button(new Rect(menuPos.x + 200, menuPos.y + 45, 100, 40), new GUIContent("Disable"), parentBehaviour.Config.VMCProtocolMode == "disable" ? CustomEnableStyle : CustomDisableStyle))
-                    {
-                        parentBehaviour.Config.VMCProtocolMode = "disable";
-                        parentBehaviour.Config.Save();
-                        parentBehaviour.DestoryVMCProtocolObject();
-                    }
-
-                    if (parentBehaviour.Config.VMCProtocolMode == "sender")
-                    {
-                        GUI.Box(new Rect(menuPos.x, menuPos.y + 90, 150, 45), new GUIContent("Address"));
-                        var addr = GUI.TextField(new Rect(menuPos.x, menuPos.y + 110, 150, 25), parentBehaviour.Config.VMCProtocolAddress);
-                        if (Regex.IsMatch(addr, ("^" + ipNum + "\\." + ipNum + "\\." + ipNum + "\\." + ipNum + "$")))
-                        {
-                            parentBehaviour.Config.VMCProtocolAddress = addr;
-                            parentBehaviour.Config.Save();
-                        }
-                        GUI.Box(new Rect(menuPos.x + 150, menuPos.y + 90, 150, 45), new GUIContent("Port"));
-                        var port = GUI.TextField(new Rect(menuPos.x + 150, menuPos.y + 110, 150, 25), parentBehaviour.Config.VMCProtocolPort.ToString());
-                        if (int.TryParse(port, out int result))
-                        {
-                            parentBehaviour.Config.VMCProtocolPort = result;
-                            parentBehaviour.Config.Save();
-                        }
-                    }
-
-                    if (GUI.Button(new Rect(menuPos.x, menuPos.y + 430, 300, 30), new GUIContent("Close External linkage Menu")))
-                        MenuMode = 0;
-                }
+                    menuExternalLink.DiplayMenu(parentBehaviour, this, menuPos);
                 GUI.matrix = originalMatrix;
             }
         }
