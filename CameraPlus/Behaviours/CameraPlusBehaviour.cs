@@ -431,8 +431,11 @@ namespace CameraPlus.Behaviours
         private IEnumerator Delayed_activeSceneChanged(Scene from, Scene to)
         {
             yield return new WaitForSeconds(0.05f);
-            string scriptpath = AddMovementScript();
-            Logger.log.Notice($"{this.name} Add MoveScript \"{Path.GetFileName(scriptpath)}\" successfully initialized! {Convert.ToString(_cam.cullingMask, 16)}");
+            if(!_cameraMovement || Config.movementAudioSync)
+            {
+                string scriptpath = AddMovementScript();
+                Logger.log.Notice($"{this.name} Add MoveScript \"{Path.GetFileName(scriptpath)}\" successfully initialized! {Convert.ToString(_cam.cullingMask, 16)}");
+            }
         }
 
         protected virtual void Update()
@@ -473,12 +476,17 @@ namespace CameraPlus.Behaviours
                 if (ThirdPerson)
                 {
                     if (FPFCPatch.isInstanceFPFC)
+                    {
                         if (isFPFC != FPFCPatch.instance.isActiveAndEnabled)
                         {
                             isFPFC = FPFCPatch.instance.enabled;
+                            turnToHead = false;
                             replaceFPFC = true;
                             CreateScreenRenderTexture();
                         }
+                        else
+                            turnToHead = Config.turnToHead;
+                    }
 #if WithVMCAvatar
                     if (Plugin.cameraController.existsVMCAvatar)
                         if (Config.VMCProtocolMode == "receiver" && marionette)
