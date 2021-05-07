@@ -1,9 +1,6 @@
-﻿using System;
-using System.Text.RegularExpressions;
+﻿using System.Text.RegularExpressions;
 using UnityEngine;
-using CameraPlus.Camera2Utils;
 using CameraPlus.Behaviours;
-using CameraPlus.Utilities;
 
 namespace CameraPlus.UI
 {
