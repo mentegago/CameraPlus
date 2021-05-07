@@ -16,7 +16,12 @@ namespace CameraPlus.Configuration
         public string y { get; set; }
         public string z { get; set; }
     }
-
+    public class StartHeadOffset
+    {
+        public string x { get; set; }
+        public string y { get; set; }
+        public string z { get; set; }
+    }
     public class EndPos
     {
         public string x { get; set; }
@@ -31,6 +36,12 @@ namespace CameraPlus.Configuration
         public string y { get; set; }
         public string z { get; set; }
     }
+    public class EndHeadOffset
+    {
+        public string x { get; set; }
+        public string y { get; set; }
+        public string z { get; set; }
+    }
 
     [JsonObject("Movements")]
     public class JSONMovement
@@ -39,10 +50,14 @@ namespace CameraPlus.Configuration
         public StartPos startPos { get; set; }
         [JsonProperty("StartRot")]
         public StartRot startRot { get; set; }
+        [JsonProperty("StartHeadOffset")]
+        public StartHeadOffset startHeadOffset { get; set; }
         [JsonProperty("EndPos")]
         public EndPos endPos { get; set; }
         [JsonProperty("EndRot")]
         public EndRot endRot { get; set; }
+        [JsonProperty("EndHeadOffset")]
+        public EndHeadOffset endHeadOffset { get; set; }
 
         public string TurnToHead { get; set; }
         public string Duration { get; set; }

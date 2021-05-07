@@ -124,6 +124,7 @@ namespace CameraPlus.Behaviours
         private GUIStyle boxStyle;
         private Transform turnToTarget;
         internal bool turnToHead = false;
+        internal Vector3 turnToHeadOffset = Vector3.zero;
 
 #if WithVMCAvatar
         private VMCProtocol.VMCAvatarMarionette marionette = null;
@@ -332,7 +333,7 @@ namespace CameraPlus.Behaviours
                 ThirdPersonRot = Config.Rotation;
             }
             turnToHead = Config.turnToHead;
-
+            turnToHeadOffset = Config.TurnToHeadOffset;
             SetCullingMask();
             CreateScreenRenderTexture();
             SetFOV();
@@ -540,7 +541,7 @@ namespace CameraPlus.Behaviours
                     if (turnToHead)
                     {
                         turnToTarget = Camera.main.transform;
-                        turnToTarget.transform.position += Config.TurnToHeadOffset;
+                        turnToTarget.transform.position += turnToHeadOffset;
                         transform.LookAt(turnToTarget);
                     }
 

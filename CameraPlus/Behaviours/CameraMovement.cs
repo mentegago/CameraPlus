@@ -21,6 +21,8 @@ namespace CameraPlus.Behaviours
         protected Vector3 EndPos = Vector3.zero;
         protected Vector3 StartRot = Vector3.zero;
         protected Vector3 EndRot = Vector3.zero;
+        protected Vector3 StartHeadOffset = Vector3.zero;
+        protected Vector3 EndHeadOffset = Vector3.zero;
         protected float StartFOV = 0;
         protected float EndFOV = 0;
         protected bool easeTransition = true;
@@ -35,9 +37,11 @@ namespace CameraPlus.Behaviours
         {
             public Vector3 StartPos;
             public Vector3 StartRot;
+            public Vector3 StartHeadOffset;
             public float StartFOV;
             public Vector3 EndPos;
             public Vector3 EndRot;
+            public Vector3 EndHeadOffset;
             public float EndFOV;
             public float Duration;
             public float Delay;
@@ -74,10 +78,13 @@ namespace CameraPlus.Behaviours
                     foreach (JSONMovement jsonmovement in movementScriptJson.Jsonmovement)
                     {
                         Movements newMovement = new Movements();
+
                         StartPos startPos = jsonmovement.startPos;
                         StartRot startRot = new StartRot();
+                        StartHeadOffset startHeadOffset = new StartHeadOffset();
                         if (jsonmovement.startRot != null) startRot = jsonmovement.startRot;
- 
+                        if (jsonmovement.startHeadOffset != null) startHeadOffset = jsonmovement.startHeadOffset;
+
                         if (startPos.x != null) newMovement.StartPos = new Vector3(float.Parse(startPos.x.Contains(sepCheck) ? startPos.x.Replace(sepCheck, sep) : startPos.x), 
                                                                                     float.Parse(startPos.y.Contains(sepCheck) ? startPos.y.Replace(sepCheck, sep) : startPos.y), 
                                                                                     float.Parse(startPos.z.Contains(sepCheck) ? startPos.z.Replace(sepCheck, sep) : startPos.z));
@@ -85,14 +92,24 @@ namespace CameraPlus.Behaviours
                                                                                     float.Parse(startRot.y.Contains(sepCheck) ? startRot.y.Replace(sepCheck, sep) : startRot.y),
                                                                                     float.Parse(startRot.z.Contains(sepCheck) ? startRot.z.Replace(sepCheck, sep) : startRot.z));
                         else
-                            newMovement.StartRot = new Vector3();
+                            newMovement.StartRot = Vector3.zero;
+
+                        if (startHeadOffset.x != null) newMovement.StartHeadOffset = new Vector3(float.Parse(startHeadOffset.x.Contains(sepCheck) ? startHeadOffset.x.Replace(sepCheck, sep) : startHeadOffset.x),
+                                                                                    float.Parse(startHeadOffset.y.Contains(sepCheck) ? startHeadOffset.y.Replace(sepCheck, sep) : startHeadOffset.y),
+                                                                                    float.Parse(startHeadOffset.z.Contains(sepCheck) ? startHeadOffset.z.Replace(sepCheck, sep) : startHeadOffset.z));
+                        else
+                            newMovement.StartHeadOffset = Vector3.zero;
+
                         if (startPos.FOV != null)
                             newMovement.StartFOV = float.Parse(startPos.FOV.Contains(sepCheck) ? startPos.FOV.Replace(sepCheck, sep) : startPos.FOV);
                         else
                             newMovement.StartFOV = 0;
+
                         EndPos endPos = jsonmovement.endPos;
                         EndRot endRot = new EndRot();
+                        EndHeadOffset endHeadOffset = new EndHeadOffset();
                         if (jsonmovement.endRot != null) endRot = jsonmovement.endRot;
+                        if (jsonmovement.endHeadOffset != null) endHeadOffset = jsonmovement.endHeadOffset;
 
                         if (endPos.x != null) newMovement.EndPos = new Vector3(float.Parse(endPos.x), float.Parse(endPos.y), float.Parse(endPos.z));
                         if (endRot.x != null) newMovement.EndRot = new Vector3(float.Parse(endRot.x), float.Parse(endRot.y), float.Parse(endRot.z));
@@ -103,7 +120,13 @@ namespace CameraPlus.Behaviours
                                                                                     float.Parse(endRot.y.Contains(sepCheck) ? endRot.y.Replace(sepCheck, sep) : endRot.y),
                                                                                     float.Parse(endRot.z.Contains(sepCheck) ? endRot.z.Replace(sepCheck, sep) : endRot.z));
                         else
-                            newMovement.EndRot = new Vector3();
+                            newMovement.EndRot = Vector3.zero;
+                        if (endHeadOffset.x != null) newMovement.EndHeadOffset = new Vector3(float.Parse(endHeadOffset.x.Contains(sepCheck) ? endHeadOffset.x.Replace(sepCheck, sep) : endHeadOffset.x),
+                                                            float.Parse(endHeadOffset.y.Contains(sepCheck) ? endHeadOffset.y.Replace(sepCheck, sep) : endHeadOffset.y),
+                                                            float.Parse(endHeadOffset.z.Contains(sepCheck) ? endHeadOffset.z.Replace(sepCheck, sep) : endHeadOffset.z));
+                        else
+                            newMovement.EndHeadOffset = Vector3.zero;
+
 
                         if (endPos.FOV != null)
                             newMovement.EndFOV = float.Parse(endPos.FOV.Contains(sepCheck) ? endPos.FOV.Replace(sepCheck, sep) : endPos.FOV);
@@ -166,6 +189,7 @@ namespace CameraPlus.Behaviours
             }
             _cameraPlus.ThirdPersonPos = LerpVector3(StartPos, EndPos, Ease(movePerc));
             _cameraPlus.ThirdPersonRot = LerpVector3(StartRot, EndRot, Ease(movePerc));
+            _cameraPlus.turnToHeadOffset = LerpVector3(StartHeadOffset, EndHeadOffset, Ease(movePerc));
             _cameraPlus.FOV(Mathf.Lerp(StartFOV,EndFOV,Ease(movePerc)));
         }
 
@@ -253,6 +277,9 @@ namespace CameraPlus.Behaviours
 
             EndRot = new Vector3(data.Movements[eventID].EndRot.x, data.Movements[eventID].EndRot.y, data.Movements[eventID].EndRot.z);
             EndPos = new Vector3(data.Movements[eventID].EndPos.x, data.Movements[eventID].EndPos.y, data.Movements[eventID].EndPos.z);
+
+            StartHeadOffset = new Vector3(data.Movements[eventID].StartHeadOffset.x, data.Movements[eventID].StartHeadOffset.y, data.Movements[eventID].StartHeadOffset.z);
+            EndHeadOffset = new Vector3(data.Movements[eventID].EndHeadOffset.x, data.Movements[eventID].EndHeadOffset.y, data.Movements[eventID].EndHeadOffset.z);
 
             if (data.Movements[eventID].StartFOV != 0)
                 StartFOV = data.Movements[eventID].StartFOV;
