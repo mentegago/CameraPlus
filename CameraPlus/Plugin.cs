@@ -53,6 +53,7 @@ namespace CameraPlus
         {
             if(cameraController)
                 GameObject.Destroy(cameraController);
+            _harmony.UnpatchAll(_harmony.Id);
         }
     }
 }
