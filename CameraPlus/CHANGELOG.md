@@ -1,3 +1,6 @@
+# v5.2.0 Changes
+- Supported game version 1.16.1 (Not compatible with 1.15.0 and earlier. Although it works)  
+
 # v5.1.0 Changes
 - Fixed an issue where the camera would fall to the bottom of the ground when Turn To Head was enabled during FPFC Toggle.  
 - Fixed an issue where scripts would be reset when crossing scenes without changing Profile when using UnityTimer (Thanks for reporting)  

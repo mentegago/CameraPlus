@@ -12,6 +12,7 @@ using CameraPlus.Configuration;
 using CameraPlus.HarmonyPatches;
 using CameraPlus.VMCProtocol;
 using CameraPlus.Utilities;
+using CameraPlus.UI;
 
 namespace CameraPlus.Behaviours
 {
@@ -106,6 +107,7 @@ namespace CameraPlus.Behaviours
         protected bool _isBottom = false, _isLeft = false;
         protected static GameObject MenuObj = null;
         protected static UI.ContextMenu _contextMenu = null;
+        private BehaviourScriptEdit _scriptEditMenu = null;
         public static CursorType currentCursor = CursorType.None;
         public static bool wasWithinBorder = false;
         public static bool anyInstanceBusy = false;
@@ -121,7 +123,6 @@ namespace CameraPlus.Behaviours
         internal bool mouseMoveCamera = false;
         internal bool mouseMoveCameraSave = false;
         internal bool scriptEditMode = false;
-        private GUIStyle boxStyle;
         private Transform turnToTarget;
         internal bool turnToHead = false;
         internal Vector3 turnToHeadOffset = Vector3.zero;
@@ -736,6 +737,11 @@ namespace CameraPlus.Behaviours
             _cam.fieldOfView = FOV;
         }
 
+        internal virtual float GetFOV()
+        {
+            return _cam.fieldOfView;
+        }
+
         internal virtual void SetCullingMask()
         {
             int builder = Camera.main.cullingMask;
@@ -774,8 +780,17 @@ namespace CameraPlus.Behaviours
                 builder &= ~(1 << UILayer);
             else
                 builder |= (1 << UILayer);
-            builder &= ~(1 << CustomNoteLayer);
-            builder |= 1 << NoteLayer;
+            if (Config.Notes)
+            {
+                builder &= ~(1 << CustomNoteLayer);
+                builder |= 1 << NoteLayer;
+            }
+            else
+            {
+                builder &= ~(1 << CustomNoteLayer);
+                builder &= ~(1 << NoteLayer);
+            }
+
             _cam.cullingMask = builder;
         }
 
@@ -1075,32 +1090,8 @@ namespace CameraPlus.Behaviours
                     }
             if (scriptEditMode)
             {
-                float menuLeft = Screen.width / 2 - 300;
-                float menuTop = Screen.height - 100;
-
-                boxStyle = new GUIStyle(GUI.skin.box);
-
-                GUI.Box(new Rect(menuLeft, menuTop, 600, 100), $"Script Edit Mode {_cam.name}");
-                boxStyle.normal.background = CameraUtilities.seekBarBackground;
-                GUI.Box(new Rect(menuLeft + 20, menuTop + 35, 560, 20), string.Empty, boxStyle);
-
-                boxStyle.normal.background = CameraUtilities.seekBar;
-                GUI.Box(new Rect(menuLeft + 20, menuTop + 35, 10, 20), string.Empty, boxStyle);
-
-                //GUI.Box(new Rect(menuLeft + 20, menuTop + 30, 10, 10), "");
-                /*
-                if (GUI.Button(new Rect(Screen.width / 2 + 200, Screen.height - 30, 100, 30), ""))
-                {
-
-                }
-                */
-
-                if (GUI.Button(new Rect(menuLeft + 500, menuTop, 100, 30), "Exit EditMode"))
-                {
-                    scriptEditMode = false;
-                    mouseMoveCamera = false;
-                    mouseMoveCameraSave = false;
-                }
+                if (_scriptEditMenu == null) _scriptEditMenu = new BehaviourScriptEdit();
+                _scriptEditMenu.DisplayUI(this);
             }
         }
         void DisplayContextMenu()
