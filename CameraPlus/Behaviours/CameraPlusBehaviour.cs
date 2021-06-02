@@ -306,6 +306,9 @@ namespace CameraPlus.Behaviours
             if (externalSender)
                 Destroy(externalSender);
 
+            if (_moverPointer) 
+                Destroy(_moverPointer);
+
             if (_screenCamera)
                 Destroy(_screenCamera.gameObject);
             if (_cameraCubeGO)

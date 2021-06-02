@@ -63,6 +63,7 @@ namespace CameraPlus.Configuration
         public bool HideUI = false;
         public bool Notes = true;
         public bool Saber = true;
+        public bool WallFrame = true;
         public string movementScriptPath = String.Empty;
         public bool movementAudioSync = true;
         public bool songSpecificScript = false;

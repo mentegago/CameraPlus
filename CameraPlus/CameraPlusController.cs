@@ -124,7 +124,7 @@ namespace CameraPlus
                             CameraUtilities.ProfileChange(rootConfig.RotateProfile);
                         else if (to.name == "GameCore" && rootConfig.GameProfile != "")
                             CameraUtilities.ProfileChange(rootConfig.GameProfile);
-                        else if ((to.name == "MainMenu" || to.name == "HealthWarning") && rootConfig.MenuProfile != "")
+                        else if ((to.name == "MainMenu" || to.name == "MenuCore" || to.name == "HealthWarning") && rootConfig.MenuProfile != "")
                             CameraUtilities.ProfileChange(rootConfig.MenuProfile);
                     }
                 }
@@ -150,7 +150,7 @@ namespace CameraPlus
 
             yield return waitForcam();
 
-            if (to.name == "GameCore" || to.name == "MainMenu" || to.name == "HealthWarning")
+            if (to.name == "GameCore" || to.name == "MainMenu" || to.name == "MenuCore" || to.name == "MenuViewControllers" || to.name == "HealthWarning")
             {
                 CameraUtilities.SetAllCameraCulling();
                 if (isRestart)
