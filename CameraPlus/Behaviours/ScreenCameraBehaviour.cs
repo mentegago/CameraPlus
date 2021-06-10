@@ -1,4 +1,7 @@
 ﻿using UnityEngine;
+using System.Collections;
+using System.Reflection;
+using CameraPlus.Utilities;
 
 namespace CameraPlus.Behaviours
 {
@@ -10,6 +13,26 @@ namespace CameraPlus.Behaviours
     {
         private Camera _cam;
         private RenderTexture _renderTexture;
+        private static Material _transparencyShader = null; //load once
+        private bool _isBackgroundTransparent = false;
+        public bool isBackgroundTransparent
+        {
+            set
+            {
+                _isBackgroundTransparent = value;
+                if (_isBackgroundTransparent)
+                {
+                    if (_transparencyShader == null)
+                    {
+                        byte[] shaderRaw = CustomUtils.GetResource(Assembly.GetCallingAssembly(), "CameraPlus.Resources.alphafilter");
+                        AssetBundle bundle = AssetBundle.LoadFromMemory(shaderRaw);
+                        _transparencyShader = bundle.LoadAsset<Material>("Assets/Materials/alphafilter.mat");
+                        DontDestroyOnLoad(_transparencyShader);
+                    }
+                }
+
+            }
+        }
 
         public void SetRenderTexture(RenderTexture renderTexture)
         {
@@ -36,7 +59,8 @@ namespace CameraPlus.Behaviours
         private void OnRenderImage(RenderTexture src, RenderTexture dest)
         {
             if (_renderTexture == null) return;
-            Graphics.Blit(_renderTexture, dest);
+            if (_isBackgroundTransparent) Graphics.Blit(_renderTexture, dest, _transparencyShader);
+            else Graphics.Blit(_renderTexture, dest);
         }
     }
 }

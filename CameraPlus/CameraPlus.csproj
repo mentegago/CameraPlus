@@ -188,6 +188,7 @@
     <Compile Include="UI\MenuMovementScript.cs" />
     <Compile Include="UI\MenuMultiplayer.cs" />
     <Compile Include="UI\MenuProfile.cs" />
+    <None Include="Unity\Assets\Materials\AlphaFilter.mat" />
     <Compile Include="Utilities\CameraUtilities.cs" />
     <Compile Include="Configuration\Config.cs" />
     <Compile Include="Configuration\RootConfig.cs" />
@@ -214,6 +215,7 @@
     <Compile Include="VMCProtocol\OscDataType.cs" />
     <Compile Include="VMCProtocol\OscPacketEncorder.cs" />
     <Compile Include="VMCProtocol\VMCAvatarMarionette.cs" />
+    <None Include="Unity\Assets\Materials\AlphaFilter.shader" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="manifest.json" />
@@ -223,6 +225,9 @@
     <EmbeddedResource Include="Resources\ExampleMovementScript.json" />
     <EmbeddedResource Include="Resources\Shader\customshader" />
   </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\alphafilter" />
+  </ItemGroup>  
   <ItemGroup />
   <ItemGroup>
     <EmbeddedResource Include="Resources\CameraLock.png" />

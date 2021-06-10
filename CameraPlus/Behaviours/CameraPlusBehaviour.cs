@@ -351,7 +351,7 @@ namespace CameraPlus.Behaviours
                 var replace = false;
                 if (_camRenderTexture == null)
                 {
-                    _camRenderTexture = new RenderTexture(1, 1, 24);
+                    _camRenderTexture = new RenderTexture(1, 1, 24, RenderTextureFormat.ARGB32);
                     replace = true;
                 }
                 else
@@ -392,7 +392,9 @@ namespace CameraPlus.Behaviours
                 _camRenderTexture.height = Mathf.Clamp(Mathf.RoundToInt(Config.screenHeight * Config.renderScale), 1, int.MaxValue);
 
                 _camRenderTexture.useDynamicScale = false;
+                _camRenderTexture.autoGenerateMips = false;
                 _camRenderTexture.antiAliasing = Config.antiAliasing;
+                if (Config.GreenScreenMode == "transparent") _camRenderTexture.antiAliasing = 1; //TODO: find workaround, do AA in shader?
                 //_camRenderTexture.Create();
 
                 _cam.targetTexture = _camRenderTexture;
@@ -753,13 +755,16 @@ namespace CameraPlus.Behaviours
             Debug.Log("Greenscreen Mode: " + Config.GreenScreenMode);
             _cam.backgroundColor = Color.black;
             _cam.clearFlags = CameraClearFlags.Color;
+            _screenCamera.isBackgroundTransparent = false;
 
             if (Config.GreenScreenMode != "off")
             {
                 builder = 0;
                 if (Config.GreenScreenMode == "transparent")
                 {
-                    _cam.backgroundColor = Color.clear;
+                    _cam.backgroundColor = new Color32(0, 0, 0, 255);
+                    _screenCamera.isBackgroundTransparent = true;
+                    
                 } else if(Config.GreenScreenMode == "greenscreen")
                 {
                     _cam.backgroundColor = Color.green;
