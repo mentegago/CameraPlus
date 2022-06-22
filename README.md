@@ -1,5 +1,10 @@
 # CameraPlus
 CameraPlus is a Beat Saber mod that allows for multiple wide FOV cameras with smoothed movement, which makes for a much more pleasant overall spectator experience.
+
+## ARCHIVED
+
+I forked CameraPlus in order to implement transparent backgrounds for displaying avatars via a selfie/front-facing camera. However since then, the Beat Saber community has mostly moved on to Camera2. Also, I am no longer experimenting with avatars that much. As such, I will not be maintaining this. In the future, I might attempt to implement said feature in Camera2 however.
+
 # Download
 [Release Page](https://github.com/Snow1226/CameraPlus/releases)
 ### Make sure to disable the base game's "Smooth Camera" If you wish to use CameraPlus
